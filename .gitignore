@@ -25,3 +25,4 @@ nbproject
 .tm_properties
 #Bats
 /*.bat
+/.gitignore
