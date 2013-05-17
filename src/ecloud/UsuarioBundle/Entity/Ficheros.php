@@ -1,0 +1,327 @@
+<?php
+
+namespace ecloud\UsuarioBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * Ficheros
+ *
+ * @ORM\Table()
+ * @ORM\Entity
+ */
+class Ficheros
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id_fichero", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $idFichero;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="propietario", type="integer")
+     */
+    private $propietario;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="nombre_fichero", type="string", length=255)
+     */
+    private $nombreFichero;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="nombre_real_fisico", type="string", length=255)
+     */
+    private $nombreRealFisico;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="ruta", type="string", length=255)
+     */
+    private $ruta;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="filesize", type="integer")
+     */
+    private $filesize;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="checksum", type="string", length=255)
+     */
+    private $checksum;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="fecha_subida", type="datetime")
+     */
+    private $fechaSubida;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="total_descargas", type="integer")
+     */
+    private $totalDescargas;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="permiso", type="string", length=2)
+     */
+    private $permiso;
+
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set idFichero
+     *
+     * @param integer $idFichero
+     * @return Ficheros
+     */
+    public function setIdFichero($idFichero)
+    {
+        $this->idFichero = $idFichero;
+    
+        return $this;
+    }
+
+    /**
+     * Get idFichero
+     *
+     * @return integer 
+     */
+    public function getIdFichero()
+    {
+        return $this->idFichero;
+    }
+
+    /**
+     * Set propietario
+     *
+     * @param integer $propietario
+     * @return Ficheros
+     */
+    public function setPropietario($propietario)
+    {
+        $this->propietario = $propietario;
+    
+        return $this;
+    }
+
+    /**
+     * Get propietario
+     *
+     * @return integer 
+     */
+    public function getPropietario()
+    {
+        return $this->propietario;
+    }
+
+    /**
+     * Set nombreFichero
+     *
+     * @param string $nombreFichero
+     * @return Ficheros
+     */
+    public function setNombreFichero($nombreFichero)
+    {
+        $this->nombreFichero = $nombreFichero;
+    
+        return $this;
+    }
+
+    /**
+     * Get nombreFichero
+     *
+     * @return string 
+     */
+    public function getNombreFichero()
+    {
+        return $this->nombreFichero;
+    }
+
+    /**
+     * Set nombreRealFisico
+     *
+     * @param string $nombreRealFisico
+     * @return Ficheros
+     */
+    public function setNombreRealFisico($nombreRealFisico)
+    {
+        $this->nombreRealFisico = $nombreRealFisico;
+    
+        return $this;
+    }
+
+    /**
+     * Get nombreRealFisico
+     *
+     * @return string 
+     */
+    public function getNombreRealFisico()
+    {
+        return $this->nombreRealFisico;
+    }
+
+    /**
+     * Set ruta
+     *
+     * @param string $ruta
+     * @return Ficheros
+     */
+    public function setRuta($ruta)
+    {
+        $this->ruta = $ruta;
+    
+        return $this;
+    }
+
+    /**
+     * Get ruta
+     *
+     * @return string 
+     */
+    public function getRuta()
+    {
+        return $this->ruta;
+    }
+
+    /**
+     * Set filesize
+     *
+     * @param integer $filesize
+     * @return Ficheros
+     */
+    public function setFilesize($filesize)
+    {
+        $this->filesize = $filesize;
+    
+        return $this;
+    }
+
+    /**
+     * Get filesize
+     *
+     * @return integer 
+     */
+    public function getFilesize()
+    {
+        return $this->filesize;
+    }
+
+    /**
+     * Set checksum
+     *
+     * @param string $checksum
+     * @return Ficheros
+     */
+    public function setChecksum($checksum)
+    {
+        $this->checksum = $checksum;
+    
+        return $this;
+    }
+
+    /**
+     * Get checksum
+     *
+     * @return string 
+     */
+    public function getChecksum()
+    {
+        return $this->checksum;
+    }
+
+    /**
+     * Set fechaSubida
+     *
+     * @param \DateTime $fechaSubida
+     * @return Ficheros
+     */
+    public function setFechaSubida($fechaSubida)
+    {
+        $this->fechaSubida = $fechaSubida;
+    
+        return $this;
+    }
+
+    /**
+     * Get fechaSubida
+     *
+     * @return \DateTime 
+     */
+    public function getFechaSubida()
+    {
+        return $this->fechaSubida;
+    }
+
+    /**
+     * Set totalDescargas
+     *
+     * @param integer $totalDescargas
+     * @return Ficheros
+     */
+    public function setTotalDescargas($totalDescargas)
+    {
+        $this->totalDescargas = $totalDescargas;
+    
+        return $this;
+    }
+
+    /**
+     * Get totalDescargas
+     *
+     * @return integer 
+     */
+    public function getTotalDescargas()
+    {
+        return $this->totalDescargas;
+    }
+
+    /**
+     * Set permiso
+     *
+     * @param string $permiso
+     * @return Ficheros
+     */
+    public function setPermiso($permiso)
+    {
+        $this->permiso = $permiso;
+    
+        return $this;
+    }
+
+    /**
+     * Get permiso
+     *
+     * @return string 
+     */
+    public function getPermiso()
+    {
+        return $this->permiso;
+    }
+}

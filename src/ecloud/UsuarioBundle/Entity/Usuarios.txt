@@ -1,0 +1,25 @@
+<?php
+namespace eCloud\UsuarioBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+/**
+* @ORM\Entity
+* @ORM\Table(name="usuarios")
+*/
+
+class Usuarios
+{
+	/** 
+	* @ORM\Id
+	* @ORM\Column(type="integer") 
+	*/
+	protected $id_user;
+	/** 
+	* @ORM\Column(type="string", length=100) 
+	*/
+	protected $password;
+	/** 
+	* @ORM\Column(type="string", length=100) 
+	*/
+	protected $nombre;
+}

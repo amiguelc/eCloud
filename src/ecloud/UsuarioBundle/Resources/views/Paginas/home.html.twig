@@ -1,0 +1,11 @@
+{% extends '::frontend.html.twig' %}
+{% block title %}home {% endblock %}
+{% block article %}
+<section>
+<!-- Si no hay login, a la izquierda registrarse, y a la derecha loguearse, y que desaparezca lo de arriba-->
+<h1><a href="{{ path('registro') }}">Registrarse en eCloud</a></h1>
+
+<center><img src="{{ asset('bundles/usuario/images/imagen_portada.png') }}"></center>
+<p>a</p>
+</section>
+{% endblock %}

@@ -1,0 +1,23 @@
+/* #Estructura */
+
+
+header{
+ position: fixed;top: 0px;left: 0px;right: 0px;z-index: 100;height: 49px;line-height: 2.5em;background:linear-gradient(rgb(17, 149, 220), rgb(11, 126, 189)) repeat scroll 0% 0% transparent;
+}
+#contenedor > article {
+	position:fixed;
+	top:49px;
+    min-height: 400px;
+	margin:7%;
+	margin-top:25px;
+	width:86%;
+}
+
+footer{
+position: fixed;bottom: 0px;left: 0px;right: 0px;z-index: 100;height: 40px;line-height: 2.5em;background:linear-gradient(rgb(17, 149, 220), rgb(11, 126, 189)) repeat scroll 0% 0% transparent;
+text-align: center;color:#DDDDDD;
+}
+a.footer_links:link {color:#DDDDDD;}
+a.footer_links:active {color:#DDDDDD;}
+a.footer_links:visited {color:#CCCCCC;}
+.login_box{position: fixed;right:0px;top:0px;}

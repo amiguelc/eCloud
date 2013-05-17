@@ -1,0 +1,35 @@
+usuario:
+    resource: "@UsuarioBundle/Resources/config/routing.yml"
+    prefix:   /
+#nuevo
+root:
+    path:    /
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /home
+        permanent: true
+inicio:
+    pattern: /home
+    defaults: { _controller: UsuarioBundle:Sitio:Home }
+
+
+#MANEJO DE USUARIOS
+login:
+    pattern: /login
+    defaults: { _controller: UsuarioBundle:Security:login }
+login_check:
+    pattern: /login_check
+logout:
+    pattern: /logout
+registro:
+    path: /registro
+    defaults: { _controller: UsuarioBundle:Registro:Registro}
+
+
+#PAGINAS ESTATICAS AL FINAL
+pagina_estatica:
+    pattern: /{pagina}
+    defaults: { _controller: UsuarioBundle:Sitio:Estaticas }
+_pagina_estatica:
+    pattern: /{pagina}/
+    defaults: { _controller: UsuarioBundle:Sitio:Estaticas }

@@ -1,0 +1,55 @@
+{% extends '::base.html.twig' %}
+{% block stylesheets %}{% stylesheets 'bundles/usuario/css/*' filter='cssrewrite' %}
+<link rel="stylesheet" href="{{ asset_url }}" />
+{% endstylesheets %}{% endblock %}
+{% block body %}
+<div id="contenedor">
+	<header>
+		<a href="{{ path('pagina_estatica', { 'pagina': 'home'}) }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>
+		<!--
+		<nav>
+			<ul>
+				<li><a href="/home">Home</a></li>
+				<li><a href="/sobre-nosotros">Sobre Nosotros</a></li>
+				<li><a href="/ayuda">Ayuda</a></li>
+			</ul>
+		</nav>
+		-->
+		{% if is_granted('ROLE_USER') %}
+			<div class='login_box'>Hola, usuario</div>
+		{% else %}
+			<div class='login_box'>
+				<form action="{{ path('login_check') }}" method="post">
+					<label for="username">Email:</label>
+					<input type="text" id="username" name="_username" value="" />
+					
+					<label for="password">Password:</label>
+					<input type="password" id="password" name="_password" />
+					
+					<input type="hidden" name="_target_path" value="/home" />
+					<button class="mid button green" type="submit">Entrar</button>
+				</form>
+			</div>
+		{% endif %}
+	</header>
+	<article>
+		{% block article %}{% endblock %}
+	</article>
+	<!--
+	<aside>
+		## FORMULARIO DE LOGIN ##
+		<section id="nosotros">
+		<h2>Sobre nosotros</h2>
+		<p>Lorem ipsum dolor sit amet...</p>
+		</section>
+	</aside>
+	-->
+	<footer>
+		&copy; {{ 'now' | date('Y') }} - eCloud
+		<a class='footer_links' href="{{ path('pagina_estatica', { 'pagina': 'ayuda'}) }}">Ayuda</a>
+		<a class='footer_links' href="{{ path('pagina_estatica', { 'pagina': 'contacto'}) }}">Contacto</a>
+		<a class='footer_links' href="{{ path('pagina_estatica', { 'pagina': 'privacidad'}) }}">Privacidad</a>
+		<a class='footer_links' href="{{ path('pagina_estatica', { 'pagina': 'sobre-nosotros'}) }}">Sobre nosotros</a>
+	</footer>
+</div>
+{% endblock %}
