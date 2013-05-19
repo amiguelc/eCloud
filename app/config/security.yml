@@ -20,20 +20,15 @@ security:
         dev:
             pattern:  ^/(_(profiler|wdt)|css|images|js)/
             security: false
-
-        login:
-            pattern:  ^/login$
-            security: false
-
         secured_area:
             pattern:    ^/
             form_login:
-                login_path: login
-                check_path: login_check
+                login_path: /login
+                check_path: /login_check
                 default_target_path: /home
                 always_use_default_target_path: true
-            #logout:
-            #    path:   _demo_logout
+            logout:
+                path:   /logout
             #    target: _demo
             anonymous: ~
             #http_basic:

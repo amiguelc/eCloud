@@ -8,7 +8,7 @@ root:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /home
         permanent: true
-inicio:
+home:
     pattern: /home
     defaults: { _controller: UsuarioBundle:Sitio:Home }
 
@@ -25,11 +25,44 @@ registro:
     path: /registro
     defaults: { _controller: UsuarioBundle:Registro:Registro}
 
+#PERFILES
+perfil:
+    pattern: /perfil
+    defaults: { _controller: UsuarioBundle:Cuenta:perfil }
+ficheros:
+    pattern: /ficheros
+    defaults: { _controller: UsuarioBundle:Cuenta:ficheros }
+subir:
+    pattern: /subir
+    defaults: { _controller: UsuarioBundle:Cuenta:subir }
+eventos:
+    pattern: /eventos
+    defaults: { _controller: UsuarioBundle:Cuenta:eventos }
 
-#PAGINAS ESTATICAS AL FINAL
-pagina_estatica:
+#PAGINAS ESTATICAS AL FINAL, YA QUE ES CUANDO LAS OTRAS NO LAS ENCUENTRA
+#pagina_estatica:
+#    pattern: /{pagina}
+#    defaults: { _controller: UsuarioBundle:Sitio:Estaticas }
+#_pagina_estatica:
+#    pattern: /{pagina}/
+#    defaults: { _controller: UsuarioBundle:Sitio:Estaticas }
+ayuda:
+    pattern: /ayuda
+    defaults: { _controller: UsuarioBundle:Sitio:ayuda }
+contacto:
+    pattern: /contacto
+    defaults: { _controller: UsuarioBundle:Sitio:contacto }
+privacidad:
+    pattern: /privacidad
+    defaults: { _controller: UsuarioBundle:Sitio:privacidad }
+sobre-nosotros:
+    pattern: /sobre-nosotros
+    defaults: { _controller: UsuarioBundle:Sitio:sobrenosotros }
+
+#No encontrado -> Home
+Noencontrado:
     pattern: /{pagina}
-    defaults: { _controller: UsuarioBundle:Sitio:Estaticas }
-_pagina_estatica:
-    pattern: /{pagina}/
-    defaults: { _controller: UsuarioBundle:Sitio:Estaticas }
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /home
+        permanent: true

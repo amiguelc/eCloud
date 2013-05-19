@@ -1,0 +1,28 @@
+{% extends '::frontend.html.twig' %}
+{% block title %}Mi perfil {% endblock %}
+
+{% block article %}
+<section>
+	<h1>{{ block('title') }}</h1>
+	<form action="{{ path('perfil') }}" method="post" {{ form_enctype(formulario) }}>
+		<div class="errors">
+		{{ form_errors(formulario) }}
+		</div>
+		<div>
+		{{ form_row(formulario.nombre) }}
+		</div>
+		<div>
+		{{ form_row(formulario.apellidos) }}
+		</div>
+		{# ... #}
+		<div>
+		{# {{ form_errors(formulario.permite_email) }} #}
+		{# {{ form_widget(formulario.permite_email) }} #}
+		</div>
+		{{ form_rest(formulario) }}
+		<input class="boton" type="submit" value="Guardar cambios" />
+	</form>
+
+
+</section>
+{% endblock %}

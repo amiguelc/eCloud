@@ -5,18 +5,18 @@
 {% block body %}
 <div id="contenedor">
 	<header>
-		<a href="{{ path('pagina_estatica', { 'pagina': 'home'}) }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>
-		<!--
+		<a href="{{ path('home') }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>
+		
+		{% if is_granted('ROLE_USER') %}
 		<nav>
-			<ul>
-				<li><a href="/home">Home</a></li>
-				<li><a href="/sobre-nosotros">Sobre Nosotros</a></li>
-				<li><a href="/ayuda">Ayuda</a></li>
+			<ul> 
+			  <li><a href="{{ path('perfil') }}">Mi Perfil</a></li>
+			  <li><a href="{{ path('ficheros') }}">Ficheros</a></li>
+			  <li><a href="{{ path('subir') }}">Subir</a></li>
+			  <li><a href="{{ path('eventos') }}">Eventos</a></li>
 			</ul>
 		</nav>
-		-->
-		{% if is_granted('ROLE_USER') %}
-			<div class='login_box'>Hola, usuario</div>
+			<div class='login_box'><span style='position:relative;right:15px;color:white;font-size:20px;'>Hola, <i>{{ app.user.nombreusuario }} </i></span> <button class='mid green button' onclick="window.location='{{ path('logout') }}'">Salir</button></div>
 		{% else %}
 			<div class='login_box'>
 				<form action="{{ path('login_check') }}" method="post">
@@ -32,7 +32,9 @@
 			</div>
 		{% endif %}
 	</header>
+		
 	<article>
+	<img class='bgbox' src="{{ asset('bundles/usuario/images/imagen_portada.png') }}">
 		{% block article %}{% endblock %}
 	</article>
 	<!--
@@ -46,10 +48,10 @@
 	-->
 	<footer>
 		&copy; {{ 'now' | date('Y') }} - eCloud
-		<a class='footer_links' href="{{ path('pagina_estatica', { 'pagina': 'ayuda'}) }}">Ayuda</a>
-		<a class='footer_links' href="{{ path('pagina_estatica', { 'pagina': 'contacto'}) }}">Contacto</a>
-		<a class='footer_links' href="{{ path('pagina_estatica', { 'pagina': 'privacidad'}) }}">Privacidad</a>
-		<a class='footer_links' href="{{ path('pagina_estatica', { 'pagina': 'sobre-nosotros'}) }}">Sobre nosotros</a>
+		<a class='footer_links' href="{{ path('ayuda') }}">Ayuda</a>
+		<a class='footer_links' href="{{ path('contacto') }}">Contacto</a>
+		<a class='footer_links' href="{{ path('privacidad') }}">Privacidad</a>
+		<a class='footer_links' href="{{ path('sobre-nosotros') }}">Sobre nosotros</a>
 	</footer>
 </div>
 {% endblock %}
