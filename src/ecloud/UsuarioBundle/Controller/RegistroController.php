@@ -9,8 +9,8 @@ use eCloud\UsuarioBundle\Form\Frontend\UsuarioType;
 
 class RegistroController extends Controller{
 
-	 public function registroAction()
-{
+	public function registroAction(){
+	 
 	$peticion = $this->getRequest();
 	$usuario = new Usuarios();
 	$formulario = $this->createForm(new UsuarioType(), $usuario);
@@ -44,15 +44,18 @@ class RegistroController extends Controller{
 			$this->get('session')->setFlash('info','¡Enhorabuena! Te has registrado correctamente en eCloud');
 			//$token = new UsernamePasswordToken($usuario,$usuario->getPassword(),'usuarios',$usuario->getRoles());
 			//$this->container->get('security.context')->setToken($token);
+			
+			//crear la carpeta del usuario en el disco duro
+			$var_archivos = $this->container->getParameter('var_archivos');
+			mkdir($var_archivos.$usuario->getNombreUsuario());
+			
 			return $this->redirect($this->generateUrl('login'));
-		
+			
+			
 		}
 	}
 	
-	return $this->render(
-	'UsuarioBundle:Security:registro.html.twig',
-	array('formulario' => $formulario->createView())
-	);
+	return $this->render('UsuarioBundle:Security:registro.html.twig', array('formulario' => $formulario->createView()) );
 }
 	
 }

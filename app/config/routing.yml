@@ -25,7 +25,7 @@ registro:
     path: /registro
     defaults: { _controller: UsuarioBundle:Registro:Registro}
 
-#PERFILES
+#PERFILES, PROTEGIDO BAJO FIREWALL
 perfil:
     pattern: /perfil
     defaults: { _controller: UsuarioBundle:Cuenta:perfil }
@@ -38,6 +38,9 @@ subir:
 eventos:
     pattern: /eventos
     defaults: { _controller: UsuarioBundle:Cuenta:eventos }
+links:
+    pattern: /links
+    defaults: { _controller: UsuarioBundle:Cuenta:links }
 
 #PAGINAS ESTATICAS AL FINAL, YA QUE ES CUANDO LAS OTRAS NO LAS ENCUENTRA
 #pagina_estatica:

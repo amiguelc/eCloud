@@ -14,6 +14,8 @@ class CuentaController extends Controller{
 		// Si la petición es POST, actualizar la información del usuario con
 		// los nuevos datos obtenidos del formulario
 		
+		//Nota: Proteger controlador
+		
 		$usuario = $this->get('security.context')->getToken()->getUser();
 		$formulario = $this->createForm(new UsuarioType(), $usuario);
 		$peticion = $this->getRequest();
@@ -27,7 +29,13 @@ class CuentaController extends Controller{
 		}
 		
 		public function ficherosAction(){
-       
+		
+		//leer los ficheros de la base de datos y pasarselos a twig con ajax, aqui se complica mucho la cosa
+		//quizas con codigo javascript se pueda subir algun fichero
+		
+		
+		
+		
 		return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
 		}
 		
@@ -39,6 +47,11 @@ class CuentaController extends Controller{
 		public function eventosAction(){
        
 		return $this->render('UsuarioBundle:Cuenta:eventos.html.twig');
+		}
+		
+		public function linksAction(){
+       
+		return $this->render('UsuarioBundle:Cuenta:links.html.twig');
 		}
 		
 		
