@@ -121,6 +121,14 @@ class Usuarios implements UserInterface {
     /**
      * @var integer
      *
+     * @ORM\Column(name="ocupado", type="integer")
+     */
+    private $ocupado;
+	
+
+    /**
+     * @var integer
+     *
      * @ORM\Column(name="logins_ftp", type="integer")
      */
     private $loginsFtp;
@@ -440,5 +448,28 @@ class Usuarios implements UserInterface {
     public function getLoginWeb()
     {
         return $this->loginWeb;
+    }
+
+    /**
+     * Set ocupado
+     *
+     * @param integer $ocupado
+     * @return Usuarios
+     */
+    public function setOcupado($ocupado)
+    {
+        $this->ocupado = $ocupado;
+    
+        return $this;
+    }
+
+    /**
+     * Get ocupado
+     *
+     * @return integer 
+     */
+    public function getOcupado()
+    {
+        return $this->ocupado;
     }
 }

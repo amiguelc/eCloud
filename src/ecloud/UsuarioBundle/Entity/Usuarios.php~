@@ -22,7 +22,7 @@ class Usuarios implements UserInterface {
 	}
 	
 	function getRoles(){
-		return array('ROLE_USUARIO');
+		return array('ROLE_USER');
 	}
 	
 	function getUsername(){
@@ -31,7 +31,7 @@ class Usuarios implements UserInterface {
 	
 	public function getSalt() {
     return ''; // Could also be 'mysalt'
-}
+	}
 
     /**
      * @var integer
@@ -117,6 +117,14 @@ class Usuarios implements UserInterface {
      * @ORM\Column(name="limite", type="integer")
      */
     private $limite;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="ocupado", type="integer")
+     */
+    private $ocupado;
+	
 
     /**
      * @var integer
