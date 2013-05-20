@@ -139,6 +139,13 @@ class Usuarios implements UserInterface {
      * @ORM\Column(name="login_web", type="integer")
      */
     private $loginWeb;
+	
+	 /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="ultimo_acceso", type="datetime")
+     */
+    private $ultimoAcceso;
 
 
     /**
@@ -448,5 +455,28 @@ class Usuarios implements UserInterface {
     public function getLoginWeb()
     {
         return $this->loginWeb;
+    }
+
+    /**
+     * Set ocupado
+     *
+     * @param integer $ocupado
+     * @return Usuarios
+     */
+    public function setOcupado($ocupado)
+    {
+        $this->ocupado = $ocupado;
+    
+        return $this;
+    }
+
+    /**
+     * Get ocupado
+     *
+     * @return integer 
+     */
+    public function getOcupado()
+    {
+        return $this->ocupado;
     }
 }

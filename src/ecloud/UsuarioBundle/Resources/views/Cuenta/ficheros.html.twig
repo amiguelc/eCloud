@@ -7,11 +7,18 @@
 	<div id="itsthetable">
 	<table><caption>{{ app.user.nombreusuario }}/</caption>
 	<thead><tr><th style='width:80%;'>Nombre</th><th>Tama&ntilde;o</th><th>Modificado</th><th>Descarga</th></tr></thead>
-	<tfoot><tr><th>Total</th><td colspan="4">0 archivos</td></tr></tfoot>
 	<tbody>
-		<tr><th>qqqq</th><td>qwqw</td><td>qq</td><td>qqqqqqqq</td></tr>
-		<tr class="odd"><th>llll</th><td>llllll</td><td>USA</td><td>lllll</td></tr>
+		{% set var1 = 0 %}
+		{% for ficheros in ficheros %}
+		
+		{% set var1 = var1 + 1 %}
+
+		<tr {% if var1 is divisibleby(2) %} class="odd" {% endif %}>
+			<th>{{ ficheros.nombrefichero }}</th><th>{{ ficheros.filesize }} bytes</th>
+		</tr>
+		{% endfor %}
 	</tbody>
+	<tfoot><tr><th>Total</th><td colspan="4">{{ var1  }} archivos</td></tr></tfoot>
 	</table>
 	</div>	
 

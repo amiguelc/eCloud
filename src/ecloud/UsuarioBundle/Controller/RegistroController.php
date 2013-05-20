@@ -33,6 +33,7 @@ class RegistroController extends Controller{
 			$usuario->setIpRegistro($_SERVER['REMOTE_ADDR']);
 			//$sp=new DateTimeZone("Europe\London");
 			$usuario->setFechaRegistro(new \DateTime());
+			$usuario->setultimoAcceso(new \DateTime());
 			$usuario->setLimite("500000000");
 			$usuario->setOcupado("0");
 			$usuario->setLoginsftp("0");
