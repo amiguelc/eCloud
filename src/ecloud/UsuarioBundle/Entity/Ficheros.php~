@@ -42,6 +42,14 @@ class Ficheros
      */
     private $nombreRealFisico;
 
+	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="tipo", type="string", length=255)
+     */
+    private $tipo;
+	
     /**
      * @var string
      *

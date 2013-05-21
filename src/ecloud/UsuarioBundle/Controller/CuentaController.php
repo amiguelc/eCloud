@@ -36,7 +36,7 @@ class CuentaController extends Controller{
 			}
 		}
 		
-		public function ficherosAction(){
+		public function ficherosAction($ruta){
 		
 		//leer los ficheros de la base de datos y pasarselos a twig con ajax, aqui se complica mucho la cosa
 		//quizas con codigo javascript se pueda subir algun fichero
@@ -49,13 +49,21 @@ class CuentaController extends Controller{
 			if ($peticion->getMethod() == 'POST') {
 				//guardar fichero y tal
 			}else{
-				//coger ficheros de ese usuario y pasarlos a la plantilla twig
-				$ficheros=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findByPropietario($userid);
+				//coger ficheros de ese usuario y pasarlos a la plantilla twig, primero saber que ruta pide.
+				
+				//quitar la / de la ruta
+				if(!isset($ruta)){$ruta="";}
+				//quitar / del principio
+				if($ruta[0]=="/"){$ruta=substr($ruta,1);}
+				//quitar / del final
+				if(($ruta[(strlen($ruta))-1])=="/"){$ruta=substr($ruta,0,-1);}
+				
+				$ficheros=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'ruta' => "/".$ruta));
 			}
 			
 			
 			
-			return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig',array('ficheros' => $ficheros));
+			return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig',array('ficheros' => $ficheros,'ruta' => $ruta));
 			
 			}
 			else{

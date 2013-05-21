@@ -31,7 +31,20 @@ perfil:
     defaults: { _controller: UsuarioBundle:Cuenta:perfil }
 ficheros:
     pattern: /ficheros
-    defaults: { _controller: UsuarioBundle:Cuenta:ficheros }
+    defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
+_ficheros:
+    pattern: /ficheros/
+    defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
+ficheros2:
+    pattern: /ficheros/{ruta}
+    defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
+    requirements:
+        ruta: ".+"
+_ficheros2:
+    pattern: /ficheros/{ruta}/
+    defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
+    requirements:
+        ruta: ".+"
 subir:
     pattern: /subir
     defaults: { _controller: UsuarioBundle:Cuenta:subir }

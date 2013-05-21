@@ -479,4 +479,27 @@ class Usuarios implements UserInterface {
     {
         return $this->ocupado;
     }
+
+    /**
+     * Set ultimoAcceso
+     *
+     * @param \DateTime $ultimoAcceso
+     * @return Usuarios
+     */
+    public function setUltimoAcceso($ultimoAcceso)
+    {
+        $this->ultimoAcceso = $ultimoAcceso;
+    
+        return $this;
+    }
+
+    /**
+     * Get ultimoAcceso
+     *
+     * @return \DateTime 
+     */
+    public function getUltimoAcceso()
+    {
+        return $this->ultimoAcceso;
+    }
 }

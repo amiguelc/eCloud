@@ -42,6 +42,14 @@ class Ficheros
      */
     private $nombreRealFisico;
 
+	
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="tipo", type="string", length=255)
+     */
+    private $tipo;
+	
     /**
      * @var string
      *
@@ -323,5 +331,28 @@ class Ficheros
     public function getPermiso()
     {
         return $this->permiso;
+    }
+
+    /**
+     * Set tipo
+     *
+     * @param string $tipo
+     * @return Ficheros
+     */
+    public function setTipo($tipo)
+    {
+        $this->tipo = $tipo;
+    
+        return $this;
+    }
+
+    /**
+     * Get tipo
+     *
+     * @return string 
+     */
+    public function getTipo()
+    {
+        return $this->tipo;
     }
 }
