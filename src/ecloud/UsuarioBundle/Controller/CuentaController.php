@@ -3,9 +3,12 @@
 namespace ecloud\UsuarioBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use eCloud\UsuarioBundle\Entity\Usuarios;
 use eCloud\UsuarioBundle\Entity\Ficheros;
 use eCloud\UsuarioBundle\Form\Frontend\UsuarioType;
+//use eCloud\UsuarioBundle\Form\Frontend\SubirFicheroType;
+
 
 class CuentaController extends Controller{
     public function perfilAction(){
@@ -75,14 +78,66 @@ class CuentaController extends Controller{
 		public function subirAction(){
 		
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
-				return $this->render('UsuarioBundle:Cuenta:subir.html.twig');
+			
+			/*
+			/*
+			//mostrar formulario de subir fichero
+			//$peticion = $this->getRequest();
+			//$request= Request::createFromGlobals();
+				if($this->getRequest()->isMethod('POST')) {
+				//guardar fichero y tal
+				$form->bind($this->getRequest());
+				//return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
+					if ($form->isValid()) {
+						//$var_archivos = $this->container->getParameter('var_archivos');
+						//$fil="0.txt";
+						//$formulario['attachment']->getData()->move($var_archivos, $fil);
+						return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
+					}
+				}else{
+				
+				//mostrar formulario
+				$ficheros = new Ficheros();
+				$formulario = $this->createForm(new SubirFicheroType());
+				return $this->render('UsuarioBundle:Cuenta:subir.html.twig', array('formulario' => $formulario->createView()));
+				
+				}
+				*/
+				$document = new Ficheros();
+				$formulario = $this->createFormBuilder($document)->add('nombrefichero')->add('file','file')->getForm();
+				if ($this->getRequest()->isMethod('POST')) {
+				$formulario->bind($this->getRequest());
+					if ($formulario->isValid()) {
+						$em = $this->getDoctrine()->getManager();
+						//propietario, nombre_fichero, nombre_real_fisico, tipo, ruta, filesize, checksum, fecha_subida, total_descargas, permiso
+						$document->setPropietario($this->get('security.context')->getToken()->getUser()->getidUser());
+						$document->setnombreFichero("eeeeeeee");
+						$document->setnombrerealfisico("eeeeee");
+						$document->setTipo("fichero");
+						$document->setRuta("/");
+						$document->setFilesize("596");
+						$document->setChecksum("258");
+						$document->setfechaSubida(new \Datetime());
+						$document->settotalDescargas("0");
+						$document->setPermiso("si");
+						$document->upload();
+						
+						$em->persist($document);
+						$em->flush();
+						//return $this->redirect($this->generateUrl('ficheros'));
+						return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
+					}
+				}
+				return $this->render('UsuarioBundle:Cuenta:subir.html.twig', array('formulario' => $formulario->createView()));
+				
+				
+				
 			}
 			else{
 				return $this->redirect($this->generateUrl('login'), 301);
 			}
-		
-		
 		}
+
 		
 		public function eventosAction(){
        

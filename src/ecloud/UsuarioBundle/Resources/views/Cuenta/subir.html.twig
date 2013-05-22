@@ -4,7 +4,12 @@
 {% block article %}
 <section>
 	<h1>{{ block('title') }}</h1>
-
+	
+	<h1>Upload File</h1>
+	<form action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario) }}>
+		{{ form_widget(formulario) }}
+		<input type="submit" value="Subir Fichero" />
+	</form>
 
 </section>
 {% endblock %}
