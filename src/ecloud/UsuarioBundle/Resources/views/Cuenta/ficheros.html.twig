@@ -26,9 +26,12 @@
 					{{ ficheros.nombrefichero }}
 				{% endif %}
 			</th>
-			<th>{{ ficheros.filesize }} bytes</th>
+			<th>{% if ficheros.filesize <= 1024 %}{{ ficheros.filesize }} bytes {% else %} {{ficheros.filesize / 1024 }} Kbytes{% endif %}</th>
 			<th>{{ ficheros.fechasubida|date('d-m-Y') }}</th>
-			<th> <img  alt="Editar" src="{{ asset('bundles/usuario/images/edit.png') }}"></img><img alt="Eliminar" src="{{ asset('bundles/usuario/images/delete.png') }}"></img></th>
+			<th> 
+				<a href="{{ path('modificar', { 'fichero': ficheros.idfichero }) }}"><img  alt="Editar" src="{{ asset('bundles/usuario/images/edit.png') }}"></img></a>
+				<a href="{{ path('borrar', { 'fichero': ficheros.idfichero }) }}"><img alt="Eliminar" src="{{ asset('bundles/usuario/images/delete.png') }}"></img></a>
+			</th>
 		</tr>
 		{% endfor %}
 		{% if var1 == 0 %}<tr><th><a href="{{ app.request.getRequestURI() }}/../"/>../</a></th><th></th><th></th><th></th></tr>{% endif %}

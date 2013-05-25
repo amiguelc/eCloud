@@ -48,6 +48,12 @@ _ficheros2:
 subir:
     pattern: /subir
     defaults: { _controller: UsuarioBundle:Cuenta:subir }
+modificar:
+    pattern: /modificar/{fichero}
+    defaults: { _controller: UsuarioBundle:Cuenta:modificar }
+borrar:
+    pattern: /borrar/{fichero}
+    defaults: { _controller: UsuarioBundle:Cuenta:borrar }
 eventos:
     pattern: /eventos
     defaults: { _controller: UsuarioBundle:Cuenta:eventos }

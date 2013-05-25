@@ -18,15 +18,14 @@ class CuentaController extends Controller{
 		// Si la petición es GET, mostrar el formulario
 		// Si la petición es POST, actualizar la información del usuario con
 		// los nuevos datos obtenidos del formulario
-		
-		//Nota: Proteger controlador
+
 		 if ($this->get('security.context')->isGranted('ROLE_USER')){
 			
 			
 			$usuario = $this->get('security.context')->getToken()->getUser();
 			$formulario = $this->createForm(new UsuarioType(), $usuario);
-			$peticion = $this->getRequest();
-			if ($peticion->getMethod() == 'POST') {
+			//$peticion = $this->getRequest();
+			if ($this->getRequest()->isMethod('POST')) {
 				$formulario->bindRequest($peticion);
 				if ($formulario->isValid()) {
 					// actualizar el perfil del usuario
@@ -47,9 +46,8 @@ class CuentaController extends Controller{
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
 			
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
-			$peticion = $this->getRequest();
 			
-			if ($peticion->getMethod() == 'POST') {
+			if ($this->getRequest()->isMethod('POST')) {
 				//guardar fichero y tal
 			}else{
 				//coger ficheros de ese usuario y pasarlos a la plantilla twig, primero saber que ruta pide.
@@ -78,54 +76,33 @@ class CuentaController extends Controller{
 		public function subirAction(){
 		
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
-			
-			/*
-			/*
-			//mostrar formulario de subir fichero
-			//$peticion = $this->getRequest();
-			//$request= Request::createFromGlobals();
-				if($this->getRequest()->isMethod('POST')) {
-				//guardar fichero y tal
-				$form->bind($this->getRequest());
-				//return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
-					if ($form->isValid()) {
-						//$var_archivos = $this->container->getParameter('var_archivos');
-						//$fil="0.txt";
-						//$formulario['attachment']->getData()->move($var_archivos, $fil);
-						return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
-					}
-				}else{
-				
-				//mostrar formulario
-				$ficheros = new Ficheros();
-				$formulario = $this->createForm(new SubirFicheroType());
-				return $this->render('UsuarioBundle:Cuenta:subir.html.twig', array('formulario' => $formulario->createView()));
-				
-				}
-				*/
 				$document = new Ficheros();
-				$formulario = $this->createFormBuilder($document)->add('nombrefichero')->add('file','file')->getForm();
+				$formulario = $this->createFormBuilder($document)->add('file','file')->getForm();
 				if ($this->getRequest()->isMethod('POST')) {
+				
+				//Falta comprobar si espacio lleno, en el post y en el get al subir ficheros.
+				
 				$formulario->bind($this->getRequest());
 					if ($formulario->isValid()) {
 						$em = $this->getDoctrine()->getManager();
 						//propietario, nombre_fichero, nombre_real_fisico, tipo, ruta, filesize, checksum, fecha_subida, total_descargas, permiso
-						$document->setPropietario($this->get('security.context')->getToken()->getUser()->getidUser());
-						$document->setnombreFichero("eeeeeeee");
-						$document->setnombrerealfisico("eeeeee");
+						$document->setPropietario($this->get('security.context')->getToken()->getUsername());
 						$document->setTipo("fichero");
 						$document->setRuta("/");
-						$document->setFilesize("596");
-						$document->setChecksum("258");
+						$ruta=$document->getRuta();
 						$document->setfechaSubida(new \Datetime());
 						$document->settotalDescargas("0");
 						$document->setPermiso("si");
 						$document->upload();
-						
+						$document->setPropietario($this->get('security.context')->getToken()->getUser()->getidUser());
 						$em->persist($document);
 						$em->flush();
-						//return $this->redirect($this->generateUrl('ficheros'));
-						return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
+						
+						//falta sumar espacio a la cuenta del userid
+						
+						
+						//return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig',array('ruta'=>$ruta));
+						return $this->redirect($this->generateUrl('ficheros'));
 					}
 				}
 				return $this->render('UsuarioBundle:Cuenta:subir.html.twig', array('formulario' => $formulario->createView()));
@@ -138,10 +115,102 @@ class CuentaController extends Controller{
 			}
 		}
 
+		public function modificarAction($fichero){
+       
+			if ($this->get('security.context')->isGranted('ROLE_USER')){
+			
+			if ($this->getRequest()->isMethod('POST')) {
+				//guardar datos modificados
+				$formulario->bind($this->getRequest());
+				if ($formulario->isValid()) {
+					$document = new Ficheros();
+					$em = $this->getDoctrine()->getManager();
+					//propietario, nombre_fichero, nombre_real_fisico, tipo, ruta, filesize, checksum, fecha_subida, total_descargas, permiso
+					$document->setPropietario($this->get('security.context')->getToken()->getUser()->getidUser());
+					$document->setnombrerealfisico($document->getnombreFichero());
+					$document->setTipo("fichero");
+					$document->setFilesize("597");
+					$document->setChecksum("258");
+					$document->setfechaSubida(new \Datetime());
+					$document->settotalDescargas("0");
+					$document->setPermiso("si");
+					//$document->upload();
+					//falta modificar nombre fichero con cmd
+					$em->persist($document);
+					$em->flush();
+					//return $this->redirect($this->generateUrl('ficheros'));
+					return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
+				}
+				
+				
+			
+			}
+			else{
+				//mostrar datos y formulario
+				$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+				//ver fichero o carpeta y modificar datos.
+				$ficheros=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('idFichero'=>$fichero,'propietario' => $userid));
+				//id_fichero,propietario,nombre_fichero,nombre_real_fisico,ruta,filesize,checksum,fecha_subida,total_descargas,permiso,tipo 
+				$document = new Ficheros();
+				$formulario = $this->createFormBuilder($document)->add('nombrefichero')->add('ruta')->getForm();
+			
+			return $this->render('UsuarioBundle:Cuenta:modificar.html.twig',array('fichero'=>$fichero,'ficheros' => $ficheros,'formulario'=>$formulario->createView()));
+			}
+			
+			}
+			else{
+				return $this->redirect($this->generateUrl('login'), 301);
+			}
+		}
+		
+		public function borrarAction($fichero){
+       
+			if ($this->get('security.context')->isGranted('ROLE_USER')){
+				$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+				$em=$this->getDoctrine()->getManager();
+				//$ficheros=new Ficheros();
+				$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
+				$em->remove($ficheros);
+				$em->flush();
+				//falta borrar el fichero del directorio
+			
+				//return $this->redirect($this->generateUrl('ficheros'), 301);
+				return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
+			}
+			else{
+				return $this->redirect($this->generateUrl('login'), 301);
+			}
+		}
+		
+				
+		public function descargarAction($fichero){
+       
+			if ($this->get('security.context')->isGranted('ROLE_USER')){
+				$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+				$em=$this->getDoctrine()->getManager();
+				$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
+				//procesar ruta y descargar el archivo, sumar una descarga a la BD.
+				
+				$em->flush();
+				//borrar de la bd y del directorio
+			
+				//return $this->redirect($this->generateUrl('ficheros'), 301);
+				return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
+			}
+			else{
+				return $this->redirect($this->generateUrl('login'), 301);
+			}
+		}
+		
 		
 		public function eventosAction(){
        
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
+			
+			//mostrar lista de modificaciones sin mas.
+			
+			
+			
 			return $this->render('UsuarioBundle:Cuenta:eventos.html.twig');
 			}
 			else{
@@ -152,6 +221,23 @@ class CuentaController extends Controller{
 		public function linksAction(){
 		
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
+			
+			//si GET, ver lista de LINKS, si link especificado, mostrar formulario para ver y modificarlo.
+			
+		   
+			return $this->render('UsuarioBundle:Cuenta:links.html.twig');
+			}
+			else{
+				return $this->redirect($this->generateUrl('login'), 301);
+			}
+		}
+		
+		public function crearlinksAction(){
+		
+			if ($this->get('security.context')->isGranted('ROLE_USER')){
+			
+			//si GET, mostrar formulario de crear link, si post procesarlo y redirigiar a /links.
+			
 		   
 			return $this->render('UsuarioBundle:Cuenta:links.html.twig');
 			}
