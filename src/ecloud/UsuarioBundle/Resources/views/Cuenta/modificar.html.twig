@@ -1,0 +1,55 @@
+{% extends '::frontend.html.twig' %}
+{% block title %}Modificar {% endblock %}
+
+{% block article %}
+<section>
+	<h1>{{ block('title') }}</h1>
+	<form action="{{ path('modificar', { 'fichero': fichero }) }}" method="post" {{ form_enctype(formulario) }}>
+		<div class="errors">
+		{{ form_errors(formulario) }}
+		</div>
+		{% for ficheros in ficheros %}
+		<div>
+			<table class='form'>
+		<tbody>
+			<tr>
+				<td style='width:150px'>Fichero: </td>
+				<td>{{ ficheros.nombrefichero }} </td>
+			</tr>
+			<tr>
+				<td>Tama&ntilde;o </td>
+				<td>{{ ficheros.filesize }} </td>
+			</tr>
+			<tr>
+				<td>Checksum: </td>
+				<td>{{ ficheros.checksum }} </td>
+			</tr>
+			<tr>
+				<td>Total Descargas: </td>
+				<td>{{ ficheros.totaldescargas }} <br></td>
+			</tr>
+			<tr>
+				<td> Nuevo Nombre Fichero </td>
+				<td>{{ form_widget(formulario.nombrefichero) }} </td>
+			</tr>
+			<tr>
+				<td> Nueva Ruta </td>
+				<td>{{ form_widget(formulario.ruta) }} </td>
+			</tr>
+		</tbody>
+		</table>
+		
+		</div>
+
+		{% endfor %}
+		{# ... #}
+		<div>
+		{# {{ form_errors(formulario.permite_email) }} #}
+		{# {{ form_widget(formulario.permite_email) }} #}
+		</div>
+		{{ form_rest(formulario) }}
+		<input class="boton" type="submit" value="Guardar cambios" />
+	</form>
+	</div>
+</section>
+{% endblock %}
