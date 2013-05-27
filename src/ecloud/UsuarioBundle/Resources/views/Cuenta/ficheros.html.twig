@@ -5,7 +5,9 @@
 <section>
 	<h1>{{ block('title') }}</h1>
 	<div id="itsthetable">
-	<table><caption>{{ app.user.nombreusuario }}<a href="{{ path('ficheros') }}">/{{ ruta }}</a></caption>
+	<table>
+	<caption>{{ app.user.nombreusuario }}<a href="{{ path('ficheros') }}">/{{ ruta }}</a> <div style='float:right'><button id='button_subir'>Subir archivo</button> <button id='button_carpeta'>Crear carpeta</button></div></caption>
+
 	<thead><tr><th style='width:80%;'>Nombre</th><th>Tama&ntilde;o</th><th>Modificado</th><th></th></tr></thead>
 	<tbody>
 		{% set var1 = 0 %}
@@ -23,7 +25,7 @@
 					{% endif %}
 					
 				{% else %}
-					{{ ficheros.nombrefichero }}
+					<a href="{{ path('descargar', { 'fichero': ficheros.idfichero }) }}">{{ ficheros.nombrefichero }}</a> 
 				{% endif %}
 			</th>
 			<th>{% if ficheros.filesize <= 1024 %}{{ ficheros.filesize }} bytes {% else %} {{ficheros.filesize / 1024 }} Kbytes{% endif %}</th>
@@ -41,5 +43,41 @@
 	</div>	
 
 	</div>
+	
+	<div id='file_upload' class='div_amagado'>
+			<form action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario) }}>
+				{{ form_errors(formulario) }}
+				{{ form_row(formulario.file) }} <input type="submit" value="Subir" />
+				{{ form_rest(formulario) }}
+			</form>
+			<button id='cerrar_file_upload'>Cerrar<button>
+	</div>
+	
+	<div id='crear_carpeta' class='div_amagado'>
+			<form action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
+				{{ form_errors(formulario_carpeta) }}
+				{{ form_row(formulario_carpeta.nombrefichero) }} <input type="submit" value="Crear" />
+				{{ form_rest(formulario_carpeta) }}
+			</form>
+			<button id='cerrar_crear_carpeta'>Cerrar<button>
+	</div>
+	
+	
+	<script>
+		$(document).ready(function(){
+		  $("#button_subir").click(function(){
+			$("#itsthetable").fadeTo("slow",0.15);
+			$("#file_upload").show();
+		  });
+		  $("#button_carpeta").click(function(){
+			$("#itsthetable").fadeTo("slow",0.15);
+			$("#crear_carpeta").show();
+		  });
+		  $("#cerrar_file_upload").click(function(){
+			$("#file_upload").hide();
+			$("#itsthetable").fadeIn();
+		  });
+		});
+	</script>
 </section>
 {% endblock %}

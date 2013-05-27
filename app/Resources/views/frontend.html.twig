@@ -1,7 +1,15 @@
 {% extends '::base.html.twig' %}
-{% block stylesheets %}{% stylesheets 'bundles/usuario/css/*' filter='cssrewrite' %}
-<link rel="stylesheet" href="{{ asset_url }}" />
-{% endstylesheets %}{% endblock %}
+{% block stylesheets %}
+	{% stylesheets 'bundles/usuario/css/*' filter='cssrewrite' %}
+		<link rel="stylesheet" href="{{ asset_url }}" />
+	{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+	{% javascripts 'bundles/usuario/js/*' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+	{% endjavascripts %}
+{% endblock %}
 {% block body %}
 <div id="contenedor">
 	<header>
@@ -12,7 +20,6 @@
 			<ul> 
 			  <li><a href="{{ path('perfil') }}">Mi Perfil</a></li>
 			  <li><a href="{{ path('ficheros') }}">Ficheros</a></li>
-			  <li><a href="{{ path('subir') }}">Subir</a></li>
 			  <li><a href="{{ path('eventos') }}">Eventos</a></li>
 			  <li><a href="{{ path('links') }}">Links</a></li>
 			</ul>
@@ -55,4 +62,6 @@
 		<a class='footer_links' href="{{ path('sobre-nosotros') }}">Sobre nosotros</a>
 	</footer>
 </div>
+
+
 {% endblock %}

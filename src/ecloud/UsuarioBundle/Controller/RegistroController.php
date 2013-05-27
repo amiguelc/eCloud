@@ -50,7 +50,7 @@ class RegistroController extends Controller{
 			//crear la carpeta del usuario en el disco duro
 			$var_archivos = $this->container->getParameter('var_archivos');
 			mkdir($var_archivos.$usuario->getNombreUsuario());
-			
+			//falta enviar email de registro completo
 			return $this->redirect($this->generateUrl('login'));
 			
 			

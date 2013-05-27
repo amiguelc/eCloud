@@ -36,7 +36,7 @@ class Usuarios implements UserInterface {
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_user", type="integer")
+     * @ORM\Column(name="id_user", type="bigint")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -114,14 +114,14 @@ class Usuarios implements UserInterface {
     /**
      * @var integer
      *
-     * @ORM\Column(name="limite", type="integer")
+     * @ORM\Column(name="limite", type="bigint")
      */
     private $limite;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="ocupado", type="integer")
+     * @ORM\Column(name="ocupado", type="bigint")
      */
     private $ocupado;
 	
@@ -129,14 +129,14 @@ class Usuarios implements UserInterface {
     /**
      * @var integer
      *
-     * @ORM\Column(name="logins_ftp", type="integer")
+     * @ORM\Column(name="logins_ftp", type="bigint")
      */
     private $loginsFtp;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="login_web", type="integer")
+     * @ORM\Column(name="login_web", type="bigint")
      */
     private $loginWeb;
 	

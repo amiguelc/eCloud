@@ -6,15 +6,26 @@
 	<h1>{{ block('title') }}</h1>
 
 	<div id="itsthetable">
-	<table><caption></caption>
-	<thead><tr><th style='width:80%;'>Acci&oacute;n</th><th>Fecha</th></tr></thead>
-	<tfoot><tr><th>Total</th><td colspan="4">0 eventos</td></tr></tfoot>
+	<table><caption>{{ app.user.nombreusuario }}</caption>
+	<thead><tr><th style='width:87%;'>Acci&oacute;n</th><th>Fecha</th></tr></thead>
 	<tbody>
-		<tr><th>qqqq</th><td>qwqw</td></tr>
-		<tr class="odd"><th>llll</th><td>llllll</td></tr>
+		{% set var1 = 0 %}
+		{% for eventos in eventos %}
+		
+		{% set var1 = var1 + 1 %}
+
+		<tr {% if var1 is divisibleby(2) %} class="odd" {% endif %}>
+			<th{% if "Has subido" in eventos.accion %} style='background-color:#B5FFB5;' {% endif %} {% if "Has borrado" in eventos.accion %} style='background-color:#FFB5B5;' {% endif %} >{{ eventos.accion }}</th>
+			<th  style='text-align:center;'>{{ eventos.fecha|date('H:i:s d-m-Y ') }}</th>
+		</tr>
+		{% endfor %}
+		{% if var1 == 0 %}<tr><th><a href="{{ app.request.getRequestURI() }}/../"/>../</a></th><th></th><th></th><th></th></tr>{% endif %}
 	</tbody>
+	<tfoot><tr><th>Total</th><td colspan="4">{{ var1  }} eventos</td></tr></tfoot>
 	</table>
 	</div>	
+
+	</div>
 
 </section>
 {% endblock %}

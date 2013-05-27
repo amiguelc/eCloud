@@ -11,10 +11,12 @@ header{
 	margin:7%;
 	margin-top:25px;
 	width:86%;
-}
+	height:85%;
+	overflow:auto;
+	}
 
 footer{
-position: fixed;bottom: 0px;left: 0px;right: 0px;z-index: 100;height: 40px;line-height: 2.5em;background:linear-gradient(rgb(17, 149, 220), rgb(11, 126, 189)) repeat scroll 0% 0% transparent;
+position: absolute;bottom: 0px;left: 0px;right: 0px;z-index: 100;height: 40px;line-height: 2.5em;background:linear-gradient(rgb(17, 149, 220), rgb(11, 126, 189)) repeat scroll 0% 0% transparent;
 text-align: center;color:#DDDDDD;
 }
 a.footer_links:link {color:#DDDDDD;}
@@ -33,6 +35,28 @@ nav ul {
 nav ul li a{ color:#111111;text-decoration:none; }
 nav ul li :hover{ color:#888888; }
 
+.form{
+
+background-color:transparent;
+border:none;
+border-left:1px dotted #bbb;
+
+}
+.form td { border:none;}
+
+.div_amagado  {
+float:left;
+width: 500px
+heigh: 500px;
+position:fixed;
+top:75px;
+left:40%;
+display:none;
+}
+
+
+
+
 /*        */
 /* TABLAS */
 /*        */
@@ -43,7 +67,8 @@ border-collapse: collapse;
 border: 2px solid #AAA;
 font: normal 80%/140% arial, helvetica, sans-serif;
 color: #555;
-background: rgb(245, 245, 245);}
+background: rgb(245, 245, 245);
+}
 
 td, th {border: 1px dotted #bbb;
 padding: .5em;}

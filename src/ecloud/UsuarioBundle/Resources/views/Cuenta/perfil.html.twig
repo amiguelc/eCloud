@@ -8,18 +8,50 @@
 		<div class="errors">
 		{{ form_errors(formulario) }}
 		</div>
-		<div>
-		{{ form_row(formulario.nombre) }}
-		</div>
-		<div>
-		{{ form_row(formulario.apellidos) }}
+		<table class='form'>
+		<tbody>
+			<tr>
+				<td style='width:150px'>{{ form_label(formulario.nombre) }}</td>
+				<td>{{ form_widget(formulario.nombre) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.apellidos) }}</td>
+				<td>{{ form_widget(formulario.apellidos) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.email) }}</td>
+				<td>{{ form_widget(formulario.email) }}</td>
+			</tr>
+						<tr>
+				<td>{{ form_label(formulario.nombre_usuario) }}</td>
+				<td>{{ form_widget(formulario.nombre_usuario) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.password) }}</td>
+				<td>{{ form_widget(formulario.password) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.direccion) }}</td>
+				<td>{{ form_widget(formulario.direccion) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.ciudad) }}</td>
+				<td>{{ form_widget(formulario.ciudad) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.pais) }}</td>
+				<td>{{ form_widget(formulario.pais) }}</td>
+			</tr>
 		</div>
 		{# ... #}
 		<div>
 		{# {{ form_errors(formulario.permite_email) }} #}
 		{# {{ form_widget(formulario.permite_email) }} #}
 		</div>
+		</tbody>
+		</table>
 		{{ form_rest(formulario) }}
+		<br>
 		<input class="boton" type="submit" value="Guardar cambios" />
 	</form>
 

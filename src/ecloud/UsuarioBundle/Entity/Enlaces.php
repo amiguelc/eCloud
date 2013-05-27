@@ -15,7 +15,7 @@ class Enlaces
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_enlace", type="integer")
+     * @ORM\Column(name="id_enlace", type="bigint")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -31,14 +31,14 @@ class Enlaces
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_fichero", type="integer")
+     * @ORM\Column(name="id_fichero", type="bigint")
      */
     private $idFichero;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="propietario", type="integer")
+     * @ORM\Column(name="propietario", type="bigint")
      */
     private $propietario;
 

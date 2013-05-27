@@ -16,7 +16,7 @@ class Ficheros
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_fichero", type="integer")
+     * @ORM\Column(name="id_fichero", type="bigint")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -25,7 +25,7 @@ class Ficheros
     /**
      * @var integer
      *
-     * @ORM\Column(name="propietario", type="integer")
+     * @ORM\Column(name="propietario", type="bigint")
      */
     private $propietario;
 
@@ -61,7 +61,7 @@ class Ficheros
     /**
      * @var integer
      *
-     * @ORM\Column(name="filesize", type="integer")
+     * @ORM\Column(name="filesize", type="bigint")
      */
     private $filesize;
 
@@ -82,7 +82,7 @@ class Ficheros
     /**
      * @var integer
      *
-     * @ORM\Column(name="total_descargas", type="integer")
+     * @ORM\Column(name="total_descargas", type="bigint")
      */
     private $totalDescargas;
 
@@ -93,6 +93,12 @@ class Ficheros
      */
     private $permiso;
 
+	 /**
+     * @var string
+     *
+     * @ORM\Column(name="mime", type="string", length=255)
+     */
+    private $mime;
 
     /**
      * Get id
@@ -390,7 +396,7 @@ class Ficheros
 			// target filename to move to
 			//$this->getFile()->move($this->getUploadRootDir(),$this->getFile()->getClientOriginalName());
 
-			
+			$this->setMime($this->getFile()->getMimeType());
 			$this->getFile()->move("C:\\ecloud\\".print_r($this->getPropietario(), true),$this->getFile()->getClientOriginalName());
 			// set the path property to the filename where you've saved the file
 			$this->path = $this->getFile()->getClientOriginalName();
@@ -402,7 +408,31 @@ class Ficheros
 			$this->setnombrerealfisico($this->getFile()->getClientOriginalName());
 			$this->setFilesize(filesize($fichero_subido));
 			
+			
 			// clean up the file property as you won't need it anymore
 			$this->file = null;
 		}
+
+    /**
+     * Set mime
+     *
+     * @param string $mime
+     * @return Ficheros
+     */
+    public function setMime($mime)
+    {
+        $this->mime = $mime;
+    
+        return $this;
+    }
+
+    /**
+     * Get mime
+     *
+     * @return string 
+     */
+    public function getMime()
+    {
+        return $this->mime;
+    }
 }

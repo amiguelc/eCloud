@@ -3,6 +3,7 @@
 namespace ecloud\UsuarioBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Ficheros
@@ -15,7 +16,7 @@ class Ficheros
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_fichero", type="integer")
+     * @ORM\Column(name="id_fichero", type="bigint")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -24,7 +25,7 @@ class Ficheros
     /**
      * @var integer
      *
-     * @ORM\Column(name="propietario", type="integer")
+     * @ORM\Column(name="propietario", type="bigint")
      */
     private $propietario;
 
@@ -60,7 +61,7 @@ class Ficheros
     /**
      * @var integer
      *
-     * @ORM\Column(name="filesize", type="integer")
+     * @ORM\Column(name="filesize", type="bigint")
      */
     private $filesize;
 
@@ -81,7 +82,7 @@ class Ficheros
     /**
      * @var integer
      *
-     * @ORM\Column(name="total_descargas", type="integer")
+     * @ORM\Column(name="total_descargas", type="bigint")
      */
     private $totalDescargas;
 
@@ -92,6 +93,12 @@ class Ficheros
      */
     private $permiso;
 
+	 /**
+     * @var string
+     *
+     * @ORM\Column(name="mime", type="string", length=255)
+     */
+    private $mime;
 
     /**
      * Get id
@@ -331,5 +338,101 @@ class Ficheros
     public function getPermiso()
     {
         return $this->permiso;
+    }
+
+    /**
+     * Set tipo
+     *
+     * @param string $tipo
+     * @return Ficheros
+     */
+    public function setTipo($tipo)
+    {
+        $this->tipo = $tipo;
+    
+        return $this;
+    }
+
+    /**
+     * Get tipo
+     *
+     * @return string 
+     */
+    public function getTipo()
+    {
+        return $this->tipo;
+    }
+	
+		/**
+		* 
+		*/
+		private $file;
+		/**
+		* Sets file.
+		*
+		* @param UploadedFile $file
+		*/
+		public function setFile(UploadedFile $file = null){
+		$this->file = $file;
+		}
+		/**
+		* Get file.
+		*
+		* @return UploadedFile
+		*/
+		public function getFile(){
+		return $this->file;
+		}
+		
+		public function upload(){
+			// the file property can be empty if the field is not required
+			if (null === $this->getFile()) {
+			return;
+			}
+						
+			// use the original file name here but you should
+			// sanitize it at least to avoid any security issues
+			// move takes the target directory and then the
+			// target filename to move to
+			//$this->getFile()->move($this->getUploadRootDir(),$this->getFile()->getClientOriginalName());
+
+			$this->setMime($this->getFile()->getMimeType());
+			$this->getFile()->move("C:\\ecloud\\".print_r($this->getPropietario(), true),$this->getFile()->getClientOriginalName());
+			// set the path property to the filename where you've saved the file
+			$this->path = $this->getFile()->getClientOriginalName();
+			
+			//Coger nombre, tamaño en bytes y checksum.
+			$fichero_subido="C:\\ecloud\\".print_r($this->getPropietario(), true)."\\".$this->getFile()->getClientOriginalName();
+			$this->setChecksum(md5_file($fichero_subido));
+			$this->setNombreFichero($this->getFile()->getClientOriginalName());
+			$this->setnombrerealfisico($this->getFile()->getClientOriginalName());
+			$this->setFilesize(filesize($fichero_subido));
+			
+			
+			// clean up the file property as you won't need it anymore
+			$this->file = null;
+		}
+
+    /**
+     * Set mime
+     *
+     * @param string $mime
+     * @return Ficheros
+     */
+    public function setMime($mime)
+    {
+        $this->mime = $mime;
+    
+        return $this;
+    }
+
+    /**
+     * Get mime
+     *
+     * @return string 
+     */
+    public function getMime()
+    {
+        return $this->mime;
     }
 }

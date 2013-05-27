@@ -54,15 +54,15 @@ modificar:
 borrar:
     pattern: /borrar/{fichero}
     defaults: { _controller: UsuarioBundle:Cuenta:borrar }
+descargar:
+    pattern: /descargar/{fichero}
+    defaults: { _controller: UsuarioBundle:Cuenta:descargar }
 eventos:
     pattern: /eventos
     defaults: { _controller: UsuarioBundle:Cuenta:eventos }
 links:
     pattern: /links
     defaults: { _controller: UsuarioBundle:Cuenta:links }
-#descargar:
-#    pattern: /descargar
-#    defaults { _controller: UsuarioBundle:Cuenta:descargar }
 #PAGINAS ESTATICAS AL FINAL, YA QUE ES CUANDO LAS OTRAS NO LAS ENCUENTRA
 #pagina_estatica:
 #    pattern: /{pagina}
