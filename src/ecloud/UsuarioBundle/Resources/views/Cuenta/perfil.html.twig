@@ -26,10 +26,7 @@
 				<td>{{ form_label(formulario.nombre_usuario) }}</td>
 				<td>{{ form_widget(formulario.nombre_usuario) }}</td>
 			</tr>
-			<tr>
-				<td>{{ form_label(formulario.password) }}</td>
-				<td>{{ form_widget(formulario.password) }}</td>
-			</tr>
+
 			<tr>
 				<td>{{ form_label(formulario.direccion) }}</td>
 				<td>{{ form_widget(formulario.direccion) }}</td>
@@ -42,19 +39,26 @@
 				<td>{{ form_label(formulario.pais) }}</td>
 				<td>{{ form_widget(formulario.pais) }}</td>
 			</tr>
-		</div>
-		{# ... #}
-		<div>
-		{# {{ form_errors(formulario.permite_email) }} #}
-		{# {{ form_widget(formulario.permite_email) }} #}
+			{{ form_rest(formulario) }}
+			<tr>
+				<td> Limite</td>
+				<td>{{ usuario.limite }}</td>
+			</tr>
+			<tr>
+				<td> Ocupado</td>
+				<td>{{ usuario.ocupado }} ({{  usuario.ocupado/usuario.limite * 100 }}%)</td>
+			</tr>
+			<tr>
+				
+			</tr>
 		</div>
 		</tbody>
-		</table>
-		{{ form_rest(formulario) }}
+		</table><br>
+		<td><input class="boton" type="submit" value="Guardar cambios" /></td>
 		<br>
-		<input class="boton" type="submit" value="Guardar cambios" />
+		
 	</form>
-
+	
 
 </section>
 {% endblock %}

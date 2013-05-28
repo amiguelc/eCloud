@@ -25,18 +25,50 @@ class CuentaController extends Controller{
 		// los nuevos datos obtenidos del formulario
 
 		 if ($this->get('security.context')->isGranted('ROLE_USER')){
+			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+			//$usuario = $this->get('security.context')->getToken()->getUser();
+			$em = $this->getDoctrine()->getManager();
+			$entity_usuarios=new Usuarios();
+			$usuario=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
+			$formulario=$this->createFormBuilder($entity_usuarios)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')->getForm();
 			
+			//$formulario = $this->createFormBuilder($document)->add('nombrefichero','text', array('data'=> $ficheros2->getNombreFichero()))->add('ruta','text',array ('data'=> $ficheros2->getRuta()))->getForm();
+			//$formulario = $this->createForm(new UsuarioType(), $usuario);
 			
-			$usuario = $this->get('security.context')->getToken()->getUser();
-			$formulario = $this->createForm(new UsuarioType(), $usuario);
-			//$peticion = $this->getRequest();
+
 			if ($this->getRequest()->isMethod('POST')) {
-				$formulario->bindRequest($peticion);
+				$formulario->bind($this->getRequest());
 				if ($formulario->isValid()) {
 					// actualizar el perfil del usuario
+					$usuario=new Usuarios();
+					$usuario=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
+					$usuario->setNombre($formulario["nombre"]->getData());
+					$usuario->setApellidos($formulario["apellidos"]->getData());
+					$usuario->setEmail($formulario["email"]->getData());
+					$usuario->setNombreUsuario($formulario["nombre_usuario"]->getData());
+					$usuario->setDireccion($formulario["direccion"]->getData());
+					$usuario->setCiudad($formulario["ciudad"]->getData());
+					$usuario->setPais($formulario["pais"]->getData());
+					//$usuario_modificado->setIdUser($userid);
+					
+					//$formulario_recibido=setIpRegistro($this->getIpRegistro());
+					//$formulario_recibido=setLimite('5555555');
+					//$formulario_recibido=setPassword($this->getPassword());
+					
+					$em->persist($usuario);
+					$em->flush();
+					
+					return $this->redirect($this->generateUrl('perfil'), 303);
+				}
+				else {
+				return $this->redirect($this->generateUrl('perfil'), 303);
 				}
 			}
-			return $this->render('UsuarioBundle:Cuenta:perfil.html.twig', array('usuario' => $usuario,'formulario' => $formulario->createView()	));
+			else{
+				//$formulario = $this->createFormBuilder($usuario)->add('nombrefichero','text', array('data'=> $ficheros2->getNombreFichero()))->add('ruta','text',array ('data'=> $ficheros2->getRuta()))->getForm();
+				$formulario=$this->createFormBuilder($usuario)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')->getForm();
+				return $this->render('UsuarioBundle:Cuenta:perfil.html.twig', array('usuario'=>$usuario,'formulario' => $formulario->createView()));
+			}
 			}
 			else{
 				return $this->redirect($this->generateUrl('login'), 301);
