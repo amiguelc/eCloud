@@ -1,0 +1,49 @@
+{% extends '::base.html.twig' %}
+{% block stylesheets %}
+	{% stylesheets 'bundles/usuario/css/comun.css' filter='cssrewrite' %}
+		<link rel="stylesheet" href="{{ asset_url }}" />
+	{% endstylesheets %}
+	{% stylesheets 'bundles/admin/css/*' filter='cssrewrite' %}
+		<link rel="stylesheet" href="{{ asset_url }}" />
+	{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+	{% javascripts 'bundles/usuario/js/*' %}
+    <script type="text/javascript" src="{{ asset_url }}"></script>
+	{% endjavascripts %}
+{% endblock %}
+{% block body %}
+<div id="contenedor">
+	<header>
+		<a href="{{ path('home') }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>
+		
+		{% if is_granted('ROLE_USER') %}
+		<nav>
+			<ul> 
+			  <li><a href="{{ path('admin_usuarios') }}">Usuarios</a></li>
+			  <li><a href="{{ path('admin_stats') }}">Estadisticas</a></li>
+			</ul>
+		</nav>
+			<div class='login_box'><span style='position:relative;right:15px;color:white;font-size:20px;'>Hola, <i>{{ app.user.nombreusuario }} </i></span> <button class='mid green button' onclick="window.location='{{ path('logout') }}'">Salir</button></div>
+		{% endif %}
+	</header>
+		
+	<article>
+	<img class='bgbox' src="{{ asset('bundles/usuario/images/imagen_portada.png') }}">
+		{% block article %}{% endblock %}
+	</article>
+
+	<footer>
+		&copy; {{ 'now' | date('Y') }} - eCloud
+		<!--
+		<a class='footer_links' href="{{ path('ayuda') }}">Ayuda</a>
+		<a class='footer_links' href="{{ path('contacto') }}">Contacto</a>
+		<a class='footer_links' href="{{ path('privacidad') }}">Privacidad</a>
+		<a class='footer_links' href="{{ path('sobre-nosotros') }}">Sobre nosotros</a>
+		-->
+	</footer>
+</div>
+
+
+{% endblock %}
