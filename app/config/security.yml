@@ -33,6 +33,19 @@ security:
             anonymous: ~
             #http_basic:
             #    realm: "Secured Demo Area"
+        admin_area:
+            pattern:    ^/admin
+            form_login:
+                login_path: /admin/login
+                check_path: /admin/login_check
+                default_target_path: /admin/home
+                always_use_default_target_path: true
+            logout:
+                path:   /admin/logout
+            #    target: _demo
+            #anonymous: ~
+            #http_basic:
+            #    realm: "Secured Demo Area"
 
     access_control:
         #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY, requires_channel: https }

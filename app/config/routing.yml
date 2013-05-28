@@ -1,7 +1,10 @@
+admin:
+    resource: "@AdminBundle/Resources/config/routing.yml"
+    prefix:   /
 usuario:
     resource: "@UsuarioBundle/Resources/config/routing.yml"
     prefix:   /
-#nuevo
+#eCloud
 root:
     path:    /
     defaults:
@@ -12,8 +15,7 @@ home:
     pattern: /home
     defaults: { _controller: UsuarioBundle:Sitio:Home }
 
-
-#MANEJO DE USUARIOS
+################################################################################################MANEJO DE USUARIOS
 login:
     pattern: /login
     defaults: { _controller: UsuarioBundle:Security:login }
@@ -63,13 +65,26 @@ eventos:
 links:
     pattern: /links
     defaults: { _controller: UsuarioBundle:Cuenta:links }
-#PAGINAS ESTATICAS AL FINAL, YA QUE ES CUANDO LAS OTRAS NO LAS ENCUENTRA
-#pagina_estatica:
-#    pattern: /{pagina}
-#    defaults: { _controller: UsuarioBundle:Sitio:Estaticas }
-#_pagina_estatica:
-#    pattern: /{pagina}/
-#    defaults: { _controller: UsuarioBundle:Sitio:Estaticas }
+
+############################################################################################## SECCION ADMIN
+admin_home:
+    pattern: /admin
+    defaults: { _controller: AdminBundle:Admin:home }
+admin_usuarios:
+    pattern: /admin/usuarios
+    defaults: { _controller: AdminBundle:Admin:usuarios }
+admin_stats:
+    pattern: /admin/stats
+    defaults: { _controller: AdminBundle:Admin:stats }
+admin_login:
+    pattern: /admin/login
+    defaults: { _controller: AdminBundle:Security:login }
+admin_login_check:
+    pattern: /admin/login_check
+logout:
+    pattern: /admin/logout
+
+################################################################################################PAGINAS ESTATICAS FRONTEND AL FINAL, YA QUE ES CUANDO LAS OTRAS NO LAS ENCUENTRA
 ayuda:
     pattern: /ayuda
     defaults: { _controller: UsuarioBundle:Sitio:ayuda }
