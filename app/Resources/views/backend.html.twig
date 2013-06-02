@@ -16,16 +16,42 @@
 {% block body %}
 <div id="contenedor">
 	<header>
-		<a href="{{ path('home') }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>
+		<a href="{{ path('admin_home') }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>
 		
-		{% if is_granted('ROLE_USER') %}
+		{% if is_granted('ROLE_ADMIN') %}
+		{% set currentPath = path(app.request.attributes.get('_route')) %}
 		<nav>
 			<ul> 
-			  <li><a href="{{ path('admin_usuarios') }}">Usuarios</a></li>
-			  <li><a href="{{ path('admin_stats') }}">Estadisticas</a></li>
+				<li>
+					<a href="{{ path('admin_home') }}"> 
+						{% if (currentPath|split('/')|last == '' or currentPath|split('/')|last == 'admin') %}
+							<b>Servidor</b> 
+						{% else %}
+							Servidor 
+						{% endif %} 
+					</a>
+				</li>
+				<li>
+					<a href="{{ path('admin_usuarios') }}"> 
+						{% if currentPath|split('/')|last == 'usuarios' %}
+							<b>Usuarios</b> 
+						{% else %}
+							Usuarios 
+						{% endif %} 
+					</a>
+				</li>
+				<li>
+					<a href="{{ path('admin_stats') }}"> 
+						{% if currentPath|split('/')|last == 'stats' %}
+							<b>Estadisticas</b> 
+						{% else %}
+							Estadisticas 
+						{% endif %} 
+					</a>
+				</li>
 			</ul>
 		</nav>
-			<div class='login_box'><span style='position:relative;right:15px;color:white;font-size:20px;'>Hola, <i>{{ app.user.nombreusuario }} </i></span> <button class='mid green button' onclick="window.location='{{ path('logout') }}'">Salir</button></div>
+			<div class='login_box'><span style='position:relative;right:15px;color:white;font-size:20px;'>Hola, <i>Admin </i></span> <button class='mid green button' onclick="window.location='{{ path('admin_logout') }}'">Salir</button></div>
 		{% endif %}
 	</header>
 		

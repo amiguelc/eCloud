@@ -4,7 +4,7 @@
 {% block article %}
 <section>
 	<h1>{{ block('title') }}</h1>
-	<div id="itsthetable">
+	<div class="tabla" id='itsthetable'>
 	<table>
 	<caption>{{ app.user.nombreusuario }}<a href="{{ path('ficheros') }}">/{{ ruta }}</a> <div style='float:right'><button id='button_subir'>Subir archivo</button> <button id='button_carpeta'>Crear carpeta</button></div></caption>
 
@@ -45,21 +45,31 @@
 	</div>
 	
 	<div id='file_upload' class='div_amagado'>
-			<form action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario) }}>
-				{{ form_errors(formulario) }}
-				{{ form_row(formulario.file) }} <input type="submit" value="Subir" />
-				{{ form_rest(formulario) }}
-			</form>
-			<button id='cerrar_file_upload'>Cerrar<button>
+		<table class='no_class'>
+			<tr>
+					<form action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario) }}>
+						{{ form_errors(formulario) }}
+						<td>{{ form_row(formulario.file) }} </td>
+						<td><input type="submit" value="Subir" /></td>
+						<td>{{ form_rest(formulario) }}</td>
+					</form>
+					<td><button id='cerrar_file_upload'>Cerrar</button></td>
+			</tr>
+		</table>
 	</div>
 	
 	<div id='crear_carpeta' class='div_amagado'>
-			<form action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
-				{{ form_errors(formulario_carpeta) }}
-				{{ form_row(formulario_carpeta.nombrefichero) }} <input type="submit" value="Crear" />
-				{{ form_rest(formulario_carpeta) }}
-			</form>
-			<button id='cerrar_crear_carpeta'>Cerrar<button>
+		<table class='no_class'>
+			<tr>
+				<form action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
+					{{ form_errors(formulario_carpeta) }}
+					<td>{{ form_row(formulario_carpeta.nombrefichero) }}</td>
+					<td><input type="submit" value="Crear" /></td>
+					<td>{{ form_rest(formulario_carpeta) }}</td>
+				</form>
+				<td><button id='cerrar_crear_carpeta'>Cerrar</button></td>
+			</tr>
+		</table>
 	</div>
 	
 	
@@ -67,15 +77,23 @@
 		$(document).ready(function(){
 		  $("#button_subir").click(function(){
 			$("#itsthetable").fadeTo("slow",0.15);
+			$("#crear_carpeta").hide();
 			$("#file_upload").show();
 		  });
 		  $("#button_carpeta").click(function(){
 			$("#itsthetable").fadeTo("slow",0.15);
+			$("#file_upload").hide();
 			$("#crear_carpeta").show();
 		  });
 		  $("#cerrar_file_upload").click(function(){
+			$("#crear_carpeta").hide();
 			$("#file_upload").hide();
-			$("#itsthetable").fadeIn();
+			$("#itsthetable").fadeTo("slow",1);
+		  });
+		  $("#cerrar_crear_carpeta").click(function(){
+			$("#crear_carpeta").hide();
+			$("#file_upload").hide();
+			$("#itsthetable").fadeTo("slow",1);
 		  });
 		});
 	</script>

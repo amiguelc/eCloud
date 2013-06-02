@@ -1,0 +1,46 @@
+{% extends '::backend.html.twig' %}
+{% block title %}Servidor {% endblock %}
+
+{% block article %}
+<section>
+	<h1>{{ block('title') }}</h1>
+		<table class='form'>
+		<tbody>
+			<tr>
+				<td>Sistema:</td>
+				<td> {{ datos.sistema }}</td>
+			</tr>
+			<tr>
+				<td>CPU:</td>
+				<td> {{ datos.cpu }}</td>
+			</tr>
+			<tr>
+				<td>Tama&ntilde;o Disco</td>
+				<td>{{ datos.size }} GB</td>
+			</tr>
+			<tr>
+				<td>Espacio Libre en Disco</td>
+				<td>{{ datos.free_space }} GB</td>
+			</tr>
+			<tr>
+				<td>Memoria:</td>
+				<td>{{ datos.memoria}} MB</td>
+			</tr>
+			<tr>
+				<td>Memoria Libre:</td>
+				<td>{{ datos.memoria_libre}} MB</td>
+			</tr>
+			<tr>
+				<td>Uptime:</td>
+				<td>{{ datos.uptime}}</td>
+			</tr>
+			<tr>
+				<td>Carga de Trabajo:</td>
+				<td>{{ datos.load}}</td>
+			</tr>
+			
+		</tbody>
+		</table>
+	</form>
+</section>
+{% endblock %}

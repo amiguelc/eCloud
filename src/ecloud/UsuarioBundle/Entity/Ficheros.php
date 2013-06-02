@@ -397,15 +397,16 @@ class Ficheros
 			//$this->getFile()->move($this->getUploadRootDir(),$this->getFile()->getClientOriginalName());
 
 			$this->setMime($this->getFile()->getMimeType());
-			$this->getFile()->move("C:\\ecloud\\".print_r($this->getPropietario(), true),$this->getFile()->getClientOriginalName());
+			$nombre=$this->getFile()->getClientOriginalName();
+			$this->getFile()->move("C:\\ecloud\\".print_r($this->getPropietario(), true).$this->getRuta(),$nombre);
 			// set the path property to the filename where you've saved the file
-			$this->path = $this->getFile()->getClientOriginalName();
+			$this->path = $nombre;
 			
 			//Coger nombre, tamaño en bytes y checksum.
-			$fichero_subido="C:\\ecloud\\".print_r($this->getPropietario(), true)."\\".$this->getFile()->getClientOriginalName();
+			$fichero_subido="C:\\ecloud\\".print_r($this->getPropietario(), true).$this->getRuta()."\\".$nombre;
 			$this->setChecksum(md5_file($fichero_subido));
-			$this->setNombreFichero($this->getFile()->getClientOriginalName());
-			$this->setnombrerealfisico($this->getFile()->getClientOriginalName());
+			$this->setNombreFichero($nombre);
+			$this->setnombrerealfisico($nombre);
 			$this->setFilesize(filesize($fichero_subido));
 			
 			

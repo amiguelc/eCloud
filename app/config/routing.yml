@@ -15,7 +15,7 @@ home:
     pattern: /home
     defaults: { _controller: UsuarioBundle:Sitio:Home }
 
-################################################################################################MANEJO DE USUARIOS
+################################################################################################ USUARIOS
 login:
     pattern: /login
     defaults: { _controller: UsuarioBundle:Security:login }
@@ -52,7 +52,7 @@ subir:
     defaults: { _controller: UsuarioBundle:Cuenta:subir }
 modificar:
     pattern: /modificar/{fichero}
-    defaults: { _controller: UsuarioBundle:Cuenta:modificar }
+    defaults: { _controller: UsuarioBundle:Cuenta:modificar, fichero: 0 }
 borrar:
     pattern: /borrar/{fichero}
     defaults: { _controller: UsuarioBundle:Cuenta:borrar }
@@ -64,27 +64,42 @@ eventos:
     defaults: { _controller: UsuarioBundle:Cuenta:eventos }
 links:
     pattern: /links
-    defaults: { _controller: UsuarioBundle:Cuenta:links }
-
+    defaults: { _controller: UsuarioBundle:Cuenta:links, id: 0 }
+borrarlink:
+    pattern: /borrarlink/{id}
+    defaults: { _controller: UsuarioBundle:Cuenta:borrarlink, id: 0 }
+################################################################################################ Descarga Externa
+download:
+    pattern: /!{descarga}
+    defaults: { _controller: UsuarioBundle:Cuenta:download, descarga: 0 }
 ############################################################################################## SECCION ADMIN
 admin_home:
     pattern: /admin
     defaults: { _controller: AdminBundle:Admin:home }
+_admin_home:
+    pattern: /admin/
+    defaults: { _controller: AdminBundle:Admin:home }
 admin_usuarios:
-    pattern: /admin/usuarios
-    defaults: { _controller: AdminBundle:Admin:usuarios }
+    pattern: /admin/usuarios/{id}
+    defaults: { _controller: AdminBundle:Admin:usuarios, id: 0 }
+admin_usuarios_modificar:
+    pattern: /admin/usuarios/modificar/{id}
+    defaults: { _controller: AdminBundle:Admin:modificarusuarios, id: 0 }
+admin_usuarios_borrar:
+    pattern: /admin/usuarios/borrar/{id}
+    defaults: { _controller: AdminBundle:Admin:borrarusuarios }
 admin_stats:
     pattern: /admin/stats
     defaults: { _controller: AdminBundle:Admin:stats }
 admin_login:
     pattern: /admin/login
-    defaults: { _controller: AdminBundle:Security:login }
+    defaults: { _controller: AdminBundle:AdminSecurity:login }
 admin_login_check:
     pattern: /admin/login_check
-logout:
+admin_logout:
     pattern: /admin/logout
 
-################################################################################################PAGINAS ESTATICAS FRONTEND AL FINAL, YA QUE ES CUANDO LAS OTRAS NO LAS ENCUENTRA
+################################################################################################ PAGINAS ESTATICAS FRONTEND AL FINAL, YA QUE ES CUANDO LAS OTRAS NO LAS ENCUENTRA
 ayuda:
     pattern: /ayuda
     defaults: { _controller: UsuarioBundle:Sitio:ayuda }
@@ -97,7 +112,6 @@ privacidad:
 sobre-nosotros:
     pattern: /sobre-nosotros
     defaults: { _controller: UsuarioBundle:Sitio:sobrenosotros }
-
 #No encontrado -> Home
 Noencontrado:
     pattern: /{pagina}

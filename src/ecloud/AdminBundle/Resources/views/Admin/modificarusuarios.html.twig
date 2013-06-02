@@ -1,0 +1,73 @@
+{% extends '::backend.html.twig' %}
+{% block title %}Modificar Usuario {% endblock %}
+
+{% block article %}
+<section>
+	<h1>{{ block('title') }}</h1>
+	
+	<form action="{{ path('admin_usuarios_modificar', { 'id': userid }) }}" method="post" {{ form_enctype(formulario) }}>
+		<div class="errors">
+		{{ form_errors(formulario) }}
+		</div>
+		<table class='form'>
+		<tbody>
+		<tr>
+				<td>{{ form_label(formulario.idUser) }}</td>
+				<td>{{ form_widget(formulario.idUser) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.email) }}</td>
+				<td>{{ form_widget(formulario.email) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.nombreUsuario) }}</td>
+				<td>{{ form_widget(formulario.nombreUsuario) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.password) }}</td>
+				<td>{{ form_widget(formulario.password) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.nombre) }}</td>
+				<td>{{ form_widget(formulario.nombre) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.apellidos) }}</td>
+				<td>{{ form_widget(formulario.apellidos) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.direccion) }}</td>
+				<td>{{ form_widget(formulario.direccion) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.ciudad) }}</td>
+				<td>{{ form_widget(formulario.ciudad) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.pais) }}</td>
+				<td>{{ form_widget(formulario.pais) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.limite) }}</td>
+				<td>{{ form_widget(formulario.limite) }}</td>
+			</tr>
+			<tr>
+				<td>{{ form_label(formulario.ocupado) }}</td>
+				<td>{{ form_widget(formulario.ocupado) }}</td>
+			</tr>
+			{{ form_rest(formulario) }}
+			<tr>
+				
+			</tr>
+		</div>
+		</tbody>
+		</table><br>
+		<td><input class="boton" type="submit" value="Guardar cambios" /></td>
+		<br>
+		<br>
+		Ficheros : {{ ficheros }}
+	</form>
+	
+
+</section>
+{% endblock %}

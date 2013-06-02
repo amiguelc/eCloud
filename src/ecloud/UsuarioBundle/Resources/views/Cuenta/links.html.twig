@@ -4,17 +4,32 @@
 {% block article %}
 <section>
 	<h1>{{ block('title') }}</h1>
-	<div id="itsthetable">
-	<table><caption></caption>
-	<thead><tr><th style='width:80%;'>Archivo</th><th>Tama&ntilde;o</th><th>Modificado</th><th>Link</th></tr></thead>
-	<tfoot><tr><th>Total</th><td colspan="4">0 links</td></tr></tfoot>
+	<div class="tabla" id='itsthetable'>
+	<table>
+	<caption>{{ app.user.nombreusuario }}</caption>
+
+	<thead><tr><th>Id Fichero</th><th>URL</th><th>Fecha Creacion</th><th>Fecha Expiracion</th><th>Usuarios</th><th></th></tr></thead>
 	<tbody>
-		<tr><th>qqqq</th><td>qwqw</td><td>qq</td><td>qqqqqqqq</td></tr>
-		<tr class="odd"><th>llll</th><td>llllll</td><td>USA</td><td>lllll</td></tr>
+		{% set var1 = 0 %}
+		{% for enlaces in enlaces %}
+		
+		{% set var1 = var1 + 1 %}
+
+		<tr {% if var1 is divisibleby(2) %} class="odd" {% endif %}>
+			<th style='width:100px;'><a href='{{ path('modificar', { 'fichero': enlaces.idFichero  }) }}'>{{ enlaces.idFichero }}</a></th>
+			<th>{{ app.request.host }}{{ path('download', { 'descarga': enlaces.idEnlace  })| raw }}</th>
+			<th>{{ enlaces.fechaInicio|date('d-m-Y') }}</th>
+			<th>{{ enlaces.fechaExpiracion|date('d-m-Y') }}</th>
+			<th>{{ enlaces.usuarios }}</th>
+			<th> 
+				<a href="{{ path('borrarlink', { 'id': enlaces.idEnlace }) }}"><img alt="Eliminar" src="{{ asset('bundles/usuario/images/delete.png') }}"></img></a>
+			</th>
+		</tr>
+		{% endfor %}
+		
 	</tbody>
+	<tfoot><tr><th>Total</th><td colspan="4">{{ var1  }} enlaces</td></tfoot>
 	</table>
 	</div>	
-
-	</div>
 </section>
 {% endblock %}

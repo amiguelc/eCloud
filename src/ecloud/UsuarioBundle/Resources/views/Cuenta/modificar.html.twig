@@ -10,33 +10,33 @@
 		</div>
 		{% for ficheros in ficheros %}
 		<div>
-			<table class='form'>
-		<tbody>
-			<tr>
-				<td style='width:150px'>Fichero: </td>
-				<td>{{ ficheros.nombrefichero }} </td>
-			</tr>
-			<tr>
-				<td>Tama&ntilde;o </td>
-				<td>{{ ficheros.filesize }} </td>
-			</tr>
-			<tr>
-				<td>Checksum: </td>
-				<td>{{ ficheros.checksum }} </td>
-			</tr>
-			<tr>
-				<td>Total Descargas: </td>
-				<td>{{ ficheros.totaldescargas }} <br></td>
-			</tr>
-			<tr>
-				<td> Nuevo Nombre Fichero </td>
-				<td>{{ form_widget(formulario.nombrefichero) }} </td>
-			</tr>
-			<tr>
-				<td> Nueva Ruta </td>
-				<td>{{ form_widget(formulario.ruta) }} </td>
-			</tr>
-		</tbody>
+		<table class='form'>
+			<tbody>
+				<tr>
+					<td style='width:150px'>Fichero: </td>
+					<td>{{ ficheros.nombrefichero }} </td>
+				</tr>
+				<tr>
+					<td>Tama&ntilde;o </td>
+					<td>{{ ficheros.filesize }} </td>
+				</tr>
+				<tr>
+					<td>Checksum: </td>
+					<td>{{ ficheros.checksum }} </td>
+				</tr>
+				<tr>
+					<td>Total Descargas: </td>
+					<td>{{ ficheros.totaldescargas }} <br></td>
+				</tr>
+				<tr>
+					<td> Nuevo Nombre Fichero </td>
+					<td>{{ form_widget(formulario.nombrefichero) }} </td>
+				</tr>
+				<tr>
+					<td> Nueva Ruta </td>
+					<td>{{ form_widget(formulario.ruta) }} </td>
+				</tr>
+			</tbody>
 		</table>
 		
 		</div>
@@ -50,6 +50,53 @@
 		{{ form_rest(formulario) }}
 		<input class="boton" type="submit" value="Guardar cambios" />
 	</form>
+	<br><br>
+	<button id='button_link'>Crear Link</button>
+	
+	<div id='crear_link' style='display:none;'>
+		<table class='no_class'>
+			<tr>
+				<form action="{{ path('links') }}" method="POST" {{ form_enctype(formulario_link) }}>
+					<div class="errors">{{ form_errors(formulario_link) }}</div>
+					<tr>
+						<td> Direccion </td>
+						<td>{{ form_widget(formulario_link.url) }} </td>
+					</tr>
+					<tr>
+						<td> Fecha Inicio </td>
+						<td>{{ form_widget(formulario_link.fechaInicio) }} </td>
+					</tr>
+					<tr>
+						<td> Fecha Expiracion </td>
+						<td>{{ form_widget(formulario_link.fechaExpiracion) }} </td>
+					</tr>
+					<tr>
+						<td> Usuarios </td>
+						<td>{{ form_widget(formulario_link.usuarios) }} </td>
+					</tr>
+					
+					<td><input type="submit" value="Crear Link" /></td>
+					<td>{{ form_rest(formulario_link) }}</td>
+				</form>
+				<td><button id='cerrar_crear_link'>Cerrar</button></td>
+			</tr>
+		</table>
 	</div>
+	
+	
+	<script>
+		$(document).ready(function(){
+		  $("#button_link").click(function(){
+			$("#crear_link").show();
+		  });
+		  $("#cerrar_crear_link").click(function(){
+			$("#crear_link").hide();
+		  });
+		});
+	</script>
+	
+	
+	
+	
 </section>
 {% endblock %}

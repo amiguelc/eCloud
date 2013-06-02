@@ -16,12 +16,45 @@
 		<a href="{{ path('home') }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>
 		
 		{% if is_granted('ROLE_USER') %}
+		{% set currentPath = path(app.request.attributes.get('_route')) %}
 		<nav>
 			<ul> 
-			  <li><a href="{{ path('perfil') }}">Mi Perfil</a></li>
-			  <li><a href="{{ path('ficheros') }}">Ficheros</a></li>
-			  <li><a href="{{ path('eventos') }}">Eventos</a></li>
-			  <li><a href="{{ path('links') }}">Links</a></li>
+				<li>
+					<a href="{{ path('perfil') }}"> 
+						{% if currentPath|split('/')|last == 'perfil' %}
+							<b>Mi Perfil</b> 
+						{% else %}
+							Mi perfil 
+						{% endif %} 
+					</a>
+				</li> 
+				<li>
+					<a href="{{ path('ficheros') }}"> 
+						{% if currentPath|split('/')|last == 'ficheros' %}
+							<b>Ficheros</b> 
+						{% else %}
+							Ficheros 
+						{% endif %} 
+					</a>
+				</li>
+				<li>
+					<a href="{{ path('eventos') }}"> 
+						{% if currentPath|split('/')|last == 'eventos' %}
+							<b>Eventos</b> 
+						{% else %}
+							Eventos 
+						{% endif %} 
+					</a>
+				</li>
+				<li>
+					<a href="{{ path('links') }}"> 
+						{% if currentPath|split('/')|last == 'links' %}
+							<b>Links</b> 
+						{% else %}
+							Links 
+						{% endif %} 
+					</a>
+				</li> 
 			</ul>
 		</nav>
 			<div class='login_box'><span style='position:relative;right:15px;color:white;font-size:20px;'>Hola, <i>{{ app.user.nombreusuario }} </i></span> <button class='mid green button' onclick="window.location='{{ path('logout') }}'">Salir</button></div>

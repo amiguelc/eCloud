@@ -5,16 +5,21 @@ namespace ecloud\UsuarioBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use eCloud\UsuarioBundle\Entity\Usuarios;
-use eCloud\UsuarioBundle\Form\Frontend\UsuarioType;
+//use eCloud\UsuarioBundle\Form\Frontend\UsuarioType;
 
 class RegistroController extends Controller{
 
 	public function registroAction(){
+	if ($this->get('security.context')->isGranted('ROLE_USER')){
+	return $this->redirect($this->generateUrl('home'), 301);
+	}
+	else{
 	 
 	$peticion = $this->getRequest();
 	$usuario = new Usuarios();
-	$formulario = $this->createForm(new UsuarioType(), $usuario);
-	
+	//id_user,email,nombre_usuario,password,nombre,apellidos,direccion,ciudad,pais,ip_registro,fecha_registro,limite,logins_ftp,login_web,ocupado,ultimo_acceso
+	//$formulario = $this->createForm(new UsuarioType(), $usuario);
+	$formulario=$this->createFormBuilder($usuario)->add('email','text')->add('nombre_usuario','text')->add('password','password')->add('nombre','text')->add('apellidos','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')->getForm();
 	
 	
 	
@@ -49,7 +54,7 @@ class RegistroController extends Controller{
 			
 			//crear la carpeta del usuario en el disco duro
 			$var_archivos = $this->container->getParameter('var_archivos');
-			mkdir($var_archivos.$usuario->getNombreUsuario());
+			mkdir($var_archivos.$usuario->getIdUser());
 			//falta enviar email de registro completo
 			return $this->redirect($this->generateUrl('login'));
 			
@@ -59,5 +64,5 @@ class RegistroController extends Controller{
 	
 	return $this->render('UsuarioBundle:Security:registro.html.twig', array('formulario' => $formulario->createView()) );
 }
-	
+}
 }

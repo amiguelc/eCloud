@@ -1,0 +1,27 @@
+{% extends '::frontend.html.twig' %}
+{% block title %}Descargar {% endblock %}
+
+{% block article %}
+<section>
+	<h1>{{ block('title') }}</h1>
+	Descarga del fichero {{ fichero.nombreFichero }} ({{ fichero.filesize}}) MB
+	
+	<br><br>{{ error }}
+	
+	{% if error == '' %} 
+	<br>Procesando descarga..10 segundos<br><br>
+		<form id='desc' style='display:none;' action="" method="POST">
+				<td><input class='mid green button' type="submit" value="Descargar" /></td>
+		</form>
+		
+	<script>
+	$(document).ready(function(){
+    $("#desc").delay(10000).fadeIn();
+	}
+	);
+	</script>
+	
+	{% endif %}
+	
+</section>
+{% endblock %}

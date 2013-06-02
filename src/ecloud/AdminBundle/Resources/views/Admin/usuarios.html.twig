@@ -5,6 +5,46 @@
 <section>
 	<h1>{{ block('title') }}</h1>
 	
+	<div class="tabla">
+	<table>
+	<caption>
+
+	<thead><tr><th>Id</th><th>Email</th><th>Usuario</th><th >Password</th><th>Nombre</th><th>Apellidos</th><th>Direccion</th><th>Ciudad</th><th>Pais</th><th>Ip Registro</th><th>Fecha Registro</th><th>Limite</th><th>Logins FTP</th><th>Logins Web</th><th>Espacio Ocupado</th><th>Ultimo acceso</th></tr></thead>
+	<tbody>
+		{% set var1 = 0 %}
+		{% for usuarios in usuarios %}
+		
+		{% set var1 = var1 + 1 %}
+
+		<tr {% if var1 is divisibleby(2) %} class="odd" {% endif %}>
+			<th>{{ usuarios.iduser }}</th>
+			<th>{{ usuarios.email }}</th>
+			<th>{{ usuarios.nombreusuario }}</th>
+			<th style=' width:80px;overflow: hidden;display: inline-block;white-space: nowrap;text-overflow: ellipsis'>{{ usuarios.password }}</th>
+			<th>{{ usuarios.nombre }}</th>
+			<th>{{ usuarios.apellidos }}</th>
+			<th>{{ usuarios.direccion }}</th>
+			<th>{{ usuarios.ciudad }}</th>
+			<th>{{ usuarios.pais }}</th>
+			<th>{{ usuarios.ipregistro }}</th>
+			<th>{{ usuarios.fecharegistro|date('H:i:s d-m-Y ') }}</th>
+			<th>{{ usuarios.limite }}</th>
+			<th>{{ usuarios.loginsftp }}</th>
+			<th>{{ usuarios.loginweb }}</th>
+			<th>{{ usuarios.ocupado }}</th>
+			<th>{{ usuarios.ultimoacceso|date('H:i:s d-m-Y ') }}</th>
+			<th> 
+				<a href="{{ path('admin_usuarios_modificar', { 'id': usuarios.iduser }) }}"><img  alt="Editar" src="{{ asset('bundles/usuario/images/edit.png') }}"></img></a>
+				<a href="{{ path('admin_usuarios_borrar', { 'id': usuarios.iduser }) }}"><img alt="Eliminar" src="{{ asset('bundles/usuario/images/delete.png') }}"></img></a>
+			</th>
+		</tr>
+		{% endfor %}
+		{% if var1 == 0 %}<tr><th>...</th><th></th><th></th><th></th></tr>{% endif %}
+	</tbody>
+	<tfoot><tr><th>Total</th><td colspan="4">{{ var1  }} usuarios</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tfoot>
+	</table>
+	</div>	
+	
 	
 
 </section>

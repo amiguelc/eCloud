@@ -7,32 +7,37 @@
 		<table class='form'>
 		<tbody>
 			<tr>
-				<td style='width:150px'>Usuarios Registrados</td>
-				<td></td>
+				<td style='width:250px'>Usuarios Registrados</td>
+				<td>{{ datos.registrados }}</td>
 			</tr>
 			<tr>
 				<td>Usuarios Conectados</td>
 				<td></td>
 			</tr>
+			<tr><td></td></tr>
 			<tr>
 				<td>Total Archivos</td>
-				<td></td>
+				<td>{{ datos.ficheros }}</td>
 			</tr>
 			<tr>
 				<td>Tama&ntilde;o Total Archivos</td>
-				<td></td>
+				<td>{{ datos.filesize }} GB</td>
+			</tr
+			<tr>
+				<td>Tama&ntilde;o Disco</td>
+				<td>{{ datos.size }} GB</td>
 			</tr>
 			<tr>
-				<td>Espacio en Disco</td>
-				<td></td>
+				<td>Espacio Libre en Disco</td>
+				<td>{{ datos.free_space }} GB</td>
 			</tr>
 			<tr>
 				<td>Links</td>
-				<td></td>
+				<td>{{ datos.links }}</td>
 			</tr>
 			<tr>
 				<td>Total Descargas</td>
-				<td></td>
+				<td>{{ datos.total_descargas}}</td>
 			</tr>
 			<tr>
 				<td></td>
@@ -42,12 +47,8 @@
 				<td></td>
 				<td></td>
 			</tr>
-		</div>
 		</tbody>
-		</table><br>
-		<td><input class="boton" type="submit" value="Guardar cambios" /></td>
-		<br>
-		
+		</table>	
 	</form>
 </section>
 {% endblock %}
