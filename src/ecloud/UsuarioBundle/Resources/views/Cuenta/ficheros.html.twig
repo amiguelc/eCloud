@@ -28,7 +28,7 @@
 					<a href="{{ path('descargar', { 'fichero': ficheros.idfichero }) }}">{{ ficheros.nombrefichero }}</a> 
 				{% endif %}
 			</th>
-			<th>{% if ficheros.filesize <= 1024 %}{{ ficheros.filesize }} bytes {% else %} {{ficheros.filesize / 1024 }} Kbytes{% endif %}</th>
+			<th> {{ficheros.filesize}} Mbytes</th>
 			<th>{{ ficheros.fechasubida|date('d-m-Y') }}</th>
 			<th> 
 				<a href="{{ path('modificar', { 'fichero': ficheros.idfichero }) }}"><img  alt="Editar" src="{{ asset('bundles/usuario/images/edit.png') }}"></img></a>

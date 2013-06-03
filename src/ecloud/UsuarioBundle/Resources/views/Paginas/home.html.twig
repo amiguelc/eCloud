@@ -2,9 +2,10 @@
 {% block title %}home {% endblock %}
 {% block article %}
 <section>
-<!-- Si no hay login, a la izquierda registrarse, y a la derecha loguearse, y que desaparezca lo de arriba-->
-<h1><a href="{{ path('registro') }}">Registrarse en eCloud</a></h1>
 
-<p>a</p>
+<div style='position:fixed;left:350px;top:120px'>
+<h1><a href="{{ path('registro') }}">Registrarse en eCloud</a></h1>
+Registrate en eCloud para obtener una cuenta con 500 MB para subir lo que tu quieras.
+</div>
 </section>
 {% endblock %}

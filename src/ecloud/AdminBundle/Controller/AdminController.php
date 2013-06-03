@@ -57,7 +57,7 @@ class AdminController extends Controller
 				$return[] = $minutes.' '." minutos";
 
 			if ($seconds > 0)
-				$return[] = $seconds. (date('m/d') == '06/03' ? ' sex' : ' '." segundos");
+				$return[] = $seconds. (date('m/d') == '06/03' ? ' secs' : ' '." segundos");
 
 			return implode(', ', $return);
 		}

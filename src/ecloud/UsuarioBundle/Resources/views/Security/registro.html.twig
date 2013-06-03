@@ -6,9 +6,51 @@
 <h1>{{ block('title') }}</h1>
 
 
-<form action="{{ path('registro') }}" method="post" {{
-form_enctype(formulario) }}>
-{{ form_widget(formulario) }}
+<form action="{{ path('registro') }}" method="post" {{form_enctype(formulario) }}>
+
+<div class="errors">
+		{{ form_errors(formulario) }}
+		</div>
+		<table class='form'>
+		<tbody>
+			<tr>
+				<td>Email</td>
+				<td>{{ form_widget(formulario.email) }}</td>
+			</tr>
+			<tr>
+				<td>Nombre Usuario</td>
+				<td>{{ form_widget(formulario.nombre_usuario) }}</td>
+			</tr>
+			<tr>
+				<td>Password</td>
+				<td>{{ form_widget(formulario.password) }}</td>
+			</tr>
+			<tr>
+				<td>Nombre</td>
+				<td>{{ form_widget(formulario.nombre) }}</td>
+			</tr><tr>
+				<td>Apellidos</td>
+				<td>{{ form_widget(formulario.apellidos) }}</td>
+			</tr>
+			<tr>
+				<td>Direccion</td>
+				<td>{{ form_widget(formulario.direccion) }}</td>
+			</tr>
+			<tr>
+				<td>Ciudad</td>
+				<td>{{ form_widget(formulario.ciudad) }}</td>
+			</tr>
+			<tr>
+				<td>Pais</td>
+				<td>{{ form_widget(formulario.pais) }}</td>
+			</tr>
+			{{ form_rest(formulario) }}
+			<tr>
+				
+			</tr>
+		</div>
+		</tbody>
+		</table><br>
 <input class="boton" type="submit" value="Registrarme" />
 </form>
 

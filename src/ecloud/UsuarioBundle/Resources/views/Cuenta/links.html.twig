@@ -8,7 +8,7 @@
 	<table>
 	<caption>{{ app.user.nombreusuario }}</caption>
 
-	<thead><tr><th>Id Fichero</th><th>URL</th><th>Fecha Creacion</th><th>Fecha Expiracion</th><th>Usuarios</th><th></th></tr></thead>
+	<thead><tr><th>Id Fichero</th><th>URL</th><th>Fecha Creacion</th><th>Fecha Expiracion</th><th>Usuarios</th></tr></thead>
 	<tbody>
 		{% set var1 = 0 %}
 		{% for enlaces in enlaces %}
@@ -26,7 +26,7 @@
 			</th>
 		</tr>
 		{% endfor %}
-		
+	{% if var1 == 0 %}<tr><th><a href="{{ app.request.getRequestURI() }}/../"/>../</a></th><th></th><th></th><th></th></tr>{% endif %}
 	</tbody>
 	<tfoot><tr><th>Total</th><td colspan="4">{{ var1  }} enlaces</td></tfoot>
 	</table>

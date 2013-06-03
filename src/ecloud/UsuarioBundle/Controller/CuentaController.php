@@ -67,6 +67,9 @@ class CuentaController extends Controller{
 			}
 			else{
 				//$formulario = $this->createFormBuilder($usuario)->add('nombrefichero','text', array('data'=> $ficheros2->getNombreFichero()))->add('ruta','text',array ('data'=> $ficheros2->getRuta()))->getForm();
+				$usuario->setLimite(round(($usuario->getLimite()/1024/1024),2)." Mbytes");
+				$usuario->setOcupado(round(($usuario->getOcupado()/1024/1024),2));
+				$usuario->setOcupado($usuario->getOcupado()." Mbytes (".round(($usuario->getOcupado()/$usuario->getLimite()*100),2)."%)");
 				$formulario=$this->createFormBuilder($usuario)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')->getForm();
 				return $this->render('UsuarioBundle:Cuenta:perfil.html.twig', array('usuario'=>$usuario,'formulario' => $formulario->createView()));
 			}
@@ -101,6 +104,15 @@ class CuentaController extends Controller{
 				$formulario = $this->createFormBuilder($entity_ficheros)->add('file','file',array('label'=>'Archivo '))->add('ruta','hidden',array('data' => "/".$ruta))->getForm();
 				$formulario_carpeta  = $this->createFormBuilder($entity_ficheros)->add('nombrefichero','text',array('label'=>'Carpeta'))->add('ruta','hidden',array('data' => "/".$ruta))->getForm();
 				$ficheros=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'ruta' => "/".$ruta));
+				
+				
+				//return $response = New Response(var_dump($ficheros));
+				//PASAR BYTES A MB
+				
+				foreach ($ficheros as $clave => $valor){
+				$ficheros[$clave]->setFilesize(round(($ficheros[$clave]->getFilesize()/1024/1024),2));
+				}
+				
 			}
 			
 			
