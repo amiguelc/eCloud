@@ -1,6 +1,9 @@
 ﻿# Archivos de bootstrap (compilan las clases más usadas en Symfony2)
 app/bootstrap*
 
+#Esto
+composer.lock
+
 # Directorios de Symfony
 vendor/*
 */logs/*
