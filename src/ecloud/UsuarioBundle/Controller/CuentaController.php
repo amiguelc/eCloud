@@ -10,24 +10,18 @@ use eCloud\UsuarioBundle\Entity\Ficheros;
 use eCloud\UsuarioBundle\Entity\Eventos;
 use eCloud\UsuarioBundle\Entity\Enlaces;
 //use eCloud\UsuarioBundle\Form\Frontend\UsuarioType;
-//use Symfony\Component\HttpFoundation\BinaryFileResponse;
-//use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
-//use eCloud\UsuarioBundle\Form\Frontend\SubirFicheroType;
 
 
 class CuentaController extends Controller{
     public function perfilAction(){
-        // Obtener los datos del usuario logueado y utilizarlos para
-		// rellenar un formulario de registro.
+        // Obtener los datos del usuario logueado y utilizarlos para rellenar un formulario de registro.
 		//
 		// Si la petición es GET, mostrar el formulario
-		// Si la petición es POST, actualizar la información del usuario con
-		// los nuevos datos obtenidos del formulario
+		// Si la petición es POST, actualizar la información del usuario con los nuevos datos obtenidos del formulario
 
 		 if ($this->get('security.context')->isGranted('ROLE_USER')){
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
-			//$usuario = $this->get('security.context')->getToken()->getUser();
 			$em = $this->getDoctrine()->getManager();
 			$entity_usuarios=new Usuarios();
 			$usuario=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
@@ -50,7 +44,6 @@ class CuentaController extends Controller{
 					$usuario->setDireccion($formulario["direccion"]->getData());
 					$usuario->setCiudad($formulario["ciudad"]->getData());
 					$usuario->setPais($formulario["pais"]->getData());
-					//$usuario_modificado->setIdUser($userid);
 					
 					//$formulario_recibido=setIpRegistro($this->getIpRegistro());
 					//$formulario_recibido=setLimite('5555555');
@@ -170,7 +163,7 @@ class CuentaController extends Controller{
 							$ficheros->setChecksum('0');
 							$ficheros->setFilesize('0');
 							//crear carpeta en el caso de crear carpetas
-							if(isset($_POST['form']['nombrefichero'])){mkdir("C:\\ecloud\\".$userid.$ficheros->getRuta()."\\".$ficheros->getnombreFichero());}
+							if(isset($_POST['form']['nombrefichero'])){mkdir($this->container->getParameter('var_archivos').$userid.$ficheros->getRuta()."\\".$ficheros->getnombreFichero());}
 						}else {
 							$ficheros->setTipo("fichero");
 							$ficheros->upload();
@@ -200,6 +193,7 @@ class CuentaController extends Controller{
 						
 						
 						//return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig',array('ruta'=>$ruta));
+						//Esta redireccion no es segura, hay que revisar.
 						return $this->redirect($this->getRequest()->headers->get('referer'),303);
 					}
 				}
@@ -230,12 +224,15 @@ class CuentaController extends Controller{
 					//propietario, nombre_fichero, nombre_real_fisico, tipo, ruta, filesize, checksum, fecha_subida, total_descargas, permiso
 					$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
 					$nombre_antiguo=$ficheros->getNombreFichero();
+					
+					//Falta validar datos introducidos de nombre y ruta del fichero					
 					$nombre_nuevo=$formulario["nombrefichero"]->getData();
 					$ruta_nueva=$formulario["ruta"]->getData();
-					$ruta_absoluta_antigua="C:\\ecloud\\".$userid.$ficheros->getRuta()."\\".$nombre_antiguo;
-					$ruta_absoluta_nueva="C:\\ecloud\\".$userid.$ficheros->getRuta()."\\".$nombre_nuevo;
+					$ruta_antigua=$ficheros->getRuta();
+					$ruta_absoluta_antigua=$this->container->getParameter('var_archivos').$userid.$ficheros->getRuta()."\\".$nombre_antiguo;
+					$ruta_absoluta_nueva=$this->container->getParameter('var_archivos').$userid.$ruta_nueva."\\".$nombre_nuevo;
 					
-					//$ficheros->setRuta($ruta_nueva);
+					$ficheros->setRuta($ruta_nueva);
 					$ficheros->setNombreFichero($nombre_nuevo);
 					$ficheros->setNombreRealFisico($nombre_nuevo);
 										
@@ -250,24 +247,25 @@ class CuentaController extends Controller{
 					$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
 					$eventos->setFecha(new \Datetime());
 					
-
+			
+					if($ficheros->getTipo()=='carpeta'){
+					//FALTA COMPROBAR EN LA BD LOS FICHEROS QUE CONTENIA ESA CARPETA Y RENOMBRARLES LA RUTA A LA NUEVA SOLO EN LA BD, EN EL FILESYSTEM YA SE HACE SOLO, COGIENDO DE ALGUNA MANERA EL VALOR ANTIGUO Y CAMBIANDOLO SOLO LA PARTE QUE COINCIDE.
+					//Falta solo los sub-subficheros.
+					$query = $em->createQuery('UPDATE UsuarioBundle:Ficheros f SET f.ruta = ?1 WHERE f.ruta LIKE ?2 and f.propietario=?3');
+					if($ruta_nueva="/"){$query->setParameter(1, "/".$nombre_nuevo);}else{$query->setParameter(1, $ruta_nueva."/".$nombre_nuevo);}
+					$query->setParameter(2, $ruta_antigua.$nombre_antiguo.'%');
+					$query->setParameter(3, $userid);
+					//return  $response = new Response(print_r($query, true));
+					$archivos=$query->getResult();
+					}
+				
 					$em->persist($eventos);					
 					$em->persist($ficheros);
 					$em->flush();
 					
-					//falta modificar nombre fichero.
 					rename($ruta_absoluta_antigua,$ruta_absoluta_nueva);
-					
-					
-					
-					//FALTA COMPROBAR EN LA BD LOS FICHEROS QUE CONTENIA ESA CARPETA Y RENOMBRARLES LA RUTA A LA NUEVA
-					
-					
-					
-					
-					
+										
 					return $this->redirect($this->generateUrl('ficheros'),303);
-					//return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
 				}
 			}
 			else{
@@ -301,7 +299,7 @@ class CuentaController extends Controller{
 				$em=$this->getDoctrine()->getManager();
 				$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
 
-				$ruta_local="C:\\ecloud\\".$userid.print_r($ficheros->getRuta(), true).print_r($ficheros->getNombreFichero(), true);
+				$ruta_local=$this->container->getParameter('var_archivos').$userid.print_r($ficheros->getRuta(), true).print_r($ficheros->getNombreFichero(), true);
 				$ruta_local=str_replace("/", "\\", $ruta_local);
 				
 				
@@ -442,7 +440,7 @@ class CuentaController extends Controller{
 				if (!$ficheros) {throw $this->createNotFoundException('No existe el fichero '.$fichero);}
 				
 				//procesar ruta y descargar el archivo, sumar una descarga a la BD.
-				$ruta_local="C:\\ecloud\\".$userid.print_r($ficheros->getRuta(), true)."\\".print_r($ficheros->getNombreFichero(), true);
+				$ruta_local=$this->container->getParameter('var_archivos').$userid.print_r($ficheros->getRuta(), true)."\\".print_r($ficheros->getNombreFichero(), true);
 				$ruta_local=str_replace("/", "\\", $ruta_local);
 				$ficheros->setTotalDescargas($ficheros->getTotalDescargas()+1);
 				$mime=$ficheros->getMime();
@@ -565,7 +563,7 @@ class CuentaController extends Controller{
 				$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$enlace->getIdFichero()));
 				if (!$ficheros) {throw $this->createNotFoundException('No existe ese fichero');}
 				//procesar ruta y descargar el archivo, sumar una descarga a la BD.
-				$ruta_local="C:\\ecloud\\".$ficheros->getPropietario().print_r($ficheros->getRuta(), true)."\\".print_r($ficheros->getNombreFichero(), true);
+				$ruta_local=$this->container->getParameter('var_archivos').$ficheros->getPropietario().print_r($ficheros->getRuta(), true)."\\".print_r($ficheros->getNombreFichero(), true);
 				$ruta_local=str_replace("/", "\\", $ruta_local);
 				$ficheros->setTotalDescargas($ficheros->getTotalDescargas()+1);
 				$mime=$ficheros->getMime();
@@ -594,7 +592,7 @@ class CuentaController extends Controller{
 				
 				if ($this->getRequest()->isMethod('POST')){
 				//procesar ruta y descargar el archivo, sumar una descarga a la BD.
-				$ruta_local="C:\\ecloud\\".$ficheros->getPropietario().print_r($ficheros->getRuta(), true)."\\".print_r($ficheros->getNombreFichero(), true);
+				$ruta_local=$this->container->getParameter('var_archivos').$ficheros->getPropietario().print_r($ficheros->getRuta(), true)."\\".print_r($ficheros->getNombreFichero(), true);
 				$ruta_local=str_replace("/", "\\", $ruta_local);
 				$ficheros->setTotalDescargas($ficheros->getTotalDescargas()+1);
 				$mime=$ficheros->getMime();

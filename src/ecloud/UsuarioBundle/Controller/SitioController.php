@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 class SitioController extends Controller{
 	
 	public function HomeAction(){
-		//si esta logueado redirige return $this->render('UsuarioBundle:Cuenta:home.html.twig');
 		
 		if ($this->get('security.context')->isGranted('ROLE_USER')) {
 		// el usuario tiene el role 'ROLE_USUARIO'

@@ -16,6 +16,7 @@ class AdminController extends Controller
 		$datos['size']=round(disk_total_space("C:")/1024/1024/1024,2);
 		$datos['free_space']=round(disk_free_space("C:")/1024/1024/1024,2);
 			
+		//Windows	
 		$wmi=new \COM('winmgmts:{impersonationLevel=impersonate}//./root/cimv2');
 		foreach ($wmi->ExecQuery("SELECT TotalPhysicalMemory FROM Win32_ComputerSystem") as $cs) {$datos['memoria'] = round($cs->TotalPhysicalMemory/1024/1024,2);}
 		foreach ($wmi->ExecQuery("SELECT FreePhysicalMemory FROM Win32_OperatingSystem") as $cs) {$datos['memoria_libre'] = round($cs->FreePhysicalMemory/1024,2);}
@@ -65,7 +66,7 @@ class AdminController extends Controller
 		$load=array();
 		foreach ($wmi->ExecQuery("SELECT LoadPercentage FROM Win32_Processor") as $cpu) {$load[] = $cpu->LoadPercentage;}
 		$datos['load']=round(array_sum($load) / count($load), 2) . "%";
-		
+		//Windows
 		
 		
 		
