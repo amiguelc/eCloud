@@ -39,7 +39,7 @@ class RegistroController extends Controller{
 			//$sp=new DateTimeZone("Europe\London");
 			$usuario->setFechaRegistro(new \DateTime());
 			$usuario->setultimoAcceso(new \DateTime());
-			$usuario->setLimite("500000000");
+			$usuario->setLimite($this->container->getParameter('default_limite'));
 			$usuario->setOcupado("0");
 			$usuario->setLoginsftp("0");
 			$usuario->setLoginweb("0");
