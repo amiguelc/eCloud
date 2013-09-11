@@ -62,6 +62,9 @@ descargar:
 eventos:
     pattern: /eventos
     defaults: { _controller: UsuarioBundle:Cuenta:eventos }
+eventosJSON:
+    pattern: /eventosjson
+    defaults: { _controller: UsuarioBundle:Cuenta:eventosjson }
 links:
     pattern: /links
     defaults: { _controller: UsuarioBundle:Cuenta:links, id: 0 }

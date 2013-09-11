@@ -5,10 +5,21 @@
 <section>
 	<h1>{{ block('title') }}</h1>
 
-	<div class="tabla">
+	<div class="tabla" id="tabla">
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- Metodo antiguo sin JSON
 	<table><caption>{{ app.user.nombreusuario }}</caption>
 	<thead><tr><th style='width:87%;'>Acci&oacute;n</th><th>Fecha</th></tr></thead>
 	<tbody>
+	
 		{% set var1 = 0 %}
 		{% for eventos in eventos %}
 		
@@ -28,9 +39,8 @@
 	</tbody>
 	<tfoot><tr><th>Total</th><td colspan="4">{{ var1  }} eventos</td></tr></tfoot>
 	</table>
+	-->
 	</div>	
-
-	</div>
 
 </section>
 {% endblock %}

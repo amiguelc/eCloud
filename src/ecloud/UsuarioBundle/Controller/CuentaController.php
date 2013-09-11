@@ -482,6 +482,21 @@ class CuentaController extends Controller{
 			}
 		}
 		
+		public function eventosJSONAction(){
+       
+			if ($this->get('security.context')->isGranted('ROLE_USER')){
+			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+			$em=$this->getDoctrine()->getManager();
+			$eventos=$em->getRepository('UsuarioBundle:Eventos')->findBy(array('idUser' => $userid),array('fecha' => 'DESC'));
+	
+			
+			return new Response ($eventos);
+			}
+			else{
+				return $this->redirect($this->generateUrl('login'), 301);
+			}
+		}
+		
 		public function linksAction($id){
 		
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
