@@ -4,17 +4,99 @@
 {% block article %}
 <section>
 	<h1>{{ block('title') }}</h1>
-
+	
 	<div class="tabla" id="tabla">
 	
 	
+		
+	<script type="text/javascript">
+		//Script para manejar el JSON -> Funcion mas tarde llamada eventosJSONtoTable()
+  String.prototype.transformaCaracteresEspeciales = function() {
+    return unescape(escape(this).
+                      replace(/%0A/g, '<br/>').
+                      replace(/%3C/g, '&lt;').
+                      replace(/%3E/g, '&gt;'));
+  }
+  
+  window.onload = function() {
+    // Cargar JSON
+    cargarContenido();
+  }
+  
+  function cargarContenido() {
+  alert("e");
+    // Borrar datos anteriores
+    document.getElementById('tabla').innerHTML = "";
+	
+	
+    // Instanciar objeto XMLHttpRequest
+    if(window.XMLHttpRequest) {
+      peticion = new XMLHttpRequest();
+    }
+    else {
+      peticion = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    
+    // Preparar función de respuesta
+    peticion.onreadystatechange = muestraContenido;
+    
+    // Realizar petición
+    peticion.open('GET', 'eventosjson?nocache='+Math.random(), true);
+    peticion.send(null);
+  }
+  
+  // Función de respuesta
+  function muestraContenido() {
+alert("e");
+    if(peticion.readyState == 4) {
+      if(peticion.status == 200) {
+	  alert("e");
+        var div = document.getElementById('tabla');
+        		
+		//JSON
+		var arr = eval ("(" + peticion.responseText+ ")"); 
+		
+		
+		// Formatear JSON en una tabla
+		var tabla;
+		var cab = "<tr>";
+		var cuerpo = "";
+	
+		for(var i=0;i<arr.length;i++){
+			var obj = arr[i];
+			cuerpo = cuerpo + "<tr>";
+			for(var key in obj){
+				var attrName = key;
+				var attrValue = obj[key];
+				cuerpo = cuerpo + "<td>" + attrValue + "</td>";
+				if (i==0){
+				//Guarda cabeceras de la tabla
+				cab = cab + "<th>" + attrName + "</th>";
+				}
+			}
+			cuerpo = cuerpo + "</tr>";
+		} 
+		tabla = "<table>" + cab + "</tr>" + cuerpo + "</table>";
+		div.innerHTML = tabla;
+		
+		
+      }
+    }
+  }
+  
+  function limpiarContenido() {
+  document.getElementById('tabla').innerHTML = "";
+  
+  }
+  
+
+	</script>
 	
 	
 	
 	
 	
-	
-	
+	{# 
 	<!-- Metodo antiguo sin JSON
 	<table><caption>{{ app.user.nombreusuario }}</caption>
 	<thead><tr><th style='width:87%;'>Acci&oacute;n</th><th>Fecha</th></tr></thead>
@@ -40,7 +122,9 @@
 	<tfoot><tr><th>Total</th><td colspan="4">{{ var1  }} eventos</td></tr></tfoot>
 	</table>
 	-->
+	#} 
 	</div>	
 
 </section>
+	
 {% endblock %}

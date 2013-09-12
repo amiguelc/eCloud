@@ -9,7 +9,11 @@ use eCloud\UsuarioBundle\Entity\Usuarios;
 use eCloud\UsuarioBundle\Entity\Ficheros;
 use eCloud\UsuarioBundle\Entity\Eventos;
 use eCloud\UsuarioBundle\Entity\Enlaces;
-//use eCloud\UsuarioBundle\Form\Frontend\UsuarioType;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 
 
@@ -467,15 +471,16 @@ class CuentaController extends Controller{
 		public function eventosAction(){
        
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
-			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
-			$em=$this->getDoctrine()->getManager();
-			$eventos=$em->getRepository('UsuarioBundle:Eventos')->findBy(array('idUser' => $userid),array('fecha' => 'DESC'));
+			//$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+			//$em=$this->getDoctrine()->getManager();
+			//$eventos=$em->getRepository('UsuarioBundle:Eventos')->findBy(array('idUser' => $userid),array('fecha' => 'DESC'));
 			
 			//mostrar lista de modificaciones sin mas.
 			
 			
 			
-			return $this->render('UsuarioBundle:Cuenta:eventos.html.twig', array('eventos'=>$eventos));
+			//return $this->render('UsuarioBundle:Cuenta:eventos.html.twig', array('eventos'=>$eventos));
+			return $this->render('UsuarioBundle:Cuenta:eventos.html.twig');
 			}
 			else{
 				return $this->redirect($this->generateUrl('login'), 301);
@@ -489,8 +494,22 @@ class CuentaController extends Controller{
 			$em=$this->getDoctrine()->getManager();
 			$eventos=$em->getRepository('UsuarioBundle:Eventos')->findBy(array('idUser' => $userid),array('fecha' => 'DESC'));
 	
+			//Hay que devolver el resultado en JSON. Esta es la manera larga utilizando los componentes de Symfony
+	/*
+			$rows = array();
+			while($r = $resultado->fetch_assoc()) {
+				$rows[] = $r;
+			}
+			$eventos=json_encode($rows);
+	*/
+			$encoders = array(new XmlEncoder(), new JsonEncoder());
+			$normalizers = array(new GetSetMethodNormalizer());
+
+			$serializer = new Serializer($normalizers, $encoders);
 			
-			//return new Response ($eventos);
+			$jsonContent = $serializer->serialize($eventos, 'json');
+
+			return new Response ($jsonContent);
 			}
 			else{
 				return $this->redirect($this->generateUrl('login'), 301);

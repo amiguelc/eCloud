@@ -1,1 +1,0 @@
-document.getElementById("tabla").innerHTML="My First JavaScript";

@@ -71,7 +71,7 @@ class Eventos
      */
     public function getId()
     {
-        return $this->id;
+        return $this->idEvento;
     }
 
     /**

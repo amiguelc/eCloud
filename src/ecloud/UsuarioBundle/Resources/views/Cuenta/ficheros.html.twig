@@ -31,8 +31,8 @@
 			<th> {{ficheros.filesize}} Mbytes</th>
 			<th>{{ ficheros.fechasubida|date('d-m-Y') }}</th>
 			<th> 
-				<a href="{{ path('modificar', { 'fichero': ficheros.idfichero }) }}"><img  alt="Editar" src="{{ asset('bundles/usuario/images/edit.png') }}"></img></a>
-				<a href="{{ path('borrar', { 'fichero': ficheros.idfichero }) }}"><img alt="Eliminar" src="{{ asset('bundles/usuario/images/delete.png') }}"></img></a>
+				<a href="{{ path('modificar', { 'fichero': ficheros.idfichero }) }}"><img  alt="Editar" src="{{ asset('bundles/usuario/images/edit.png') }}"></a>
+				<a href="{{ path('borrar', { 'fichero': ficheros.idfichero }) }}"><img alt="Eliminar" src="{{ asset('bundles/usuario/images/delete.png') }}"></a>
 			</th>
 		</tr>
 		{% endfor %}
@@ -42,7 +42,6 @@
 	</table>
 	</div>	
 
-	</div>
 	
 	<div id='file_upload' class='div_amagado'>
 		<table class='no_class'>
