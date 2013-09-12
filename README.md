@@ -3,17 +3,26 @@ eCloud
 Tu servidor de descargas
 
 
-En Construcción...
-
-
-Comandos GIT
-
-git init
-git add .
-git push https://.....git
-
-git commit -a -m "cambios"
-git push -u origin master
+Requisitos
+	-Windows.
+	-Habilitar php_fileinfo extension
+	-Fichero php.ini.
+				-memory_limit = 6728M
+				-upload_max_filesize 400000M
+				-post_max_size 400000M
+				-max_execution_time = 14400.
+	-Virtualhost Apache, fichero apache/conf/extra/httpd-vhosts.conf
+		<VirtualHost *:80>
+			DocumentRoot "D:\wamp\www\symfony\web"
+			DirectoryIndex app.php
+			ServerName ecloud
+		<Directory "D:\wamp\www\symfony\web">
+			AllowOverride All
+			Order allow,deny
+			Allow from All
+		</Directory>
+		</VirtualHost>
+	-Fichero apache/conf/httpd.conf, descomentar "Include conf/extra/httpd-vhosts.conf"
 
 
 Instalación de eCloud.
