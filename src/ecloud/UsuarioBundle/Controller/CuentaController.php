@@ -490,7 +490,7 @@ class CuentaController extends Controller{
 			$eventos=$em->getRepository('UsuarioBundle:Eventos')->findBy(array('idUser' => $userid),array('fecha' => 'DESC'));
 	
 			
-			return new Response ($eventos);
+			//return new Response ($eventos);
 			}
 			else{
 				return $this->redirect($this->generateUrl('login'), 301);

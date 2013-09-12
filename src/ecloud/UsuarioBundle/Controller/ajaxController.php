@@ -14,8 +14,8 @@ use eCloud\UsuarioBundle\Entity\Enlaces;
 
 
 
-class CuentaController extends Controller{
-    public function perfilAction(){}
+class ajaxController extends Controller{
+    public function cargarJsonAction(){}
 	
 	
 }
