@@ -5,6 +5,7 @@ namespace ecloud\UsuarioBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use eCloud\UsuarioBundle\Entity\Usuarios;
+use eCloud\UsuarioBundle\Entity\Eventos;
 //use eCloud\UsuarioBundle\Form\Frontend\UsuarioType;
 
 class RegistroController extends Controller{
@@ -28,13 +29,11 @@ class RegistroController extends Controller{
 		$formulario->bindRequest($peticion);
 		if ($formulario->isValid()) {
 		// guardar la información en la base de datos
-			$encoder = $this->get('security.encoder_factory')
-			->getEncoder($usuario);
+			$encoder = $this->get('security.encoder_factory')->getEncoder($usuario);
+			
+			//Usuario
 			//$usuario->setSalt(md5(time()));
-			$passwordCodificado = $encoder->encodePassword(
-			$usuario->getPassword(),
-			$usuario->getSalt()
-			);
+			$passwordCodificado = $encoder->encodePassword($usuario->getPassword(),$usuario->getSalt());
 			$usuario->setIpRegistro($_SERVER['REMOTE_ADDR']);
 			//$sp=new DateTimeZone("Europe\London");
 			$usuario->setFechaRegistro(new \DateTime());
@@ -45,8 +44,21 @@ class RegistroController extends Controller{
 			$usuario->setLoginweb("0");
 			$usuario->setPassword($passwordCodificado);
 			$em = $this->getDoctrine()->getEntityManager();
+			
 			$em->persist($usuario);
 			$em->flush();
+			
+			
+			//Crear evento de cuenta creada
+			$eventos=new Eventos();
+			//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
+			$eventos->setIdUser($usuario->getidUser());
+			$eventos->setaccion("&iexcl;Te has registrado!");
+			$eventos->setFecha(new \Datetime());
+			
+			$em2 = $this->getDoctrine()->getEntityManager();
+			$em2->persist($eventos);
+			$em2->flush();
 			
 			$this->get('session')->setFlash('info','¡Enhorabuena! Te has registrado correctamente en eCloud');
 			//$token = new UsernamePasswordToken($usuario,$usuario->getPassword(),'usuarios',$usuario->getRoles());
@@ -55,6 +67,8 @@ class RegistroController extends Controller{
 			//crear la carpeta del usuario en el disco duro
 			$var_archivos = $this->container->getParameter('var_archivos');
 			mkdir($var_archivos.$usuario->getIdUser());
+			
+			
 			//falta enviar email de registro completo
 			return $this->redirect($this->generateUrl('login'));
 			

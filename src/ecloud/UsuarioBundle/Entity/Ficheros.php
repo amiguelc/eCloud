@@ -107,7 +107,7 @@ class Ficheros
      */
     public function getId()
     {
-        return $this->id;
+        return $this->idFichero;
     }
 
     /**

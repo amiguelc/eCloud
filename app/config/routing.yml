@@ -47,6 +47,9 @@ _ficheros2:
     defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
     requirements:
         ruta: ".+"
+api_ficheros:
+    pattern: /api/ficheros
+    defaults: { _controller: UsuarioBundle:Cuenta:ficherosjson, ruta: / }
 subir:
     pattern: /subir
     defaults: { _controller: UsuarioBundle:Cuenta:subir }
@@ -62,8 +65,8 @@ descargar:
 eventos:
     pattern: /eventos
     defaults: { _controller: UsuarioBundle:Cuenta:eventos }
-eventosJSON:
-    pattern: /eventosjson
+api_eventos:
+    pattern: /api/eventos
     defaults: { _controller: UsuarioBundle:Cuenta:eventosjson }
 links:
     pattern: /links

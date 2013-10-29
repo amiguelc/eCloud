@@ -38,21 +38,21 @@ class Eventos
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_fichero", type="integer")
+     * @ORM\Column(name="id_fichero", type="integer", nullable=true)
      */
     private $idFichero;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre_fichero_antiguo", type="string", length=255)
+     * @ORM\Column(name="nombre_fichero_antiguo", type="string", length=255, nullable=true)
      */
     private $nombreFicheroAntiguo;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre_fichero_nuevo", type="string", length=255)
+     * @ORM\Column(name="nombre_fichero_nuevo", type="string", length=255, nullable=true)
      */
     private $nombreFicheroNuevo;
 
