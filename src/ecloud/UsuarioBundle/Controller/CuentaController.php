@@ -310,14 +310,43 @@ class CuentaController extends Controller{
 					
 			
 					if($ficheros->getTipo()=='carpeta'){
-					//FALTA COMPROBAR EN LA BD LOS FICHEROS QUE CONTENIA ESA CARPETA Y RENOMBRARLES LA RUTA A LA NUEVA SOLO EN LA BD, EN EL FILESYSTEM YA SE HACE SOLO, COGIENDO DE ALGUNA MANERA EL VALOR ANTIGUO Y CAMBIANDOLO SOLO LA PARTE QUE COINCIDE.
-					//Falta solo los sub-subficheros.
+					
+					//Cambia ruta subficheros.
 					$query = $em->createQuery('UPDATE UsuarioBundle:Ficheros f SET f.ruta = ?1 WHERE f.ruta LIKE ?2 and f.propietario=?3');
-					if($ruta_nueva="/"){$query->setParameter(1, "/".$nombre_nuevo);}else{$query->setParameter(1, $ruta_nueva."/".$nombre_nuevo);}
-					$query->setParameter(2, $ruta_antigua.$nombre_antiguo.'%');
+					if($ruta_nueva=="/"){$query->setParameter(1, "/".$nombre_nuevo);}else{$query->setParameter(1, $ruta_nueva."/".$nombre_nuevo);}
+					if ($ruta_antigua=="/"){$query->setParameter(2, $ruta_antigua.$nombre_antiguo);}else{$query->setParameter(2, $ruta_antigua."/".$nombre_antiguo);}
 					$query->setParameter(3, $userid);
 					//return  $response = new Response(print_r($query, true));
+					$query->getResult();
+					
+					
+					//Falta solo los sub-subficheros. Count valores, hacer un for y por cada una guardar el valor anterior y su valor nuevo, ejecutar.
+					//Saca las rutas de los sub-subficheros a cambiar
+					
+					$query = $em->createQuery('SELECT f.ruta FROM UsuarioBundle:Ficheros f WHERE f.ruta LIKE ?1');
+					if ($ruta_antigua=="/"){$query->setParameter(1, $ruta_antigua.$nombre_antiguo.'/%');}else{$query->setParameter(1, $ruta_antigua."/".$nombre_antiguo.'/%');}
+					//Saca rutas a cambiar de sub-subficheros.
 					$archivos=$query->getResult();
+					
+					//Cambiar la ruta del principio
+					if ($ruta_antigua=="/"){$patron=$ruta_antigua.$nombre_antiguo."/";}else{$patron=$ruta_antigua."/".$nombre_antiguo.'/';}
+					if ($ruta_nueva=="/"){$sustitucion="/".$nombre_nuevo;}else{$sustitucion=$ruta_nueva."/".$nombre_nuevo;}
+					foreach ($archivos as $clave => $valor){
+						$ruta_modificada_sub_subficheros=preg_replace(":^".$patron.":",$sustitucion."/",$archivos[$clave]['ruta']);
+						
+						$query = $em->createQuery('UPDATE UsuarioBundle:Ficheros f SET f.ruta = ?1 WHERE f.ruta LIKE ?2 and f.propietario=?3');
+						$query->setParameter(1, $ruta_modificada_sub_subficheros);
+						$query->setParameter(2, $archivos[$clave]['ruta']);
+						$query->setParameter(3, $userid);
+						//return  $response = new Response(print_r($query, true));
+						$query->getResult();
+						
+					}
+					
+					
+					//return  $response = new Response(print_r($archivos, true));
+					
+					
 					}
 				
 					$em->persist($eventos);					
