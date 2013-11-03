@@ -47,9 +47,6 @@ _ficheros2:
     defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
     requirements:
         ruta: ".+"
-api_ficheros:
-    pattern: /api/ficheros
-    defaults: { _controller: UsuarioBundle:Cuenta:ficherosjson, ruta: / }
 subir:
     pattern: /subir
     defaults: { _controller: UsuarioBundle:Cuenta:subir }
@@ -65,15 +62,22 @@ descargar:
 eventos:
     pattern: /eventos
     defaults: { _controller: UsuarioBundle:Cuenta:eventos }
-api_eventos:
-    pattern: /api/eventos
-    defaults: { _controller: UsuarioBundle:Cuenta:eventosjson }
 links:
     pattern: /links
     defaults: { _controller: UsuarioBundle:Cuenta:links, id: 0 }
 borrarlink:
     pattern: /borrarlink/{id}
     defaults: { _controller: UsuarioBundle:Cuenta:borrarlink, id: 0 }
+################################################################################################ API
+api_ficheros:
+    pattern: /api/ficheros
+    defaults: { _controller: UsuarioBundle:Cuenta:ficherosjson }
+api_fichero:
+    pattern: /api/fichero/{id}
+    defaults: { _controller: UsuarioBundle:Cuenta:ficherojson, id: 0 }
+api_eventos:
+    pattern: /api/eventos
+    defaults: { _controller: UsuarioBundle:Cuenta:eventosjson }
 ################################################################################################ Descarga Externa
 download:
     pattern: /!{descarga}

@@ -79,7 +79,7 @@ class CuentaController extends Controller{
 		public function ficherosAction($ruta){
 		
 		//leer los ficheros de la base de datos y pasarselos a twig con ajax, aqui se complica mucho la cosa
-		//quizas con codigo javascript se pueda subir algun fichero
+		//con codigo javascript a la hora de subir ficheros tener en cuenta el espacio libre y en base a ello permitir la subida del fichero, calcular checksum.
 		
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
 			
@@ -102,6 +102,34 @@ class CuentaController extends Controller{
 				$formulario_carpeta  = $this->createFormBuilder($entity_ficheros)->add('nombrefichero','text',array('label'=>'Carpeta'))->add('ruta','hidden',array('data' => "/".$ruta))->getForm();
 				$ficheros=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'ruta' => "/".$ruta));
 				
+				//For each $ficheros cuando sea carpeta hacer una SQL para sacar el tamaño de subficheros. Esto consumirá mucho SQL. Ademas no se deberia poner aqui, sino en ficheros JSON y guardarse el valor para la app.
+				$filesize_total=0;
+
+				foreach ($ficheros as $clave => $valor){
+					if ($ficheros[$clave]->getTipo()=="carpeta"){
+					
+						if($ficheros[$clave]->getRuta()=="/"){$carpeta_en_cuestion="/".$ficheros[$clave]->getNombreFichero();}
+						else{$carpeta_en_cuestion=$ficheros[$clave]->getRuta()."/".$ficheros[$clave]->getNombreFichero();}
+						
+					$em=$this->getDoctrine()->getManager();
+					$query = $em->createQuery('SELECT f FROM UsuarioBundle:Ficheros f WHERE f.propietario=?1 AND f.ruta LIKE ?2 OR f.propietario=?1 AND f.ruta LIKE ?3');
+					$query->setParameter(1, $userid);
+					$query->setParameter(2, $carpeta_en_cuestion);
+					$query->setParameter(3, $carpeta_en_cuestion.'/%');
+					$todos_ficheros=$query->getResult();
+						
+						foreach ($todos_ficheros as $clave2 => $valor2){
+						//segunda comprobacion innecesaria..
+							if (preg_match(":^".$carpeta_en_cuestion.":",$todos_ficheros[$clave2]->getRuta())==1){
+								$filesize_total+=$todos_ficheros[$clave2]->getFilesize();
+							}
+						}
+							
+						$ficheros[$clave]->setFilesize($filesize_total);
+						$filesize_total=0;
+					}
+					
+				}
 				
 				//return $response = New Response(var_dump($ficheros));
 				//PASAR BYTES A MB
@@ -123,7 +151,7 @@ class CuentaController extends Controller{
 		
 		}
 		
-		public function ficherosjsonAction($ruta){
+		public function ficherosjsonAction(){
 		
 		//leer los ficheros de la base de datos y pasarselos a twig con ajax, aqui se complica mucho la cosa
 		//quizas con codigo javascript se pueda subir algun fichero
@@ -133,24 +161,9 @@ class CuentaController extends Controller{
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 			
 			if ($this->getRequest()->isMethod('POST')) {
-				//guardar fichero y tal
 			}else{
-				//coger ficheros de ese usuario y pasarlos a la plantilla twig, primero saber que ruta pide.
-				$entity_ficheros = new Ficheros();
-				//quitar la / de la ruta
-				if(!isset($ruta)){$ruta="";}
-				//quitar / del principio
-				if($ruta[0]=="/"){$ruta=substr($ruta,1);}
-				//quitar / del final
-				if(($ruta[(strlen($ruta))-1])=="/"){$ruta=substr($ruta,0,-1);}
+				$ficheros=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid));
 				
-				//formulario de subir fichero
-				$formulario = $this->createFormBuilder($entity_ficheros)->add('file','file',array('label'=>'Archivo '))->add('ruta','hidden',array('data' => "/".$ruta))->getForm();
-				$formulario_carpeta  = $this->createFormBuilder($entity_ficheros)->add('nombrefichero','text',array('label'=>'Carpeta'))->add('ruta','hidden',array('data' => "/".$ruta))->getForm();
-				$ficheros=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'ruta' => "/".$ruta));
-				
-				
-				//return $response = New Response(var_dump($ficheros));
 				//PASAR BYTES A MB
 				
 				foreach ($ficheros as $clave => $valor){
@@ -167,7 +180,38 @@ class CuentaController extends Controller{
 			return new Response ($jsonContent);
 			//JSON
 			
-			//return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig',array('ficheros' => $ficheros,'ruta' => $ruta, 'formulario' => $formulario->createView(), 'formulario_carpeta' => $formulario_carpeta->createView()));
+			}
+			else{
+					return $this->redirect($this->generateUrl('login'), 301);
+			}
+		
+		}
+		
+		public function ficherojsonAction($id){
+		
+		//leer los ficheros de la base de datos y pasarselos a twig con ajax, aqui se complica mucho la cosa
+		//quizas con codigo javascript se pueda subir algun fichero
+		
+			if ($this->get('security.context')->isGranted('ROLE_USER')){
+			
+			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+			
+			if ($this->getRequest()->isMethod('POST')) {
+				//guardar fichero y tal
+			}else{
+				
+				$ficheros=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'idFichero' => $id));
+				if ($ficheros==NULL){return new Response ("Fichero no encontrado");}
+				
+			}
+			
+			//JSON
+			$encoders = array(new XmlEncoder(), new JsonEncoder());
+			$normalizers = array(new GetSetMethodNormalizer());
+			$serializer = new Serializer($normalizers, $encoders);		
+			$jsonContent = $serializer->serialize($ficheros, 'json');
+			return new Response ($jsonContent);
+			//JSON
 			
 			}
 			else{
@@ -243,7 +287,7 @@ class CuentaController extends Controller{
 						$eventos=new Eventos();
 						//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
 						$eventos->setIdUser($userid);
-						if ($carpeta==FALSE){$eventos->setaccion("Has subido el fichero ".$ficheros->getnombreFichero());}else{$eventos->setaccion("Has creado la carpeta ".$ficheros->getnombreFichero());}
+						if ($carpeta==FALSE){$eventos->setaccion("Has subido el fichero ".$ficheros->getnombreFichero());}else{$eventos->setaccion("Has creado la carpeta ".$ficheros->getnombreFichero()." en ".$ficheros->getRuta());}
 						$eventos->setIdFichero($ficheros->getIdFichero());
 						$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
 						$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
@@ -301,7 +345,7 @@ class CuentaController extends Controller{
 					$eventos=new Eventos();
 					//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
 					$eventos->setIdUser($userid);
-					$eventos->setaccion("Has modificado el fichero ".$nombre_antiguo." por ".$nombre_nuevo);
+					$eventos->setaccion("Has cambiado el nombre al fichero ".$nombre_antiguo." por ".$nombre_nuevo);
 					//$eventos->setIdFichero($ficheros->getIdFichero());
 					$eventos->setIdFichero(0); //Falta: Problema es que el idFichero se genera despues con el autoincremento de SQL.
 					$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
@@ -353,6 +397,14 @@ class CuentaController extends Controller{
 					$em->persist($ficheros);
 					$em->flush();
 					
+					//Detectar SO y preparar ruta para ello.
+					if (PHP_OS=="WINNT"){
+					
+					}else{
+					//Convierte rutas windows a unix. Codigo no probado.
+					$ruta_absoluta_antigua=preg_replace(":\:","/",$ruta_absoluta_antigua);
+					$ruta_absoluta_nueva=preg_replace(":\:","/",$ruta_absoluta_nueva);
+					}
 					rename($ruta_absoluta_antigua,$ruta_absoluta_nueva);
 										
 					return $this->redirect($this->generateUrl('ficheros'),303);
@@ -557,15 +609,7 @@ class CuentaController extends Controller{
 		public function eventosAction(){
        
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
-			//$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
-			//$em=$this->getDoctrine()->getManager();
-			//$eventos=$em->getRepository('UsuarioBundle:Eventos')->findBy(array('idUser' => $userid),array('fecha' => 'DESC'));
-			
-			//mostrar lista de modificaciones sin mas.
-			
-			
-			
-			//return $this->render('UsuarioBundle:Cuenta:eventos.html.twig', array('eventos'=>$eventos));
+
 			return $this->render('UsuarioBundle:Cuenta:eventos.html.twig');
 			}
 			else{

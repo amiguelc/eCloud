@@ -2,8 +2,9 @@
 {% block title %}Ficheros {% endblock %}
 
 {% block article %}
+
 <section>
-	<h1>{{ block('title') }}</h1>
+	<h1 id='titulo'>{{ block('title') }}</h1>
 	<div class="tabla" id='itsthetable'>
 	<table>
 	<caption>{{ app.user.nombreusuario }}<a href="{{ path('ficheros') }}">/{{ ruta }}</a> <div style='float:right'><button id='button_subir'>Subir archivo</button> <button id='button_carpeta'>Crear carpeta</button></div></caption>
@@ -28,7 +29,7 @@
 					<a href="{{ path('descargar', { 'fichero': ficheros.idfichero }) }}">{{ ficheros.nombrefichero }}</a> 
 				{% endif %}
 			</th>
-			<th> {{ficheros.filesize}} Mbytes</th>
+			<th style='text-align:right;'> {{ficheros.filesize}} Mb</th>
 			<th>{{ ficheros.fechasubida|date('d-m-Y') }}</th>
 			<th> 
 				<a href="{{ path('modificar', { 'fichero': ficheros.idfichero }) }}"><img  alt="Editar" src="{{ asset('bundles/usuario/images/edit.png') }}"></a>
@@ -42,7 +43,6 @@
 	</table>
 	</div>	
 
-	
 	<div id='file_upload' class='div_amagado'>
 		<table class='no_class'>
 			<tr>

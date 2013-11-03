@@ -71,7 +71,8 @@
 		var tabla;
 		var cab = "<tr>";
 		var cuerpo = "";
-	
+		var color="";
+		var idfichero="";
 		for(var i=0;i<arr.length;i++){
 			var obj = arr[i];
 			cuerpo = cuerpo + "<tr>";
@@ -83,14 +84,35 @@
 					var attrName = key;
 					var attrValue = obj[key];
 					if(attrName=="accion"){
-						/*if(attrValue[4]=="s"){
-						cuerpo = cuerpo + "<td style='background-color:#B5FFB5';>" + attrValue + "</td>";
-						}else{cuerpo = cuerpo + "<td style='background-color:#FFB5B5';>" + attrValue + "</td>";}
-						*/
-						if(attrValue[4]=="s" || attrValue[4]=="c"){cuerpo = cuerpo + "<td style='background-color:#B5FFB5';>" + attrValue + "</td>";}
-						else if(attrValue[4]=="b"){cuerpo = cuerpo + "<td style='background-color:#FFB5B5';>" + attrValue + "</td>";}
-						else if(attrValue=="&iexcl;Te has registrado!"){cuerpo = cuerpo + "<td style='background-color:#95FF95';>" + attrValue + "</td>";}
-						else {cuerpo = cuerpo + "<td>" + attrValue + "</td>";}
+
+						if(attrValue.match(/^Has subido el fichero/)!=null){
+							//Has subido... //Procesar accion para sacar el idfichero del fichero subido
+							color="#B5FFB5";
+							idfichero="cargadivFichero("+obj['idFichero']+")";
+							attrValue=attrValue.replace(obj['nombreFicheroNuevo'],"<a href='descargar/"+obj['idFichero']+"' onmouseover=\" ' "+idfichero+"\" onmouseout=\" \">"+obj['nombreFicheroNuevo']+"</a>");
+							
+						}
+						else if(attrValue.match(/^Has creado la carpeta/)!=null){
+							//Has creado la carpeta... //Procesar accion para sacar el idfichero de la carpeta creada
+							color="#B5FFB5";
+						}
+						else if(attrValue.match(/^Has borrado el fichero/)!=null){
+							//Has borrado... //Procesar accion para sacar el idfichero del fichero borrado
+							color="#FFB5B5";
+							}
+						else if(attrValue.match(/^Has borrado la carpeta/)!=null){
+							//Has borrado... //Procesar accion para sacar el idfichero del fichero borrado
+							color="#FFB5B5";
+							}
+						else if(attrValue.match(/^Has cambiado el nombre al fichero /)!=null){
+							//Has cambiado el nombre al fichero... //Procesar accion para sacar el idfichero del fichero modificado
+							color="#FFFF00";
+						}
+						else if(attrValue=="&iexcl;Te has registrado!"){color="#95FF95";}
+						else {color="";}
+						
+						cuerpo = cuerpo + "<td style='background-color:"+color+";' > "+attrValue+"</td>";
+						idFichero="";
 					}
 					else if(attrName=="fecha"){
 						var date = new Date(attrValue['timestamp']*1000);
@@ -98,8 +120,8 @@
 						var _dia=date.getDate(); //getDate devuelve el dia del mes
 						var _anyo=date.getFullYear();
 						//alert(_dia+"-"+_mes+"-"+_anyo); //ejemplo para mostrarlo
-					
-						cuerpo = cuerpo + "<td style='text-align:right;'>" + _dia+"/"+_mes+"/"+_anyo + " "+date.getHours()+":"+date.getMinutes()+"</td>";
+						//alert(color);
+						cuerpo = cuerpo + "<td style='text-align:right;background-color:"+color+";'>" + _dia+"/"+_mes+"/"+_anyo + " "+date.getHours()+":"+date.getMinutes()+"</td>";
 					}
 					else if(attrValue==null){cuerpo = cuerpo +"<td></td>";}
 					else{cuerpo = cuerpo + "<td>" + attrValue + "</td>";
@@ -123,6 +145,7 @@
 	
   }
   
+  //Sin terminar, es la plantilla para crear tablas.
   function muestraFicheros() {
     if(peticion.readyState == 4) {
 	 
@@ -171,6 +194,66 @@
   }
   
   
+    function cargadivFichero(id) {
+	cargarContenido('GET','api/fichero/'+id+'?nocache='+Math.random(), muestradivFichero);
+	}
+	
+	
+    function muestradivFichero() {
+    if(peticion.readyState == 4) {
+	 
+      if(peticion.status == 200) {
+	 
+		// Borrar datos anteriores
+		//limpia(contenedor);
+	  
+        div = document.getElementById('divfichero');
+        		
+		//JSON
+		var arr = eval ("(" + peticion.responseText+ ")"); 
+		//alert(arr);
+		
+		// Formatear JSON en una tabla
+		var tabla;
+		
+		var cab = "<tr>";
+		var cuerpo = "";
+	
+		for(var i=0;i<arr.length;i++){
+			var obj = arr[i];
+			cuerpo = cuerpo + "<tr>";
+			for(var key in obj){
+				//Para saltar campos
+				//alert(key);
+				if(key=="nombreFichero" || key=="ruta" || key=="filesize" || key=="fechaSubida"){
+				
+					var attrName = key;
+					var attrValue = obj[key];
+					cuerpo = cuerpo + "<td>" + attrValue + "</td>";
+					if (i==0){
+					//Guarda cabeceras de la tabla
+					cab = cab + "<th>" + attrName + "</th>";
+					}
+				}
+			}
+			cuerpo = cuerpo + "</tr>";
+		}
+		tabla = "<table>" + cab + "</tr>" + cuerpo + "</table>";
+		
+		
+		
+		div.innerHTML = tabla;
+		
+		
+      }
+    }
+	
+  }
+  
+  
+  
+  
+  
   
   
   function limpia(id) {
@@ -211,7 +294,11 @@
 	</table>
 	-->
 	#} 
-	</div>	
+	</div>
+	
+	<div id="divfichero" style="position:relative;background-color:#00FF00">
+	ss
+	</div>
 
 </section>
 	
