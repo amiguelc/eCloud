@@ -86,10 +86,14 @@
 					if(attrName=="accion"){
 
 						if(attrValue.match(/^Has subido el fichero/)!=null){
-							//Has subido... //Procesar accion para sacar el idfichero del fichero subido
+							//Has subido... //Procesar accion para sacar el idfichero del fichero subido y que el elnace tenga de id el evento
 							color="#B5FFB5";
-							idfichero="cargadivFichero("+obj['idFichero']+")";
-							attrValue=attrValue.replace(obj['nombreFicheroNuevo'],"<a href='descargar/"+obj['idFichero']+"' onmouseover=\" ' "+idfichero+"\" onmouseout=\" \">"+obj['nombreFicheroNuevo']+"</a>");
+							//idevento_idfichero="cargadivFichero('d_"+obj['idEvento']+"','"+obj['idFichero']+"')";
+							var patt=new RegExp(obj['nombreFicheroNuevo']+"$");
+							//attrValue=attrValue.replace(patt,"<a id='a_"+obj['idEvento']+"' href='descargar/"+obj['idFichero']+"' onmouseover=\" "+idevento_idfichero+"\" onmouseout=\" oculta('d_"+obj['idEvento']+"')\">"+obj['nombreFicheroNuevo']+"</a><span id='d_"+obj['idEvento']+"' class='tooltip'></span>");
+							
+							attrValue=attrValue.replace(patt,"<a idfile='"+obj['idFichero']+"' href='descargar/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>");
+							
 							
 						}
 						else if(attrValue.match(/^Has creado la carpeta/)!=null){
@@ -139,7 +143,7 @@
 		tabla = "<table>" + cab + "</tr>" + cuerpo + "</table>";
 		div.innerHTML = tabla;
 		
-		
+		peticion="";
       }
     }
 	
@@ -194,52 +198,47 @@
   }
   
   
-    function cargadivFichero(id) {
-	cargarContenido('GET','api/fichero/'+id+'?nocache='+Math.random(), muestradivFichero);
+  /*
+    function cargadivFichero(evento1,fichero1) {
+	//Mostrar div con "Recuperando informacion"
+	var ballon=document.getElementById(evento1);
+	ballon.innerHTML="Recuperando informacion...";
+	ballon.style.display='inline';
+	//ballon.style.z-index='2';
+	//funcion2=muestradivFichero(evento1);
+	//function(args){if(http.readyState==4){callback(http)}
+	//function(args){if(http.readyState==4){callback(http)}
+	cargarContenido('GET','api/fichero/'+fichero1+'?nocache='+Math.random(), function(){if(peticion.readyState==4){muestradivFichero(evento1);}});
 	}
 	
-	
-    function muestradivFichero() {
+	*/
+	/*
+    function muestradivFichero(ballon) {
     if(peticion.readyState == 4) {
 	 
       if(peticion.status == 200) {
 	 
 		// Borrar datos anteriores
 		//limpia(contenedor);
-	  
-        div = document.getElementById('divfichero');
+		var div=document.getElementById(ballon);
+        //div = ballon;
         		
 		//JSON
 		var arr = eval ("(" + peticion.responseText+ ")"); 
-		//alert(arr);
-		
-		// Formatear JSON en una tabla
-		var tabla;
-		
-		var cab = "<tr>";
-		var cuerpo = "";
+		var tabla="";
 	
 		for(var i=0;i<arr.length;i++){
 			var obj = arr[i];
-			cuerpo = cuerpo + "<tr>";
+
 			for(var key in obj){
-				//Para saltar campos
-				//alert(key);
-				if(key=="nombreFichero" || key=="ruta" || key=="filesize" || key=="fechaSubida"){
+				var attrName = key;
+				var attrValue = obj[key];
 				
-					var attrName = key;
-					var attrValue = obj[key];
-					cuerpo = cuerpo + "<td>" + attrValue + "</td>";
-					if (i==0){
-					//Guarda cabeceras de la tabla
-					cab = cab + "<th>" + attrName + "</th>";
-					}
-				}
-			}
-			cuerpo = cuerpo + "</tr>";
-		}
-		tabla = "<table>" + cab + "</tr>" + cuerpo + "</table>";
+				tabla=tabla+"<p>"+attrValue+"</p>"
 		
+			}
+			
+		}
 		
 		
 		div.innerHTML = tabla;
@@ -249,56 +248,93 @@
     }
 	
   }
+  */
   
   
   
-  
-  
-  
-  
-  function limpia(id) {
-  document.getElementById(id).innerHTML = "";
-  }
-  
+	  function oculta(id){
+	  document.getElementById(id).style.display="none";
+	  }
+	  
+	  
+	  function limpia(id) {
+	  document.getElementById(id).innerHTML = "";
+	  }
+
+	
+	window.setTimeout('juju()', 4000);
+	
+	function juju(){
+	
+		$('a').qtip({
+			content: {
+				text: function(event, api) {
+					$.ajax({
+						url: 'api/fichero/'+$(this).attr('idfile'), // URL to the JSON file
+						type: 'GET', // POST or GET
+						dataType: 'json', // Tell it we're retrieving JSON
+						data: {},
+					})
+					.then(function(data) {
+						/* Process the retrieved JSON object
+						 *    Retrieve a specific attribute from our parsed
+						 *    JSON string and set the tooltip content.
+						 */
+						var content = 'Fichero '+ data[0].nombreFichero+"<br> Tama&ntilde;o: "+ data[0].filesize+" bytes";
+
+						// Now we set the content manually (required!)
+						api.set('content.text', content);
+					}, function(xhr, status, error) {
+						// Upon failure... set the tooltip content to the status and error value
+						//api.set('content.text', status + ': ' + error);
+						api.set('content.text', 'Fichero no encontrado');
+					});
+
+					return 'Loading...' // Set some initial loading text
+				}
+			}
+		});
+		
+		
+		
+	}
+
+	/* Metodo 2 
+	
+		$('a').each(function() {
+ 
+			//var fichero = $(this).find("input[name=link]").val();
+			//var imdbLink = { "link" : link };
+		
+		
+			$(this).qtip({
+				content: {
+					text: 'Loading...', // Loading text...
+					ajax: {
+						url: 'api/fichero/'+$(this).attr('idfile'), // URL to the JSON script
+						type: 'GET', // POST or GET
+						data: { }, // Data to pass along with your request
+						dataType: 'json', // Tell it we're retrieving JSON
+						success: function(data, status) {
+							
+							var content = 'Fichero '+ data[0].nombreFichero+"<br> Tama&ntilde;o: "+ data[0].filesize+" bytes";
+
+							// Now we set the content manually (required!)
+							this.set('content.text', content);
+						}
+					}
+				}
+			});
+		
+		})
+	*/
 
 	</script>
 	
 	<div class="tabla" id="tabla">
 	
-	
-	
-	{# 
-	<!-- Metodo antiguo sin JSON
-	<table><caption>{{ app.user.nombreusuario }}</caption>
-	<thead><tr><th style='width:87%;'>Acci&oacute;n</th><th>Fecha</th></tr></thead>
-	<tbody>
-	
-		{% set var1 = 0 %}
-		{% for eventos in eventos %}
-		
-		{% set var1 = var1 + 1 %}
-
-		<tr {% if var1 is divisibleby(2) %} class="odd" {% endif %}>
-			<th
-				{% if "Has subido" in eventos.accion %} style='background-color:#B5FFB5;' {% endif %} 
-				{% if "Has borrado" in eventos.accion %} style='background-color:#FFB5B5;' {% endif %}
-				{% if "Has modificado" in eventos.accion %} style='background-color:yellow;' {% endif %}				
-				>{{ eventos.accion }}		
-			</th>
-			<th  style='text-align:center;'>{{ eventos.fecha|date('H:i:s d-m-Y ') }}</th>
-		</tr>
-		{% endfor %}
-		{% if var1 == 0 %}<tr><th><a href="{{ app.request.getRequestURI() }}/../"/>../</a></th><th></th><th></th><th></th></tr>{% endif %}
-	</tbody>
-	<tfoot><tr><th>Total</th><td colspan="4">{{ var1  }} eventos</td></tr></tfoot>
-	</table>
-	-->
-	#} 
 	</div>
 	
-	<div id="divfichero" style="position:relative;background-color:#00FF00">
-	ss
-	</div>
 
 </section>
 	

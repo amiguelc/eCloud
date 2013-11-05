@@ -1,12 +1,12 @@
 {% extends '::base.html.twig' %}
 {% block stylesheets %}
-	{% stylesheets 'bundles/usuario/css/*' filter='cssrewrite' %}
+	{% stylesheets '@UsuarioBundle/Resources/public/css/*' filter='cssrewrite' %}
 		<link rel="stylesheet" href="{{ asset_url }}" />
 	{% endstylesheets %}
 {% endblock %}
 
 {% block javascripts %}
-	{% javascripts 'bundles/usuario/js/*' %}
+	{% javascripts '@UsuarioBundle/Resources/public/js/*' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
 	{% endjavascripts %}
 {% endblock %}

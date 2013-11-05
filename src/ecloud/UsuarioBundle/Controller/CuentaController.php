@@ -76,6 +76,66 @@ class CuentaController extends Controller{
 			}
 		}
 		
+		public function perfiljsonAction($info){
+ 
+		 if ($this->get('security.context')->isGranted('ROLE_USER')){
+			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+		
+
+			if ($this->getRequest()->isMethod('POST')) {
+			}
+			else{
+				$em=$this->getDoctrine()->getManager();
+				$usuario=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
+			
+				//if isset nombre dar solo esa info-> jsonificar
+				
+				if ($info!="all"){
+				//Enviar solo lo pedido [email,nombreusuario,limite,ocupado] sin JSON
+
+					switch ($info){
+					case "email":
+						$jsonContent=$usuario->getEmail();
+						break;
+					case "nombreusuario":
+						$jsonContent=$usuario->getNombreUsuario();
+						break;
+					case "limite":
+						$jsonContent=$usuario->getLimite();
+						break;
+					case "ocupado":
+						$jsonContent=$usuario->getOcupado();
+						break;
+					default:						
+						$encoders = array(new XmlEncoder(), new JsonEncoder());
+						$normalizers = array(new GetSetMethodNormalizer());
+						$serializer = new Serializer($normalizers, $encoders);
+						$jsonContent = $serializer->serialize($usuario, 'json');
+						break;
+					}
+					
+				
+				}else{
+				//Enviar todo en formato JSON
+				
+				$encoders = array(new XmlEncoder(), new JsonEncoder());
+				$normalizers = array(new GetSetMethodNormalizer());
+				$serializer = new Serializer($normalizers, $encoders);
+				$jsonContent = $serializer->serialize($usuario, 'json');
+				}
+				
+			
+
+				return new Response ($jsonContent);
+					
+					
+			}
+			}
+			else{
+				return $this->redirect($this->generateUrl('login'), 301);
+			}
+		}
+		
 		public function ficherosAction($ruta){
 		
 		//leer los ficheros de la base de datos y pasarselos a twig con ajax, aqui se complica mucho la cosa
@@ -234,7 +294,6 @@ class CuentaController extends Controller{
 				
 				if ($this->getRequest()->isMethod('POST')) {
 				
-				//return $response = New Response(print_r($this->getRequest()->request->all()), true);
 				//Falta comprobar si espacio lleno, en el post y en el get al subir ficheros.
 				
 				$formulario->bind($this->getRequest());
@@ -246,12 +305,10 @@ class CuentaController extends Controller{
 						
 						//Ficheros normales///
 						//propietario, nombre_fichero, nombre_real_fisico, tipo, ruta, filesize, checksum, fecha_subida, total_descargas, permiso
-						//$ficheros->setPropietario($this->get('security.context')->getToken()->getUsername());
 						$ficheros->setPropietario($userid);
 						
 						//$ficheros->setRuta("/");
 						$ruta=$formulario["ruta"]->getData();
-						//return  $response = new Response(print_r($formulario["ruta"]->getData(), true));
 						$ficheros->setRuta($ruta);
 						$ficheros->setfechaSubida(new \Datetime());
 						$ficheros->settotalDescargas("0");
@@ -563,8 +620,9 @@ class CuentaController extends Controller{
 				
 				
 				
-				
-				return $this->redirect($this->generateUrl('ficheros'), 303);
+				//Antes redirigia a ficheros pero ahora con el borrado por ajax devuelve 1 en casa de borrado bien y 0 en caso de que no
+				//return $this->redirect($this->generateUrl('ficheros'), 303);
+				return $response = New Response('1');
 				//return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
 			}
 			else{

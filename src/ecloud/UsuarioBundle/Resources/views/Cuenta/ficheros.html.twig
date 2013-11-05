@@ -3,6 +3,46 @@
 
 {% block article %}
 
+<script type="text/javascript">
+
+	function borrarNodo(nodo,idfichero){
+		//Calculo de si es el ultimo nodo
+		var body=document.getElementById("tbody"); 
+		var x=body.childNodes;
+		var hijos=0;
+		for (i=0;i<x.length;i++){
+			if (x[i].tagName=="TR"){hijos+=1;}
+		}
+		
+		//Obtiene nodo
+		var child=document.getElementById(nodo);
+		if (hijos==1){
+		//Si es el ultimo nodo, lo borra pero crea uno vacio, ademas pone 0 archivos.
+		child.innerHTML="<tr id='tr1'><th>...</th><th></th><th></th><th></th></tr>";
+		document.getElementById("td_total_archivos").innerHTML="<span id='total_archivos'>0</span> archivos";
+		}
+		else{
+		//Borra nodo
+		child.parentNode.removeChild(child);
+		if(hijos==2){
+			//Si quedan 2 nodos, al borrar uno, quedara uno -> 1 archivo
+			document.getElementById("td_total_archivos").innerHTML="<span id='total_archivos'>1</span> archivo";
+			
+		}else if(hijos>2){
+			//Si quedan mas de 2 nodos, resta la cantiada de ficheros totales.
+			var y=document.getElementById("total_archivos").innerHTML;
+			document.getElementById("total_archivos").innerHTML=y-1;
+		}
+		}
+		//falta peticion POST AJAX para eliminar fichero.
+		
+		$.get(idfichero);
+	}
+	
+
+	
+</script>
+
 <section>
 	<h1 id='titulo'>{{ block('title') }}</h1>
 	<div class="tabla" id='itsthetable'>
@@ -10,13 +50,13 @@
 	<caption>{{ app.user.nombreusuario }}<a href="{{ path('ficheros') }}">/{{ ruta }}</a> <div style='float:right'><button id='button_subir'>Subir archivo</button> <button id='button_carpeta'>Crear carpeta</button></div></caption>
 
 	<thead><tr><th style='width:80%;'>Nombre</th><th>Tama&ntilde;o</th><th>Modificado</th><th></th></tr></thead>
-	<tbody>
+	<tbody id="tbody">
 		{% set var1 = 0 %}
 		{% for ficheros in ficheros %}
 		
 		{% set var1 = var1 + 1 %}
 
-		<tr {% if var1 is divisibleby(2) %} class="odd" {% endif %}>
+		<tr id="tr{{var1}}" {% if var1 is divisibleby(2) %} class="odd" {% endif %}>
 			<th>
 				{% if ficheros.tipo == 'carpeta' %}
 					{% if ficheros.ruta == '/' %}
@@ -33,13 +73,14 @@
 			<th>{{ ficheros.fechasubida|date('d-m-Y') }}</th>
 			<th> 
 				<a href="{{ path('modificar', { 'fichero': ficheros.idfichero }) }}"><img  alt="Editar" src="{{ asset('bundles/usuario/images/edit.png') }}"></a>
-				<a href="{{ path('borrar', { 'fichero': ficheros.idfichero }) }}"><img alt="Eliminar" src="{{ asset('bundles/usuario/images/delete.png') }}"></a>
+				<!-- <a href="{{ path('borrar', { 'fichero': ficheros.idfichero }) }}">  <img alt="Eliminar" src="{{ asset('bundles/usuario/images/delete.png') }}"></a> -->
+				<a href="#" onclick="borrarNodo('tr{{var1}}','{{ path('borrar', { 'fichero': ficheros.idfichero }) }}')">  <img alt="Eliminar" src="{{ asset('bundles/usuario/images/delete.png') }}"></a> 
 			</th>
 		</tr>
 		{% endfor %}
 		{% if var1 == 0 %}<tr><th><a href="{{ app.request.getRequestURI() }}/../"/>../</a></th><th></th><th></th><th></th></tr>{% endif %}
 	</tbody>
-	<tfoot><tr><th>Total</th><td colspan="4">{{ var1  }} archivos</td></tr></tfoot>
+	<tfoot><tr><th>Total</th><td colspan="4" id="td_total_archivos"><span id='total_archivos'>{{var1}}</span> archivos</td></tr></tfoot>
 	</table>
 	</div>	
 
@@ -78,6 +119,7 @@
 			$("#itsthetable").fadeTo("slow",0.15);
 			$("#crear_carpeta").hide();
 			$("#file_upload").show();
+			//hacer peticion ajax para sacar el tamaño ocupado a api/perfil/ocupado.
 		  });
 		  $("#button_carpeta").click(function(){
 			$("#itsthetable").fadeTo("slow",0.15);
