@@ -384,7 +384,7 @@ class Ficheros
 		return $this->file;
 		}
 		
-		public function upload(){
+		public function upload($var_archivos){
 			// the file property can be empty if the field is not required
 			if (null === $this->getFile()) {
 			return;
@@ -398,12 +398,12 @@ class Ficheros
 
 			$this->setMime($this->getFile()->getMimeType());
 			$nombre=$this->getFile()->getClientOriginalName();
-			$this->getFile()->move("C:\\ecloud\\".print_r($this->getPropietario(), true).$this->getRuta(),$nombre);
+			$this->getFile()->move($var_archivos.print_r($this->getPropietario(), true).$this->getRuta(),$nombre);
 			// set the path property to the filename where you've saved the file
 			$this->path = $nombre;
 			
 			//Coger nombre, tamaño en bytes y checksum.
-			$fichero_subido="C:\\ecloud\\".print_r($this->getPropietario(), true).$this->getRuta()."\\".$nombre;
+			$fichero_subido=$var_archivos.print_r($this->getPropietario(), true).$this->getRuta()."\\".$nombre;
 			$this->setChecksum(md5_file($fichero_subido));
 			$this->setNombreFichero($nombre);
 			$this->setnombrerealfisico($nombre);

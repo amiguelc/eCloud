@@ -289,8 +289,10 @@ class CuentaController extends Controller{
 				//$name = $data['form']['nombrefichero'];
 				
 				$carpeta=FALSE;
-				if(isset($_POST['form']['nombrefichero'])){$carpeta=TRUE;$formulario  = $this->createFormBuilder($ficheros)->add('nombrefichero','text')->add('ruta','hidden')->getForm();}
-				else{$formulario = $this->createFormBuilder($ficheros)->add('file','file')->add('ruta','hidden')->getForm();}
+				if(isset($_POST['form']['nombrefichero'])){$carpeta=TRUE;$formulario  = $this->createFormBuilder($ficheros)->add('nombrefichero','text')->add('ruta','hidden')->getForm();
+				}
+				else{$formulario = $this->createFormBuilder($ficheros)->add('file','file')->add('ruta','hidden')->getForm();
+				}
 				
 				if ($this->getRequest()->isMethod('POST')) {
 				
@@ -326,7 +328,8 @@ class CuentaController extends Controller{
 							if($carpeta==TRUE){mkdir($this->container->getParameter('var_archivos').$userid.$ficheros->getRuta()."\\".$ficheros->getnombreFichero());}
 						}else {
 							$ficheros->setTipo("fichero");
-							$ficheros->upload();
+							$var_archivos=$this->container->getParameter('var_archivos');
+							$ficheros->upload($var_archivos);
 						}
 						
 						
@@ -355,13 +358,22 @@ class CuentaController extends Controller{
 						$em2->flush();
 						
 						//return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig',array('ruta'=>$ruta));
-						//Esta redireccion no es segura, hay que revisar.
+						//Esta redireccion no es segura, hay que revisar, para que redirija a ficheros/ruta/nombrefichero
 						return $this->redirect($this->getRequest()->headers->get('referer'),303);
+						//Fichero subido correctamente
+						//return  $response = new Response("Subido correctamente");
+					}
+					else{
+					//Formulario no valido.
+					//return $this->redirect($this->generateUrl('perfil'), 301);
+					return  $response = new Response("Formulario no valido ->".$formulario->createView());
 					}
 				}
-				return $this->render('UsuarioBundle:Cuenta:subir.html.twig', array('formulario' => $formulario->createView()));
-				
-				
+				else{
+				//Peticion GET
+				//return $this->render('UsuarioBundle:Cuenta:subir.html.twig', array('formulario' => $formulario->createView()));
+				return  $response = new Response("Peticion GET");
+				}
 				
 			}
 			else{
@@ -621,9 +633,9 @@ class CuentaController extends Controller{
 				
 				
 				//Antes redirigia a ficheros pero ahora con el borrado por ajax devuelve 1 en casa de borrado bien y 0 en caso de que no
-				//return $this->redirect($this->generateUrl('ficheros'), 303);
+
 				return $response = New Response('1');
-				//return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig');
+
 			}
 			else{
 				return $this->redirect($this->generateUrl('login'), 301);

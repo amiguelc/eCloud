@@ -144,6 +144,7 @@
 		div.innerHTML = tabla;
 		
 		peticion="";
+		tooltipear();
       }
     }
 	
@@ -262,11 +263,14 @@
 	  }
 
 	
-	window.setTimeout('juju()', 4000);
+	//window.setTimeout('juju()', 4000);
 	
-	function juju(){
+	function tooltipear(){
 	
-		$('a').qtip({
+		$('a[idfile]').qtip({
+			style: {
+				classes: 'qtip-tipsy qtip-shadow'
+			},
 			content: {
 				text: function(event, api) {
 					$.ajax({
@@ -290,7 +294,7 @@
 						api.set('content.text', 'Fichero no encontrado');
 					});
 
-					return 'Loading...' // Set some initial loading text
+					return 'Cargando...' // Set some initial loading text
 				}
 			}
 		});

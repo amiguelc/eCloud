@@ -91,7 +91,7 @@
 						{{ form_errors(formulario) }}
 						<td>{{ form_row(formulario.file) }} </td>
 						<td><input type="submit" value="Subir" /></td>
-						<td>{{ form_rest(formulario) }}</td>
+						<td>{{ form_row(formulario.ruta) }}{{ form_rest(formulario) }}</td>
 					</form>
 					<td><button id='cerrar_file_upload'>Cerrar</button></td>
 			</tr>
@@ -119,7 +119,11 @@
 			$("#itsthetable").fadeTo("slow",0.15);
 			$("#crear_carpeta").hide();
 			$("#file_upload").show();
-			//hacer peticion ajax para sacar el tamaño ocupado a api/perfil/ocupado.
+			var xhr_ocupado = $.get( "api/perfil/ocupado", function( datos ) {
+				//alert(datos);
+			});
+			
+			
 		  });
 		  $("#button_carpeta").click(function(){
 			$("#itsthetable").fadeTo("slow",0.15);
