@@ -1,7 +1,3 @@
-jms_security_extra:
-    secure_all_services: false
-    expressions: true
-
 security:
     encoders:
         eCloud\UsuarioBundle\Entity\Usuarios: { algorithm: sha512, iterations:0, encode_as_base64: false }
