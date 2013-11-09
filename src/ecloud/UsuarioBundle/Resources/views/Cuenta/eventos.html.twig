@@ -197,73 +197,16 @@
     }
 	
   }
-  
-  
-  /*
-    function cargadivFichero(evento1,fichero1) {
-	//Mostrar div con "Recuperando informacion"
-	var ballon=document.getElementById(evento1);
-	ballon.innerHTML="Recuperando informacion...";
-	ballon.style.display='inline';
-	//ballon.style.z-index='2';
-	//funcion2=muestradivFichero(evento1);
-	//function(args){if(http.readyState==4){callback(http)}
-	//function(args){if(http.readyState==4){callback(http)}
-	cargarContenido('GET','api/fichero/'+fichero1+'?nocache='+Math.random(), function(){if(peticion.readyState==4){muestradivFichero(evento1);}});
-	}
-	
-	*/
-	/*
-    function muestradivFichero(ballon) {
-    if(peticion.readyState == 4) {
-	 
-      if(peticion.status == 200) {
-	 
-		// Borrar datos anteriores
-		//limpia(contenedor);
-		var div=document.getElementById(ballon);
-        //div = ballon;
-        		
-		//JSON
-		var arr = eval ("(" + peticion.responseText+ ")"); 
-		var tabla="";
-	
-		for(var i=0;i<arr.length;i++){
-			var obj = arr[i];
-
-			for(var key in obj){
-				var attrName = key;
-				var attrValue = obj[key];
-				
-				tabla=tabla+"<p>"+attrValue+"</p>"
-		
-			}
-			
-		}
-		
-		
-		div.innerHTML = tabla;
-		
-		
-      }
-    }
-	
-  }
-  */
-  
-  
-  
-	  function oculta(id){
+    
+	function oculta(id){
 	  document.getElementById(id).style.display="none";
-	  }
+	}
 	  
 	  
-	  function limpia(id) {
+	function limpia(id) {
 	  document.getElementById(id).innerHTML = "";
-	  }
+	}
 
-	
-	//window.setTimeout('juju()', 4000);
 	
 	function tooltipear(){
 	

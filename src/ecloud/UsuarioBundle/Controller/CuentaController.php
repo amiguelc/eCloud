@@ -138,7 +138,7 @@ class CuentaController extends Controller{
 		
 		public function ficherosAction($ruta){
 		
-		//leer los ficheros de la base de datos y pasarselos a twig con ajax, aqui se complica mucho la cosa
+		//falta ajaxificar
 		//con codigo javascript a la hora de subir ficheros tener en cuenta el espacio libre y en base a ello permitir la subida del fichero, calcular checksum.
 		
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
@@ -297,7 +297,7 @@ class CuentaController extends Controller{
 				if ($this->getRequest()->isMethod('POST')) {
 				
 				//Falta comprobar si espacio lleno, en el post y en el get al subir ficheros.
-				
+				//Cambiar bind() por handleRequest()
 				$formulario->bind($this->getRequest());
 					if ($formulario->isValid()) {
 						$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
@@ -359,9 +359,9 @@ class CuentaController extends Controller{
 						
 						//return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig',array('ruta'=>$ruta));
 						//Esta redireccion no es segura, hay que revisar, para que redirija a ficheros/ruta/nombrefichero
-						return $this->redirect($this->getRequest()->headers->get('referer'),303);
+						//return $this->redirect($this->getRequest()->headers->get('referer'),303);
 						//Fichero subido correctamente
-						//return  $response = new Response("Subido correctamente");
+						return  $response = new Response("Subido correctamente");
 					}
 					else{
 					//Formulario no valido.

@@ -39,6 +39,75 @@
 		$.get(idfichero);
 	}
 	
+	function fileSelected() {
+	  var file = document.getElementById('{{ formulario.file.vars.id }}').files[0];
+	  if (file) {
+		var fileSize = 0;
+		if (file.size > 1024 * 1024){
+		  fileSize = (Math.round(file.size * 100 / (1024 * 1024)) / 100).toString() + 'MB';
+		}
+		else{
+		  fileSize = (Math.round(file.size * 100 / 1024) / 100).toString() + 'KB';
+		}
+		//Recuperar el espacio ocupado del usuario
+		var xhr_ocupado = $.get( "api/perfil/ocupado", function( datos ) {
+		//Comprobacion de si el fichero seleccionado es mayor al espacio disponible
+		if (file.size>datos){
+				if (datos > 1024 * 1024){
+				  datos = (Math.round(datos * 100 / (1024 * 1024)) / 100).toString() + 'MB';
+				}
+				else{
+				  datos = (Math.round(datos * 100 / 1024) / 100).toString() + 'KB';
+				}
+			document.getElementById('fileName').innerHTML = 'Name: ' + file.name +"<br>Error: Te quedan solo "+datos+" libres. Y el fichero seleccionado ocupa "+fileSize;
+			document.getElementById('{{ formulario.file.vars.id }}').value="";
+		}
+		else{
+		document.getElementById('fileName').innerHTML = 'Name: ' + file.name;
+		document.getElementById('fileSize').innerHTML = 'Size: ' + fileSize;
+		document.getElementById('fileType').innerHTML = 'Type: ' + file.type;
+		}
+		});
+	  }
+	}
+	
+	function uploadFile() {
+	  var xhr = new XMLHttpRequest();
+	  //var fd = document.getElementById('form1').getFormData();
+	  var fd = new FormData(document.getElementById('form1'));
+	  /* event listners */
+	  xhr.upload.addEventListener("progress", uploadProgress, false);
+	  xhr.addEventListener("load", uploadComplete, false);
+	  xhr.addEventListener("error", uploadFailed, false);
+	  xhr.addEventListener("abort", uploadCanceled, false);
+	  /* Be sure to change the url below to the url of your upload server side script */
+	  xhr.open("POST", "subir");
+	  xhr.send(fd);
+	}
+	
+	function uploadProgress(evt) {
+	  if (evt.lengthComputable) {
+		var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+		document.getElementById('progressNumber').innerHTML = percentComplete.toString() + '%';
+	  }
+	  else {
+		document.getElementById('progressNumber').innerHTML = 'unable to compute';
+	  }
+	}
+
+	function uploadComplete(evt) {
+	  /* This event is raised when the server send back a response */
+	  alert(evt.target.responseText);
+	  //Recargar pagina
+	}
+
+	function uploadFailed(evt) {
+	  alert("There was an error attempting to upload the file.");
+	}
+
+	function uploadCanceled(evt) {
+	  alert("The upload has been canceled by the user or the browser dropped the connection.");
+	}  
 
 	
 </script>
@@ -87,15 +156,21 @@
 	<div id='file_upload' class='div_amagado'>
 		<table class='no_class'>
 			<tr>
-					<form action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario) }}>
+					<form id="form1" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario) }}>
 						{{ form_errors(formulario) }}
-						<td>{{ form_row(formulario.file) }} </td>
-						<td><input type="submit" value="Subir" /></td>
+						<td><div>{{ form_label(formulario.file) }}{{ form_errors(formulario.file) }}{{ form_widget(formulario.file, {'attr': {'onchange': 'fileSelected()'}}) }} </div></td>
+						<td><input id="subir" type="button" onclick="uploadFile()" value="Subir" /></td>
 						<td>{{ form_row(formulario.ruta) }}{{ form_rest(formulario) }}</td>
 					</form>
 					<td><button id='cerrar_file_upload'>Cerrar</button></td>
 			</tr>
 		</table>
+		<div id="subiendofichero">
+			<div id="fileName"></div>
+			<div id="fileSize"></div>
+			<div id="fileType"></div>
+		</div>
+		<div id="progressNumber"></div>
 	</div>
 	
 	<div id='crear_carpeta' class='div_amagado'>
@@ -119,11 +194,6 @@
 			$("#itsthetable").fadeTo("slow",0.15);
 			$("#crear_carpeta").hide();
 			$("#file_upload").show();
-			var xhr_ocupado = $.get( "api/perfil/ocupado", function( datos ) {
-				//alert(datos);
-			});
-			
-			
 		  });
 		  $("#button_carpeta").click(function(){
 			$("#itsthetable").fadeTo("slow",0.15);
