@@ -26,7 +26,7 @@ class RegistroController extends Controller{
 	
 	if ($peticion->getMethod() == 'POST') {
 		// Validar los datos enviados y guardarlos en la base de datos
-		$formulario->bindRequest($peticion);
+		$formulario->handleRequest($peticion);
 		if ($formulario->isValid()) {
 		// guardar la información en la base de datos
 			$encoder = $this->get('security.encoder_factory')->getEncoder($usuario);
@@ -43,7 +43,7 @@ class RegistroController extends Controller{
 			$usuario->setLoginsftp("0");
 			$usuario->setLoginweb("0");
 			$usuario->setPassword($passwordCodificado);
-			$em = $this->getDoctrine()->getEntityManager();
+			$em = $this->getDoctrine()->getManager();
 			
 			$em->persist($usuario);
 			$em->flush();
@@ -56,11 +56,11 @@ class RegistroController extends Controller{
 			$eventos->setaccion("&iexcl;Te has registrado!");
 			$eventos->setFecha(new \Datetime());
 			
-			$em2 = $this->getDoctrine()->getEntityManager();
+			$em2 = $this->getDoctrine()->getManager();
 			$em2->persist($eventos);
 			$em2->flush();
 			
-			$this->get('session')->setFlash('info','¡Enhorabuena! Te has registrado correctamente en eCloud');
+			//$this->get('session')->setFlash('info','¡Enhorabuena! Te has registrado correctamente en eCloud');
 			//$token = new UsernamePasswordToken($usuario,$usuario->getPassword(),'usuarios',$usuario->getRoles());
 			//$this->container->get('security.context')->setToken($token);
 			
