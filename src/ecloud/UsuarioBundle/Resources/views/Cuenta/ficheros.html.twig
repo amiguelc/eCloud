@@ -50,16 +50,17 @@
 		  fileSize = (Math.round(file.size * 100 / 1024) / 100).toString() + 'KB';
 		}
 		//Recuperar el espacio ocupado del usuario
-		var xhr_ocupado = $.get( "api/perfil/ocupado", function( datos ) {
+		var xhr_ocupado = $.get( "api/perfil/espacio", function( datos ) {
+		document.getElementById('max_file_size').value = datos.libre;
 		//Comprobacion de si el fichero seleccionado es mayor al espacio disponible
-		if (file.size>datos){
-				if (datos > 1024 * 1024){
-				  datos = (Math.round(datos * 100 / (1024 * 1024)) / 100).toString() + 'MB';
+		if (file.size>datos.libre){
+				if (datos.libre > 1024 * 1024){
+				  datos.libre = (Math.round(datos.libre * 100 / (1024 * 1024)) / 100).toString() + 'MB';
 				}
 				else{
-				  datos = (Math.round(datos * 100 / 1024) / 100).toString() + 'KB';
+				  datos.libre = (Math.round(datos.libre * 100 / 1024) / 100).toString() + 'KB';
 				}
-			document.getElementById('fileName').innerHTML = 'Name: ' + file.name +"<br>Error: Te quedan solo "+datos+" libres. Y el fichero seleccionado ocupa "+fileSize;
+			document.getElementById('fileName').innerHTML = 'Name: ' + file.name +"<br>Error: Te quedan solo "+datos.libre+" libres. Y el fichero seleccionado ocupa "+fileSize;
 			document.getElementById('{{ formulario.file.vars.id }}').value="";
 		}
 		else{
@@ -67,11 +68,14 @@
 		document.getElementById('fileSize').innerHTML = 'Size: ' + fileSize;
 		document.getElementById('fileType').innerHTML = 'Type: ' + file.type;
 		}
-		});
+		}, 'json');
 	  }
 	}
 	
 	function uploadFile() {
+	
+	//Comprobaciones de que no falten datos, form_ruta y max_file_size, en el lado del servidor tambien.
+		
 	  var xhr = new XMLHttpRequest();
 	  //var fd = document.getElementById('form1').getFormData();
 	  var fd = new FormData(document.getElementById('form1'));
@@ -160,7 +164,7 @@
 						{{ form_errors(formulario) }}
 						<td><div>{{ form_label(formulario.file) }}{{ form_errors(formulario.file) }}{{ form_widget(formulario.file, {'attr': {'onchange': 'fileSelected()'}}) }} </div></td>
 						<td><input id="subir" type="button" onclick="uploadFile()" value="Subir" /></td>
-						<td>{{ form_row(formulario.ruta) }}{{ form_rest(formulario) }}</td>
+						<td>{{ form_row(formulario.ruta) }}{{ form_rest(formulario) }} <input id="max_file_size" type="hidden" name="MAX_FILE_SIZE" value="" /></td>
 					</form>
 					<td><button id='cerrar_file_upload'>Cerrar</button></td>
 			</tr>

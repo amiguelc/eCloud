@@ -64,11 +64,12 @@ class CuentaController extends Controller{
 			}
 			else{
 				//$formulario = $this->createFormBuilder($usuario)->add('nombrefichero','text', array('data'=> $ficheros2->getNombreFichero()))->add('ruta','text',array ('data'=> $ficheros2->getRuta()))->getForm();
-				$usuario->setLimite(round(($usuario->getLimite()/1024/1024),2)." Mbytes");
+				$usuario->setLimite(round(($usuario->getLimite()/1024/1024),2)." MB");
 				$usuario->setOcupado(round(($usuario->getOcupado()/1024/1024),2));
-				$usuario->setOcupado($usuario->getOcupado()." Mbytes (".round(($usuario->getOcupado()/$usuario->getLimite()*100),2)."%)");
+				$usuario->setOcupado($usuario->getOcupado()." MB ");
+				$libre=($usuario->getLimite()-$usuario->getOcupado())." MB (".round((($usuario->getOcupado()/$usuario->getLimite())*100),2)."%)";
 				$formulario=$this->createFormBuilder($usuario)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')->getForm();
-				return $this->render('UsuarioBundle:Cuenta:perfil.html.twig', array('usuario'=>$usuario,'formulario' => $formulario->createView()));
+				return $this->render('UsuarioBundle:Cuenta:perfil.html.twig', array('usuario'=>$usuario,'formulario' => $formulario->createView(), 'libre'=> $libre));
 			}
 			}
 			else{
@@ -87,7 +88,7 @@ class CuentaController extends Controller{
 			else{
 				$em=$this->getDoctrine()->getManager();
 				$usuario=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
-			
+				//return new Response (var_dump($usuario));
 				//if isset nombre dar solo esa info-> jsonificar
 				
 				if ($info!="all"){
@@ -106,7 +107,16 @@ class CuentaController extends Controller{
 					case "ocupado":
 						$jsonContent=$usuario->getOcupado();
 						break;
-					default:						
+					case "libre":
+						$jsonContent=$usuario->getLimite()-$usuario->getOcupado();
+						break;
+					case "espacio":
+						$libre=$usuario->getLimite()-$usuario->getOcupado();
+						$jsonContent="{\"limite\":\"".$usuario->getLimite()."\",\"ocupado\":\"".$usuario->getOcupado()."\", \"libre\":\"".$libre."\"}";
+						break;
+					default:
+						//Envia todo... hasta contraseña..
+						$usuario->setPassword("");
 						$encoders = array(new XmlEncoder(), new JsonEncoder());
 						$normalizers = array(new GetSetMethodNormalizer());
 						$serializer = new Serializer($normalizers, $encoders);
@@ -117,7 +127,7 @@ class CuentaController extends Controller{
 				
 				}else{
 				//Enviar todo en formato JSON
-				
+				$usuario->setPassword("");
 				$encoders = array(new XmlEncoder(), new JsonEncoder());
 				$normalizers = array(new GetSetMethodNormalizer());
 				$serializer = new Serializer($normalizers, $encoders);
