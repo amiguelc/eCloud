@@ -398,6 +398,11 @@ class Ficheros
 
 			$this->setMime($this->getFile()->getMimeType());
 			$nombre=$this->getFile()->getClientOriginalName();
+			
+			
+			//AQUI FALTA COMPROBAR ANTES SI YA EXISTE EL FICHERO CON EL MISMO NOMBRE
+			
+			
 			$this->getFile()->move($var_archivos.print_r($this->getPropietario(), true).$this->getRuta(),$nombre);
 			// set the path property to the filename where you've saved the file
 			$this->path = $nombre;
@@ -413,6 +418,14 @@ class Ficheros
 			// clean up the file property as you won't need it anymore
 			$this->file = null;
 		}
+		
+		public function remove($var_archivos){
+		
+		$fichero_subido=$var_archivos.print_r($this->getPropietario(), true).$this->getRuta()."\\".$this->getNombreFichero();
+		if (file_exists($fichero_subido)){
+			unlink($fichero_subido);
+		}
+	}	
 
     /**
      * Set mime

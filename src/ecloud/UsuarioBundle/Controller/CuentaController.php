@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 
 
@@ -294,21 +295,19 @@ class CuentaController extends Controller{
 		
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
 				$ficheros = new Ficheros();
-				//$formulario = $this->createFormBuilder($ficheros)->add('file','file')->getForm();
 				//$data = $this->getRequest()->request->all();
 				//$name = $data['form']['nombrefichero'];
 				
 				$carpeta=FALSE;
 				if(isset($_POST['form']['nombrefichero'])){$carpeta=TRUE;$formulario  = $this->createFormBuilder($ficheros)->add('nombrefichero','text')->add('ruta','hidden')->getForm();
 				}
-				else{$formulario = $this->createFormBuilder($ficheros)->add('file','file')->add('ruta','hidden')->getForm();
+				else{$formulario = $this->createFormBuilder($ficheros)->add('file','file')->add('ruta','hidden', array('constraints' => new NotBlank()))->getForm();
 				}
 				
 				if ($this->getRequest()->isMethod('POST')) {
 				
-				//Falta comprobar si espacio lleno, en el post y en el get al subir ficheros.
-				//Cambiar bind() por handleRequest()
-				$formulario->bind($this->getRequest());
+				//Falta comprobar si espacio lleno.
+				$formulario->handleRequest($this->getRequest());
 					if ($formulario->isValid()) {
 						$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 						
@@ -339,13 +338,26 @@ class CuentaController extends Controller{
 						}else {
 							$ficheros->setTipo("fichero");
 							$var_archivos=$this->container->getParameter('var_archivos');
+							//FALTA COMPROBAR SI YA EXISTE EL MISMO FICHERO HACIENDO UNA SQL, INCLUIR LA COMPROBACION EN EL CLIENTE
 							$ficheros->upload($var_archivos);
 						}
 						
 						
 						//Sumar espacio ocupado a la cuenta del userid, pero antes hay que comprobar que no supera el espacio.
 						$usuarios=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser'=>$userid));
-						if($usuarios->getOcupado()+$ficheros->getFilesize()<=$usuarios->getLimite()){$usuarios->setOcupado($usuarios->getOcupado()+$ficheros->getFilesize());}else {return $this->redirect($this->generateUrl('ficheros'), 303);}
+						$ocupado=$usuarios->getOcupado();
+						$tamanyo=$ficheros->getFilesize();
+						$limite=$usuarios->getLimite();
+						//return  $response = new Response($ocupado."/".$tamanyo."/".$limite);
+						if($ocupado+$tamanyo<=$limite){
+							$usuarios->setOcupado($usuarios->getOcupado()+$ficheros->getFilesize());
+						}
+						else {
+							//Borra fichero previamente subido a la carpeta <- Hay que mejorarlo para que corte la ejecucion del script dentro de fichero.php antes de copiar nada, asi es mas rapido. 
+							$ficheros->remove($this->container->getParameter('var_archivos'));
+							//return $this->redirect($this->generateUrl('ficheros'), 303);
+							return  $response = new Response("Sin espacio");
+						}
 						
 						//ejecutar sentencias
 						$em->persist($ficheros);
@@ -376,7 +388,7 @@ class CuentaController extends Controller{
 					else{
 					//Formulario no valido.
 					//return $this->redirect($this->generateUrl('perfil'), 301);
-					return  $response = new Response("Formulario no valido ->".$formulario->createView());
+					return  $response = new Response("Formulario no valido");
 					}
 				}
 				else{
@@ -642,7 +654,7 @@ class CuentaController extends Controller{
 				
 				
 				
-				//Antes redirigia a ficheros pero ahora con el borrado por ajax devuelve 1 en casa de borrado bien y 0 en caso de que no
+				//Con el borrado por ajax devuelve 1 en casa de borrado bien y 0 en caso de que no
 
 				return $response = New Response('1');
 

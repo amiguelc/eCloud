@@ -34,7 +34,7 @@
 			document.getElementById("total_archivos").innerHTML=y-1;
 		}
 		}
-		//falta peticion POST AJAX para eliminar fichero.
+		//peticion POST AJAX para eliminar fichero.
 		
 		$.get(idfichero);
 	}
@@ -50,7 +50,16 @@
 		  fileSize = (Math.round(file.size * 100 / 1024) / 100).toString() + 'KB';
 		}
 		//Recuperar el espacio ocupado del usuario
-		var xhr_ocupado = $.get( "api/perfil/espacio", function( datos ) {
+		if (location.pathname.match(/^\/app_dev.php\/ficheros/)!=null){
+			var dir=location.protocol+"//"+location.hostname+"/app_dev.php/api/perfil/espacio";
+		}
+		else if(location.pathname.match(/^\/app.php\/ficheros/)!=null){
+			var dir=location.protocol+"//"+location.hostname+"/app.php/api/perfil/espacio";
+		}
+		else{
+			var dir=location.protocol+"//"+location.hostname+"/api/perfil/espacio";
+		}
+		var xhr_ocupado = $.get( dir, function( datos ) {
 		document.getElementById('max_file_size').value = datos.libre;
 		//Comprobacion de si el fichero seleccionado es mayor al espacio disponible
 		if (file.size>datos.libre){
@@ -75,9 +84,27 @@
 	function uploadFile() {
 	
 	//Comprobaciones de que no falten datos, form_ruta y max_file_size, en el lado del servidor tambien.
+	if(document.getElementById('form_file').value==="" || document.getElementById('form_ruta').value===undefined || document.getElementById('form__token').value===undefined){
+		 alert("Error en la subida. Faltan datos");
+	 }
+	 else{
+	 	if (location.pathname.match(/^\/app_dev.php\/ficheros/)!=null){
+			var dir=location.protocol+"//"+location.hostname+"/app_dev.php/subir";
+		}
+		else if(location.pathname.match(/^\/app.php\/ficheros/)!=null){
+			var dir=location.protocol+"//"+location.hostname+"/app.php/subir";
+		}
+		else{
+			var dir=location.protocol+"//"+location.hostname+"/subir";
+		}
 		
-	  var xhr = new XMLHttpRequest();
-	  //var fd = document.getElementById('form1').getFormData();
+		if(window.XMLHttpRequest) {
+		  xhr = new XMLHttpRequest();
+		}
+		else {
+		  xhr = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		
 	  var fd = new FormData(document.getElementById('form1'));
 	  /* event listners */
 	  xhr.upload.addEventListener("progress", uploadProgress, false);
@@ -85,8 +112,9 @@
 	  xhr.addEventListener("error", uploadFailed, false);
 	  xhr.addEventListener("abort", uploadCanceled, false);
 	  /* Be sure to change the url below to the url of your upload server side script */
-	  xhr.open("POST", "subir");
+	  xhr.open("POST", dir);
 	  xhr.send(fd);
+		}
 	}
 	
 	function uploadProgress(evt) {
@@ -103,6 +131,7 @@
 	  /* This event is raised when the server send back a response */
 	  alert(evt.target.responseText);
 	  //Recargar pagina
+	  location.reload(true);
 	}
 
 	function uploadFailed(evt) {
@@ -112,7 +141,42 @@
 	function uploadCanceled(evt) {
 	  alert("The upload has been canceled by the user or the browser dropped the connection.");
 	}  
+	
+	
+	function crearCarpeta() {
+	if(document.getElementById('form_nombrefichero').value==="" || document.getElementById('form_ruta').value===undefined || document.getElementById('form__token').value===undefined){
+		 alert("Error en la subida. Faltan datos");
+	 }else{
+	//Comprobaciones de que no falten datos, form_ruta y max_file_size, en el lado del servidor tambien.
+		if (location.pathname.match(/^\/app_dev.php\/ficheros/)!=null){
+			var dir=location.protocol+"//"+location.hostname+"/app_dev.php/subir";
+		}
+		else if(location.pathname.match(/^\/app.php\/ficheros/)!=null){
+			var dir=location.protocol+"//"+location.hostname+"/app.php/subir";
+		}
+		else{
+			var dir=location.protocol+"//"+location.hostname+"/subir";
+		}
+		
+		if(window.XMLHttpRequest) {
+		  xhr = new XMLHttpRequest();
+		}
+		else {
+		  xhr = new ActiveXObject("Microsoft.XMLHTTP");
+		}
 
+	  var fd = new FormData(document.getElementById('form2'));
+	  /* event listners */
+	  //xhr.upload.addEventListener("progress", uploadProgress, false);
+	  xhr.addEventListener("load", uploadComplete, false);
+	  xhr.addEventListener("error", uploadFailed, false);
+	  xhr.addEventListener("abort", uploadCanceled, false);
+	  /* Be sure to change the url below to the url of your upload server side script */
+	  xhr.open("POST", dir);
+	  xhr.send(fd);
+	  }
+	}
+	
 	
 </script>
 
@@ -180,10 +244,10 @@
 	<div id='crear_carpeta' class='div_amagado'>
 		<table class='no_class'>
 			<tr>
-				<form action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
+				<form id="form2" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
 					{{ form_errors(formulario_carpeta) }}
 					<td>{{ form_row(formulario_carpeta.nombrefichero) }}</td>
-					<td><input type="submit" value="Crear" /></td>
+					<td><input type="button" onclick="crearCarpeta()" value="Crear" /></td>
 					<td>{{ form_rest(formulario_carpeta) }}</td>
 				</form>
 				<td><button id='cerrar_crear_carpeta'>Cerrar</button></td>
