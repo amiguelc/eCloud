@@ -299,7 +299,7 @@ class CuentaController extends Controller{
 				//$name = $data['form']['nombrefichero'];
 				
 				$carpeta=FALSE;
-				if(isset($_POST['form']['nombrefichero'])){$carpeta=TRUE;$formulario  = $this->createFormBuilder($ficheros)->add('nombrefichero','text')->add('ruta','hidden')->getForm();
+				if(isset($_POST['form']['nombrefichero'])){$carpeta=TRUE;$formulario  = $this->createFormBuilder($ficheros)->add('nombrefichero','text')->add('ruta','hidden', array('constraints' => new NotBlank()))->getForm();
 				}
 				else{$formulario = $this->createFormBuilder($ficheros)->add('file','file')->add('ruta','hidden', array('constraints' => new NotBlank()))->getForm();
 				}
@@ -312,7 +312,35 @@ class CuentaController extends Controller{
 						$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 						
 						$em = $this->getDoctrine()->getManager();
-								
+							
+						//Comprobaciones de nombre de fichero, carpeta o ruta. Si el fichero/carpeta ya existe. Caracteres prohibidos ( / \ : ? < > ' " ~ * | )
+						
+						if($carpeta==TRUE){
+						//Comprobaciones a carpeta.
+							if(preg_match("/(\/|\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['nombrefichero'])==1){ return  $response = new Response("Error en el nombre de la carpeta");}
+							if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['ruta'])==1){ return  $response = new Response("Error en la ruta de la carpeta");}
+							if(preg_match("/\.\.\//",$_POST['form']['ruta'])==1){ return  $response = new Response("No se permite rutas con ../");}
+							
+							$query=$em->createQuery("SELECT f.nombreFichero FROM UsuarioBundle:Ficheros f WHERE f.propietario=?1 and f.ruta like ?2 and f.nombreFichero like ?3 and f.tipo like 'carpeta'");
+							$query->setParameter(1, $userid);
+							$query->setParameter(2, $_POST['form']['ruta']);
+							$query->setParameter(3, $_POST['form']['nombrefichero']);
+							$mismacarpeta = $query->getOneOrNullResult();
+							if($mismacarpeta!=null){return  $response = new Response("Esa carpeta ya existe en el directorio actual");}
+						}
+						else{
+						//Comprobaciones a fichero			
+							if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['ruta'])==1){ return  $response = new Response("Error en la ruta del fichero");}
+							if(preg_match("/\.\.\//",$_POST['form']['ruta'])==1){ return  $response = new Response("No se permite rutas con ../");}
+							if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_FILES['form']['name']['file'])==1){ return  $response = new Response("Error en el nombre del fichero");}
+							
+							$query=$em->createQuery("SELECT f.nombreFichero FROM UsuarioBundle:Ficheros f WHERE f.propietario=?1 and f.ruta like ?2 and f.nombreFichero like ?3 and f.tipo like 'fichero'");
+							$query->setParameter(1, $userid);
+							$query->setParameter(2, $_POST['form']['ruta']);
+							$query->setParameter(3, $_FILES['form']['name']['file']);
+							$mismofichero = $query->getOneOrNullResult();
+							if($mismofichero!=null){return  $response = new Response("Ese fichero ya existe en el directorio actual");}
+						}
 						
 						//Ficheros normales///
 						//propietario, nombre_fichero, nombre_real_fisico, tipo, ruta, filesize, checksum, fecha_subida, total_descargas, permiso

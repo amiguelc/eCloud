@@ -86,34 +86,42 @@
 	//Comprobaciones de que no falten datos, form_ruta y max_file_size, en el lado del servidor tambien.
 	if(document.getElementById('form_file').value==="" || document.getElementById('form_ruta').value===undefined || document.getElementById('form__token').value===undefined){
 		 alert("Error en la subida. Faltan datos");
-	 }
-	 else{
-	 	if (location.pathname.match(/^\/app_dev.php\/ficheros/)!=null){
-			var dir=location.protocol+"//"+location.hostname+"/app_dev.php/subir";
-		}
-		else if(location.pathname.match(/^\/app.php\/ficheros/)!=null){
-			var dir=location.protocol+"//"+location.hostname+"/app.php/subir";
+	}
+	else{
+		//Comrpobaciones de nombres con caracteres no permitidos.
+		var cadena=document.getElementById('form_file').value;
+		if (caracteresprohibidos(cadena)==true){
+			alert("El nombre del fichero tiene caracteres no permitidos");
+			document.getElementById('form_file').value="";
 		}
 		else{
-			var dir=location.protocol+"//"+location.hostname+"/subir";
-		}
-		
-		if(window.XMLHttpRequest) {
-		  xhr = new XMLHttpRequest();
-		}
-		else {
-		  xhr = new ActiveXObject("Microsoft.XMLHTTP");
-		}
-		
-	  var fd = new FormData(document.getElementById('form1'));
-	  /* event listners */
-	  xhr.upload.addEventListener("progress", uploadProgress, false);
-	  xhr.addEventListener("load", uploadComplete, false);
-	  xhr.addEventListener("error", uploadFailed, false);
-	  xhr.addEventListener("abort", uploadCanceled, false);
-	  /* Be sure to change the url below to the url of your upload server side script */
-	  xhr.open("POST", dir);
-	  xhr.send(fd);
+			if (location.pathname.match(/^\/app_dev.php\/ficheros/)!=null){
+				var dir=location.protocol+"//"+location.hostname+"/app_dev.php/subir";
+			}
+			else if(location.pathname.match(/^\/app.php\/ficheros/)!=null){
+				var dir=location.protocol+"//"+location.hostname+"/app.php/subir";
+			}
+			else{
+				var dir=location.protocol+"//"+location.hostname+"/subir";
+			}
+			
+			if(window.XMLHttpRequest) {
+			  xhr = new XMLHttpRequest();
+			}
+			else {
+			  xhr = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			
+		  var fd = new FormData(document.getElementById('form1'));
+		  /* event listners */
+		  xhr.upload.addEventListener("progress", uploadProgress, false);
+		  xhr.addEventListener("load", uploadComplete, false);
+		  xhr.addEventListener("error", uploadFailed, false);
+		  xhr.addEventListener("abort", uploadCanceled, false);
+		  /* Be sure to change the url below to the url of your upload server side script */
+		  xhr.open("POST", dir);
+		  xhr.send(fd);
+		   }
 		}
 	}
 	
@@ -144,37 +152,73 @@
 	
 	
 	function crearCarpeta() {
+	//Comprobaciones de que no falten datos, form_ruta y max_file_size, en el lado del servidor tambien.
 	if(document.getElementById('form_nombrefichero').value==="" || document.getElementById('form_ruta').value===undefined || document.getElementById('form__token').value===undefined){
 		 alert("Error en la subida. Faltan datos");
 	 }else{
-	//Comprobaciones de que no falten datos, form_ruta y max_file_size, en el lado del servidor tambien.
-		if (location.pathname.match(/^\/app_dev.php\/ficheros/)!=null){
-			var dir=location.protocol+"//"+location.hostname+"/app_dev.php/subir";
-		}
-		else if(location.pathname.match(/^\/app.php\/ficheros/)!=null){
-			var dir=location.protocol+"//"+location.hostname+"/app.php/subir";
-		}
+	
+		//Comrpobaciones de nombres con carcateres no permitidos.
+		var cadena=document.getElementById('form_nombrefichero').value;
+		if (caracteresprohibidos(cadena)==true){
+			alert("Caracteres no permitidos");
+			document.getElementById('form_nombrefichero').value="";}
 		else{
-			var dir=location.protocol+"//"+location.hostname+"/subir";
-		}
 		
-		if(window.XMLHttpRequest) {
-		  xhr = new XMLHttpRequest();
-		}
-		else {
-		  xhr = new ActiveXObject("Microsoft.XMLHTTP");
-		}
+			if (location.pathname.match(/^\/app_dev.php\/ficheros/)!=null){
+				var dir=location.protocol+"//"+location.hostname+"/app_dev.php/subir";
+			}
+			else if(location.pathname.match(/^\/app.php\/ficheros/)!=null){
+				var dir=location.protocol+"//"+location.hostname+"/app.php/subir";
+			}
+			else{
+				var dir=location.protocol+"//"+location.hostname+"/subir";
+			}
+			
+			if(window.XMLHttpRequest) {
+			  xhr = new XMLHttpRequest();
+			}
+			else {
+			  xhr = new ActiveXObject("Microsoft.XMLHTTP");
+			}
 
-	  var fd = new FormData(document.getElementById('form2'));
-	  /* event listners */
-	  //xhr.upload.addEventListener("progress", uploadProgress, false);
-	  xhr.addEventListener("load", uploadComplete, false);
-	  xhr.addEventListener("error", uploadFailed, false);
-	  xhr.addEventListener("abort", uploadCanceled, false);
-	  /* Be sure to change the url below to the url of your upload server side script */
-	  xhr.open("POST", dir);
-	  xhr.send(fd);
+		  var fd = new FormData(document.getElementById('form2'));
+		  /* event listners */
+		  //xhr.upload.addEventListener("progress", uploadProgress, false);
+		  xhr.addEventListener("load", uploadComplete, false);
+		  xhr.addEventListener("error", uploadFailed, false);
+		  xhr.addEventListener("abort", uploadCanceled, false);
+		  /* Be sure to change the url below to the url of your upload server side script */
+		  xhr.open("POST", dir);
+		  xhr.send(fd);
 	  }
+	  }
+	}
+	
+	//Funcion para comprobar caracteres prohibidos. ( / \ : ? < > ' " ~ * | ). Falta mejorar para detectar el caracter prohibido y devolverlo.
+	function caracteresprohibidos(cadena){
+	var a=false;
+		if(cadena.match(/\//)){ a=true;}
+		if(cadena.match(/\\/)){ a=true;}
+		if(cadena.match(/:/)){ a=true;}
+		if(cadena.match(/\?/)){ a=true;}
+		if(cadena.match(/</)){ a=true;}
+		if(cadena.match(/>/)){ a=true;}
+		if(cadena.match(/'/)){ a=true;}
+		if(cadena.match(/"/)){ a=true;}
+		if(cadena.match(/~/)){ a=true;} //Aqui hay un bug que hace que se ejecute dos veces el alert del warning,
+		if(cadena.match(/\*/)){ a=true;}
+		if(cadena.match(/\|/)){ a=true;}
+		
+		return a;
+	}
+	
+	function comprobarCarpeta() {
+	var cadena=document.getElementById('form_nombrefichero').value;
+		if (caracteresprohibidos(cadena)==true){
+			alert("Esta prohibido crear carpetas con caracteres prohibidos ( / \\ : ? < > \' \" ~ * | ).");
+			document.getElementById('form_nombrefichero').value=cadena.slice(0,cadena.length-1);
+		}
+	
 	}
 	
 	
@@ -246,7 +290,7 @@
 			<tr>
 				<form id="form2" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
 					{{ form_errors(formulario_carpeta) }}
-					<td>{{ form_row(formulario_carpeta.nombrefichero) }}</td>
+					<td><div>{{ form_label(formulario_carpeta.nombrefichero) }}{{ form_errors(formulario_carpeta.nombrefichero) }}{{ form_widget(formulario_carpeta.nombrefichero, {'attr': {'onkeyup': 'comprobarCarpeta()'}}) }}</div></td>
 					<td><input type="button" onclick="crearCarpeta()" value="Crear" /></td>
 					<td>{{ form_rest(formulario_carpeta) }}</td>
 				</form>

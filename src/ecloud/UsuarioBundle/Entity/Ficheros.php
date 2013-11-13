@@ -400,7 +400,7 @@ class Ficheros
 			$nombre=$this->getFile()->getClientOriginalName();
 			
 			
-			//AQUI FALTA COMPROBAR ANTES SI YA EXISTE EL FICHERO CON EL MISMO NOMBRE
+			//AQUI FALTA COMPROBAR ANTES SI YA EXISTE EL FICHERO CON EL MISMO NOMBRE Y COMPROBACIONES EN EL NOMBRE DEL FICHERO
 			
 			
 			$this->getFile()->move($var_archivos.print_r($this->getPropietario(), true).$this->getRuta(),$nombre);
