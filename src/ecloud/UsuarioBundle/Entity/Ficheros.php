@@ -16,7 +16,7 @@ class Ficheros
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_fichero", type="bigint")
+     * @ORM\Column(name="idFichero", type="bigint")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -32,14 +32,14 @@ class Ficheros
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre_fichero", type="string", length=255)
+     * @ORM\Column(name="nombreFichero", type="string", length=255)
      */
     private $nombreFichero;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre_real_fisico", type="string", length=255)
+     * @ORM\Column(name="nombreRealFisico", type="string", length=255)
      */
     private $nombreRealFisico;
 
@@ -75,14 +75,14 @@ class Ficheros
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="fecha_subida", type="datetime")
+     * @ORM\Column(name="fechaSubida", type="datetime")
      */
     private $fechaSubida;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="total_descargas", type="bigint")
+     * @ORM\Column(name="totalDescargas", type="bigint")
      */
     private $totalDescargas;
 

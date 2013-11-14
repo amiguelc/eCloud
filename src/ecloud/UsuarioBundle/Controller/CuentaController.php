@@ -416,6 +416,7 @@ class CuentaController extends Controller{
 						$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
 						$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
 						$eventos->setFecha(new \Datetime());
+						$eventos->setRuta($ficheros->getRuta());
 						
 						$em2 = $this->getDoctrine()->getManager();
 						$em2->persist($eventos);
@@ -478,6 +479,7 @@ class CuentaController extends Controller{
 					$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
 					$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
 					$eventos->setFecha(new \Datetime());
+					$eventos->setRuta($ficheros->getRuta());
 					
 			
 					if($ficheros->getTipo()=='carpeta'){
@@ -584,6 +586,7 @@ class CuentaController extends Controller{
 					$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
 					$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
 					$eventos->setFecha(new \Datetime());
+					$eventos->setRuta($ficheros->getRuta());
 					
 					//Restar espacio ocupado a la cuenta del userid.
 					$usuarios=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser'=>$userid));
@@ -630,6 +633,7 @@ class CuentaController extends Controller{
 				$eventos->setNombreFicheroAntiguo($sub_ficheros[$clave]->getnombreFichero());
 				$eventos->setNombreFicheroNuevo($sub_ficheros[$clave]->getnombreFichero());
 				$eventos->setFecha(new \Datetime());
+				$eventos->setRuta($sub_ficheros[$clave]->getRuta()); //$eventos->setRuta($ficheros->getRuta());
 				if($sub_ficheros[$clave]->getTipo()=='fichero'){
 				$eventos->setaccion("Has borrado el fichero ".$sub_ficheros[$clave]->getnombreFichero());
 				}else{
@@ -654,6 +658,7 @@ class CuentaController extends Controller{
 				$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
 				$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
 				$eventos->setFecha(new \Datetime());
+				$eventos->setRuta($ficheros->getRuta());
 
 				$em->remove($ficheros);
 				$em->persist($eventos);

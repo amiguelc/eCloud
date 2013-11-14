@@ -15,7 +15,7 @@ class Logins
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_login", type="bigint")
+     * @ORM\Column(name="idLogin", type="bigint")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -24,7 +24,7 @@ class Logins
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_user", type="bigint")
+     * @ORM\Column(name="idUser", type="bigint")
      */
     private $idUser;
 

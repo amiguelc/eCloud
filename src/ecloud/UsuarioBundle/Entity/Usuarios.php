@@ -36,7 +36,7 @@ class Usuarios implements UserInterface {
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_user", type="bigint")
+     * @ORM\Column(name="idUser", type="bigint")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -51,7 +51,7 @@ class Usuarios implements UserInterface {
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre_usuario", type="string", length=255, unique=true)
+     * @ORM\Column(name="nombreUsuario", type="string", length=255, unique=true)
      */
     private $nombreUsuario;
 
@@ -100,14 +100,14 @@ class Usuarios implements UserInterface {
     /**
      * @var string
      *
-     * @ORM\Column(name="ip_registro", type="string", length=255)
+     * @ORM\Column(name="ipRegistro", type="string", length=255)
      */
     private $ipRegistro;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="fecha_registro", type="datetime")
+     * @ORM\Column(name="fechaRegistro", type="datetime")
      */
     private $fechaRegistro;
 
@@ -129,21 +129,21 @@ class Usuarios implements UserInterface {
     /**
      * @var integer
      *
-     * @ORM\Column(name="logins_ftp", type="bigint")
+     * @ORM\Column(name="loginsFtp", type="bigint")
      */
     private $loginsFtp;
 
     /**
      * @var integer
      *
-     * @ORM\Column(name="login_web", type="bigint")
+     * @ORM\Column(name="loginsWeb", type="bigint")
      */
     private $loginWeb;
 	
 	 /**
      * @var \DateTime
      *
-     * @ORM\Column(name="ultimo_acceso", type="datetime")
+     * @ORM\Column(name="ultimoAcceso", type="datetime")
      */
     private $ultimoAcceso;
 

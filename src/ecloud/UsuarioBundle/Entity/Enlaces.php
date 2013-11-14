@@ -15,7 +15,7 @@ class Enlaces
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_enlace", type="bigint")
+     * @ORM\Column(name="idEnlace", type="bigint")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -31,7 +31,7 @@ class Enlaces
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_fichero", type="bigint")
+     * @ORM\Column(name="idFichero", type="bigint")
      */
     private $idFichero;
 
@@ -45,14 +45,14 @@ class Enlaces
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="fecha_inicio", type="datetime")
+     * @ORM\Column(name="fechaInicio", type="datetime")
      */
     private $fechaInicio;
 
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="fecha_expiracion", type="datetime")
+     * @ORM\Column(name="fechaExpiracion", type="datetime")
      */
     private $fechaExpiracion;
 

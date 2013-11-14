@@ -55,12 +55,12 @@ class RegistroController extends Controller{
 			$eventos->setIdUser($usuario->getidUser());
 			$eventos->setaccion("&iexcl;Te has registrado!");
 			$eventos->setFecha(new \Datetime());
+			$eventos->setRuta("-");
 			
-			$em2 = $this->getDoctrine()->getManager();
-			$em2->persist($eventos);
-			$em2->flush();
+			//$em2 = $this->getDoctrine()->getManager();
+			$em->persist($eventos);
+			$em->flush();
 			
-			//$this->get('session')->setFlash('info','¡Enhorabuena! Te has registrado correctamente en eCloud');
 			//$token = new UsernamePasswordToken($usuario,$usuario->getPassword(),'usuarios',$usuario->getRoles());
 			//$this->container->get('security.context')->setToken($token);
 			

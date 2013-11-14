@@ -15,7 +15,7 @@ class Logins_error
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_loginerroneo", type="integer")
+     * @ORM\Column(name="idLoginErroneo", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -24,7 +24,7 @@ class Logins_error
 	 /**
      * @var string
      *
-     * @ORM\Column(name="id_user", type="integer")
+     * @ORM\Column(name="idUser", type="integer")
      */
     private $idUser;
 
@@ -45,14 +45,14 @@ class Logins_error
     /**
      * @var string
      *
-     * @ORM\Column(name="email_erroneo", type="string", length=255)
+     * @ORM\Column(name="emailErroneo", type="string", length=255)
      */
     private $emailErroneo;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="password_erroneo", type="string", length=255)
+     * @ORM\Column(name="passwordErroneo", type="string", length=255)
      */
     private $passwordErroneo;
 

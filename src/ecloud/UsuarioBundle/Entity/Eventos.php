@@ -15,7 +15,7 @@ class Eventos
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_evento", type="integer")
+     * @ORM\Column(name="idEvento", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
@@ -24,7 +24,7 @@ class Eventos
 	/**
      * @var integer
      *
-     * @ORM\Column(name="id_user", type="integer")
+     * @ORM\Column(name="idUser", type="integer")
      */
     private $idUser;
 	
@@ -38,21 +38,28 @@ class Eventos
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_fichero", type="integer", nullable=true)
+     * @ORM\Column(name="idFichero", type="integer", nullable=true)
      */
     private $idFichero;
+	
+	/**
+     * @var string
+     *
+     * @ORM\Column(name="ruta", type="string", length=255)
+     */
+    private $ruta;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre_fichero_antiguo", type="string", length=255, nullable=true)
+     * @ORM\Column(name="nombreFicheroAntiguo", type="string", length=255, nullable=true)
      */
     private $nombreFicheroAntiguo;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre_fichero_nuevo", type="string", length=255, nullable=true)
+     * @ORM\Column(name="nombreFicheroNuevo", type="string", length=255, nullable=true)
      */
     private $nombreFicheroNuevo;
 
@@ -220,5 +227,28 @@ class Eventos
     public function getIdEvento()
     {
         return $this->idEvento;
+    }
+
+    /**
+     * Set ruta
+     *
+     * @param string $ruta
+     * @return Eventos
+     */
+    public function setRuta($ruta)
+    {
+        $this->ruta = $ruta;
+    
+        return $this;
+    }
+
+    /**
+     * Get ruta
+     *
+     * @return string 
+     */
+    public function getRuta()
+    {
+        return $this->ruta;
     }
 }
