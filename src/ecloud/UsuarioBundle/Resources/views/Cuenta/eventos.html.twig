@@ -86,22 +86,20 @@
 					if(attrName=="accion"){
 
 						if(attrValue.match(/^Has subido el fichero/)!=null){
-							//Has subido... //Procesar accion para sacar el idfichero del fichero subido y que el elnace tenga de id el evento
+							//Has subido...
 							color="#B5FFB5";
-							//idevento_idfichero="cargadivFichero('d_"+obj['idEvento']+"','"+obj['idFichero']+"')";
-							var patt=new RegExp(obj['nombreFicheroNuevo']+"$");
-							//attrValue=attrValue.replace(patt,"<a id='a_"+obj['idEvento']+"' href='descargar/"+obj['idFichero']+"' onmouseover=\" "+idevento_idfichero+"\" onmouseout=\" oculta('d_"+obj['idEvento']+"')\">"+obj['nombreFicheroNuevo']+"</a><span id='d_"+obj['idEvento']+"' class='tooltip'></span>");
-							
-							attrValue=attrValue.replace(patt,"<a idfile='"+obj['idFichero']+"' href='descargar/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>");
-							
+							attrValue="Has subido el fichero <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
 							
 						}
 						else if(attrValue.match(/^Has creado la carpeta/)!=null){
-							//Has creado la carpeta... //Procesar accion para sacar el idfichero de la carpeta creada
+							//Has creado la carpeta...
 							color="#B5FFB5";
+							var patt=new RegExp("^Has creado la carpeta "+obj['nombreFicheroNuevo']+" en ");
+							
+							attrValue=attrValue.replace(patt,"Has creado la carpeta <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a> en ");
 						}
 						else if(attrValue.match(/^Has borrado el fichero/)!=null){
-							//Has borrado... //Procesar accion para sacar el idfichero del fichero borrado
+							//Has borrado... 
 							color="#FFB5B5";
 							}
 						else if(attrValue.match(/^Has borrado la carpeta/)!=null){
@@ -109,8 +107,18 @@
 							color="#FFB5B5";
 							}
 						else if(attrValue.match(/^Has cambiado el nombre al fichero /)!=null){
-							//Has cambiado el nombre al fichero... //Procesar accion para sacar el idfichero del fichero modificado
+							//Has cambiado el nombre al fichero...
 							color="#FFFF00";
+							var patt=new RegExp("por "+obj['nombreFicheroNuevo']+"$");
+							
+							attrValue=attrValue.replace(patt,"por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>");
+						}
+						else if(attrValue.match(/^Has cambiado el nombre a la carpeta /)!=null){
+							//Has cambiado el nombre a la carpeta...
+							color="#FFFF00";
+							var patt=new RegExp("por "+obj['nombreFicheroNuevo']+"$");
+							
+							attrValue=attrValue.replace(patt,"por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>");
 						}
 						else if(attrValue=="&iexcl;Te has registrado!"){color="#95FF95";}
 						else {color="";}
@@ -123,9 +131,7 @@
 						var _mes=date.getMonth()+1; //getMonth devuelve el mes empezando por 0
 						var _dia=date.getDate(); //getDate devuelve el dia del mes
 						var _anyo=date.getFullYear();
-						//alert(_dia+"-"+_mes+"-"+_anyo); //ejemplo para mostrarlo
-						//alert(color);
-						cuerpo = cuerpo + "<td style='text-align:right;background-color:"+color+";'>" + _dia+"/"+_mes+"/"+_anyo + " "+date.getHours()+":"+date.getMinutes()+"</td>";
+						cuerpo = cuerpo + "<td style='text-align:right;background-color:"+color+";'>" + _dia+"/"+_mes+"/"+_anyo + " "+addZeroo(date.getHours())+":"+addZeroo(date.getMinutes())+"</td>";
 					}
 					else if(attrValue==null){cuerpo = cuerpo +"<td></td>";}
 					else{cuerpo = cuerpo + "<td>" + attrValue + "</td>";
@@ -227,7 +233,12 @@
 						 *    Retrieve a specific attribute from our parsed
 						 *    JSON string and set the tooltip content.
 						 */
+						 //Modificar para que el caso de que sea carpeta solo mostrar nombre y ruta.
+						if(data[0].tipo=="fichero"){
 						var content = 'Fichero '+ data[0].nombreFichero+"<br> Tama&ntilde;o: "+ data[0].filesize+" bytes";
+						}else{
+						var content = 'Carpeta '+ data[0].nombreFichero+"<br> Ruta: "+ data[0].ruta;
+						}
 
 						// Now we set the content manually (required!)
 						api.set('content.text', content);
@@ -275,7 +286,15 @@
 		
 		})
 	*/
-
+	
+	function addZeroo(num){
+		if (num<10){
+			num="0"+num;
+		}
+		return num;
+	}
+	
+	
 	</script>
 	
 	<div class="tabla" id="tabla">

@@ -1,0 +1,50 @@
+{% extends '::frontend.html.twig' %}
+{% block title %}Informaci&oacute;n del fichero {% endblock %}
+
+{% block article %}
+<section>
+	<h1>{{ block('title') }}</h1>
+	
+		<table class='form'>
+			<tbody>
+				<tr>
+					<td style='width:150px'>Fichero: </td>
+					<td>{{ fichero.0.nombrefichero }} </td>
+				</tr>
+				<tr>
+					<td>Tipo </td>
+					<td>{{ fichero.0.tipo }} </td>
+				</tr>
+				<tr>
+					<td>Ruta: </td>
+					<td>{{ fichero.0.ruta }} </td>
+				</tr>
+				<tr>
+					<td>Tama&ntilde;o </td>
+					<td>{{ fichero.0.filesize }} </td>
+				</tr>
+				<tr>
+					<td>Checksum: </td>
+					<td>{{ fichero.0.checksum }} </td>
+				</tr>
+				<tr>
+					<td>Fecha subida: </td>
+					<td>{{ fichero.0.fechasubida|date('d-m-Y') }} </td>
+				</tr>
+				<tr>
+					<td>Total Descargas: </td>
+					<td>{{ fichero.0.totaldescargas }} <br></td>
+				</tr>
+				<tr>
+					<td>Permiso: </td>
+					<td>{{ fichero.0.permiso }} <br></td>
+				</tr>
+				<tr>
+					<td>Mime: </td>
+					<td>{{ fichero.0.mime }} <br></td>
+				</tr>
+			</tbody>
+		</table>
+		
+</section>
+{% endblock %}

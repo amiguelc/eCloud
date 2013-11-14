@@ -258,24 +258,40 @@ class CuentaController extends Controller{
 		
 		}
 		
-		public function ficherojsonAction($id){
 		
-		//leer los ficheros de la base de datos y pasarselos a twig con ajax, aqui se complica mucho la cosa
-		//quizas con codigo javascript se pueda subir algun fichero
+		public function ficheroAction($id){
 		
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
 			
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 			
-			if ($this->getRequest()->isMethod('POST')) {
-				//guardar fichero y tal
-			}else{
-				
-				$ficheros=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'idFichero' => $id));
-				if ($ficheros==NULL){return new Response ("Fichero no encontrado");}
-				
-			}
+			//Validar ID.
 			
+			$fichero = new Ficheros();
+			$fichero=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'idFichero' => $id));
+			if ($fichero==NULL){return new Response ("Fichero no encontrado");}
+				
+			return $this->render('UsuarioBundle:Cuenta:fichero.html.twig',array('fichero'=>$fichero));
+
+			}
+			else{
+					return $this->redirect($this->generateUrl('login'), 301);
+			}
+		
+		}
+		
+		
+		public function ficherojsonAction($id){
+			
+			if ($this->get('security.context')->isGranted('ROLE_USER')){
+			
+			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+			
+			//Falta validar datos del ID.
+				
+			$ficheros=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'idFichero' => $id));
+			if ($ficheros==NULL){return new Response ("Fichero no encontrado");}
+
 			//JSON
 			$encoders = array(new XmlEncoder(), new JsonEncoder());
 			$normalizers = array(new GetSetMethodNormalizer());
@@ -306,7 +322,6 @@ class CuentaController extends Controller{
 				
 				if ($this->getRequest()->isMethod('POST')) {
 				
-				//Falta comprobar si espacio lleno.
 				$formulario->handleRequest($this->getRequest());
 					if ($formulario->isValid()) {
 						$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
@@ -383,7 +398,6 @@ class CuentaController extends Controller{
 						else {
 							//Borra fichero previamente subido a la carpeta <- Hay que mejorarlo para que corte la ejecucion del script dentro de fichero.php antes de copiar nada, asi es mas rapido. 
 							$ficheros->remove($this->container->getParameter('var_archivos'));
-							//return $this->redirect($this->generateUrl('ficheros'), 303);
 							return  $response = new Response("Sin espacio");
 						}
 						
@@ -407,21 +421,16 @@ class CuentaController extends Controller{
 						$em2->persist($eventos);
 						$em2->flush();
 						
-						//return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig',array('ruta'=>$ruta));
-						//Esta redireccion no es segura, hay que revisar, para que redirija a ficheros/ruta/nombrefichero
-						//return $this->redirect($this->getRequest()->headers->get('referer'),303);
 						//Fichero subido correctamente
 						return  $response = new Response("Subido correctamente");
 					}
 					else{
 					//Formulario no valido.
-					//return $this->redirect($this->generateUrl('perfil'), 301);
 					return  $response = new Response("Formulario no valido");
 					}
 				}
 				else{
 				//Peticion GET
-				//return $this->render('UsuarioBundle:Cuenta:subir.html.twig', array('formulario' => $formulario->createView()));
 				return  $response = new Response("Peticion GET");
 				}
 				
@@ -449,7 +458,7 @@ class CuentaController extends Controller{
 					$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
 					$nombre_antiguo=$ficheros->getNombreFichero();
 					
-					//Falta validar datos introducidos de nombre y ruta del fichero					
+					//Falta validar datos introducidos de nombre y ruta del fichero. FALTA VALIDAAAAAAR			
 					$nombre_nuevo=$formulario["nombrefichero"]->getData();
 					$ruta_nueva=$formulario["ruta"]->getData();
 					$ruta_antigua=$ficheros->getRuta();
@@ -464,9 +473,8 @@ class CuentaController extends Controller{
 					$eventos=new Eventos();
 					//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
 					$eventos->setIdUser($userid);
-					$eventos->setaccion("Has cambiado el nombre al fichero ".$nombre_antiguo." por ".$nombre_nuevo);
-					//$eventos->setIdFichero($ficheros->getIdFichero());
-					$eventos->setIdFichero(0); //Falta: Problema es que el idFichero se genera despues con el autoincremento de SQL.
+					if($ficheros->getTipo()=='fichero'){$eventos->setaccion("Has cambiado el nombre al fichero ".$nombre_antiguo." por ".$nombre_nuevo);}else{$eventos->setaccion("Has cambiado el nombre a la carpeta ".$nombre_antiguo." por ".$nombre_nuevo);}
+					$eventos->setIdFichero($ficheros->getIdFichero());
 					$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
 					$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
 					$eventos->setFecha(new \Datetime());

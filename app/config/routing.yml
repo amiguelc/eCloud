@@ -47,6 +47,9 @@ _ficheros2:
     defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
     requirements:
         ruta: ".+"
+fichero:
+    pattern: /fichero/{id}
+    defaults: { _controller: UsuarioBundle:Cuenta:fichero, id: 0 }
 subir:
     pattern: /subir
     defaults: { _controller: UsuarioBundle:Cuenta:subir }
