@@ -212,11 +212,11 @@
 		return a;
 	}
 	
-	function comprobarCarpeta() {
-	var cadena=document.getElementById('form_nombrefichero').value;
+	function comprobarCarpeta(elemento) {
+	var cadena=elemento.value;
 		if (caracteresprohibidos(cadena)==true){
 			alert("Esta prohibido crear carpetas con caracteres prohibidos ( / \\ : ? < > \' \" ~ * | ).");
-			document.getElementById('form_nombrefichero').value=cadena.slice(0,cadena.length-1);
+			elemento.value=cadena.slice(0,cadena.length-1);
 		}
 	
 	}
@@ -290,7 +290,7 @@
 			<tr>
 				<form id="form2" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
 					{{ form_errors(formulario_carpeta) }}
-					<td><div>{{ form_label(formulario_carpeta.nombrefichero) }}{{ form_errors(formulario_carpeta.nombrefichero) }}{{ form_widget(formulario_carpeta.nombrefichero, {'attr': {'onkeyup': 'comprobarCarpeta()'}}) }}</div></td>
+					<td><div>{{ form_label(formulario_carpeta.nombrefichero) }}{{ form_errors(formulario_carpeta.nombrefichero) }}{{ form_widget(formulario_carpeta.nombrefichero, {'attr': {'onkeyup': 'comprobarCarpeta(this)'}}) }}</div></td>
 					<td><input type="button" onclick="crearCarpeta()" value="Crear" /></td>
 					<td>{{ form_rest(formulario_carpeta) }}</td>
 				</form>

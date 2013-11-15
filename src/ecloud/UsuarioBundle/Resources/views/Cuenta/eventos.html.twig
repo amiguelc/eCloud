@@ -10,7 +10,7 @@
 	
 		
 	<script type="text/javascript">
-		//Script para manejar el JSON -> Funcion mas tarde llamada eventosJSONtoTable en un fichero Javascript General que detecte la URL y ejecute funciones en base a ello()
+		//Esto mas tarde estará en un fichero Javascript General que detecte la URL y ejecute funciones en base a ello.
   String.prototype.transformaCaracteresEspeciales = function() {
     return unescape(escape(this).
                       replace(/%0A/g, '<br/>').
@@ -94,9 +94,7 @@
 						else if(attrValue.match(/^Has creado la carpeta/)!=null){
 							//Has creado la carpeta...
 							color="#B5FFB5";
-							var patt=new RegExp("^Has creado la carpeta "+obj['nombreFicheroNuevo']+" en ");
-							
-							attrValue=attrValue.replace(patt,"Has creado la carpeta <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a> en ");
+							attrValue="Has creado la carpeta <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a> en "+obj['ruta'];
 						}
 						else if(attrValue.match(/^Has borrado el fichero/)!=null){
 							//Has borrado... 
@@ -108,17 +106,13 @@
 							}
 						else if(attrValue.match(/^Has cambiado el nombre al fichero /)!=null){
 							//Has cambiado el nombre al fichero...
-							color="#FFFF00";
-							var patt=new RegExp("por "+obj['nombreFicheroNuevo']+"$");
-							
-							attrValue=attrValue.replace(patt,"por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>");
+							color="#FFFF00";				
+							attrValue="Has cambiado el nombre al fichero "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
 						}
 						else if(attrValue.match(/^Has cambiado el nombre a la carpeta /)!=null){
 							//Has cambiado el nombre a la carpeta...
-							color="#FFFF00";
-							var patt=new RegExp("por "+obj['nombreFicheroNuevo']+"$");
-							
-							attrValue=attrValue.replace(patt,"por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>");
+							color="#FFFF00";									
+							attrValue="Has cambiado el nombre a la carpeta "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
 						}
 						else if(attrValue=="&iexcl;Te has registrado!"){color="#95FF95";}
 						else {color="";}

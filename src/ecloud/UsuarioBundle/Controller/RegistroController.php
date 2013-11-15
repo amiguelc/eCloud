@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use eCloud\UsuarioBundle\Entity\Usuarios;
 use eCloud\UsuarioBundle\Entity\Eventos;
-//use eCloud\UsuarioBundle\Form\Frontend\UsuarioType;
 
 class RegistroController extends Controller{
 
@@ -19,7 +18,7 @@ class RegistroController extends Controller{
 	$peticion = $this->getRequest();
 	$usuario = new Usuarios();
 	//id_user,email,nombre_usuario,password,nombre,apellidos,direccion,ciudad,pais,ip_registro,fecha_registro,limite,logins_ftp,login_web,ocupado,ultimo_acceso
-	//$formulario = $this->createForm(new UsuarioType(), $usuario);
+
 	$formulario=$this->createFormBuilder($usuario)->add('email','text')->add('nombre_usuario','text')->add('password','password')->add('nombre','text')->add('apellidos','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')->getForm();
 	
 	
@@ -57,7 +56,6 @@ class RegistroController extends Controller{
 			$eventos->setFecha(new \Datetime());
 			$eventos->setRuta("-");
 			
-			//$em2 = $this->getDoctrine()->getManager();
 			$em->persist($eventos);
 			$em->flush();
 			

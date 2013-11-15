@@ -347,7 +347,7 @@ class CuentaController extends Controller{
 						//Comprobaciones a fichero			
 							if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['ruta'])==1){ return  $response = new Response("Error en la ruta del fichero");}
 							if(preg_match("/\.\.\//",$_POST['form']['ruta'])==1){ return  $response = new Response("No se permite rutas con ../");}
-							if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_FILES['form']['name']['file'])==1){ return  $response = new Response("Error en el nombre del fichero");}
+							if(preg_match("/(\/|\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_FILES['form']['name']['file'])==1){ return  $response = new Response("Error en el nombre del fichero");}
 							
 							$query=$em->createQuery("SELECT f.nombreFichero FROM UsuarioBundle:Ficheros f WHERE f.propietario=?1 and f.ruta like ?2 and f.nombreFichero like ?3 and f.tipo like 'fichero'");
 							$query->setParameter(1, $userid);
@@ -450,18 +450,32 @@ class CuentaController extends Controller{
 			$formulario = $this->createFormBuilder($document)->add('nombrefichero','text')->add('ruta','text')->getForm();
 			$em = $this->getDoctrine()->getManager();
 			
+			
 			if ($this->getRequest()->isMethod('POST')) {
 				//guardar datos modificados
 				$formulario->bind($this->getRequest());
 				if ($formulario->isValid()) {
 					
-					//propietario, nombre_fichero, nombre_real_fisico, tipo, ruta, filesize, checksum, fecha_subida, total_descargas, permiso
-					$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
-					$nombre_antiguo=$ficheros->getNombreFichero();
+					//Si solo cambia ruta lo que ha hecho es MOVER en cuyo caso hay que comprobar que la carpeta destino existe y crear el evento correspondiente.
+					//Si solo cambia el nombre o las dos cosas solo se notificará en los eventos como que ha cambiado de nombre.
+					//Falta comprobar si ya existe un nombre con ese fichero.
 					
-					//Falta validar datos introducidos de nombre y ruta del fichero. FALTA VALIDAAAAAAR			
+					//Validar datos
+					if($_POST['form']['ruta']=="" || $_POST['form']['nombrefichero']==""){ return  $response = new Response("Faltan datos");}
+					if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['ruta'])==1){ return  $response = new Response("Error en la ruta del fichero");}
+					if(preg_match("/\.\.\//",$_POST['form']['ruta'])==1){ return  $response = new Response("No se permite rutas con ../");}
+					if(preg_match("/(\/|\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['nombrefichero'])==1){ return  $response = new Response("Error en el nombre del fichero");}
+					
+					$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
+					if ($ficheros==null){ return  $response = new Response("Ese fichero no es tuyo");}
+					if($_POST['form']['nombrefichero']==$ficheros->getNombreFichero() && $_POST['form']['ruta']==$ficheros->getRuta()){return $this->redirect($this->generateUrl('ficheros'),303);} //Ningun cambio
+					if($_POST['form']['nombrefichero']==$ficheros->getNombreFichero() && $_POST['form']['ruta']!=$ficheros->getRuta()){return  $response = new Response("Mover fichero");}
+					if($_POST['form']['nombrefichero']!=$ficheros->getNombreFichero() && $_POST['form']['ruta']!=$ficheros->getRuta()){return  $response = new Response("Cambiar nombre fichero y mover fichero");}
+					if($_POST['form']['nombrefichero']!=$ficheros->getNombreFichero() && $_POST['form']['ruta']==$ficheros->getRuta()){return  $response = new Response("Cambiar nombre fichero");}
+					
+					$nombre_antiguo=$ficheros->getNombreFichero();
 					$nombre_nuevo=$formulario["nombrefichero"]->getData();
-					$ruta_nueva=$formulario["ruta"]->getData();
+					$ruta_nueva=$formulario["ruta"]->getData();					
 					$ruta_antigua=$ficheros->getRuta();
 					$ruta_absoluta_antigua=$this->container->getParameter('var_archivos').$userid.$ficheros->getRuta()."\\".$nombre_antiguo;
 					$ruta_absoluta_nueva=$this->container->getParameter('var_archivos').$userid.$ruta_nueva."\\".$nombre_nuevo;
@@ -472,11 +486,10 @@ class CuentaController extends Controller{
 										
 					//Eventos//
 					$eventos=new Eventos();
-					//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
 					$eventos->setIdUser($userid);
 					if($ficheros->getTipo()=='fichero'){$eventos->setaccion("Has cambiado el nombre al fichero ".$nombre_antiguo." por ".$nombre_nuevo);}else{$eventos->setaccion("Has cambiado el nombre a la carpeta ".$nombre_antiguo." por ".$nombre_nuevo);}
 					$eventos->setIdFichero($ficheros->getIdFichero());
-					$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
+					$eventos->setNombreFicheroAntiguo($nombre_antiguo);
 					$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
 					$eventos->setFecha(new \Datetime());
 					$eventos->setRuta($ficheros->getRuta());
@@ -493,9 +506,7 @@ class CuentaController extends Controller{
 					$query->getResult();
 					
 					
-					//Falta solo los sub-subficheros. Count valores, hacer un for y por cada una guardar el valor anterior y su valor nuevo, ejecutar.
 					//Saca las rutas de los sub-subficheros a cambiar
-					
 					$query = $em->createQuery('SELECT f.ruta FROM UsuarioBundle:Ficheros f WHERE f.ruta LIKE ?1');
 					if ($ruta_antigua=="/"){$query->setParameter(1, $ruta_antigua.$nombre_antiguo.'/%');}else{$query->setParameter(1, $ruta_antigua."/".$nombre_antiguo.'/%');}
 					//Saca rutas a cambiar de sub-subficheros.
@@ -511,13 +522,9 @@ class CuentaController extends Controller{
 						$query->setParameter(1, $ruta_modificada_sub_subficheros);
 						$query->setParameter(2, $archivos[$clave]['ruta']);
 						$query->setParameter(3, $userid);
-						//return  $response = new Response(print_r($query, true));
 						$query->getResult();
 						
 					}
-					
-					
-					//return  $response = new Response(print_r($archivos, true));
 					
 					
 					}
@@ -569,7 +576,7 @@ class CuentaController extends Controller{
 				$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 				$em=$this->getDoctrine()->getManager();
 				$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
-
+				if ($ficheros==null){ return  $response = new Response("Ese fichero no es tuyo");}
 				$ruta_local=$this->container->getParameter('var_archivos').$userid.print_r($ficheros->getRuta(), true).print_r($ficheros->getNombreFichero(), true);
 				$ruta_local=str_replace("/", "\\", $ruta_local);
 				
@@ -616,6 +623,7 @@ class CuentaController extends Controller{
 				//BUCLE QUE RECORRE FICHERO A FICHERO DENTRO DE LA BD PARA BORRAR SUBFICHEROS
 				foreach ($sub_ficheros as $clave => $valor){
 				
+				//Falta analizar el sentido de esta SQL. Creo que hay que eliminarla.
 				$filesize_query=$em->createQuery('SELECT f from UsuarioBundle:Ficheros f WHERE f.propietario=?1 and id_fichero=?2');
 				$filesize_query->setParameter(1, $userid);
 				$filesize_query->setParameter(2, $sub_ficheros[$clave]->getidFichero());
@@ -633,7 +641,7 @@ class CuentaController extends Controller{
 				$eventos->setNombreFicheroAntiguo($sub_ficheros[$clave]->getnombreFichero());
 				$eventos->setNombreFicheroNuevo($sub_ficheros[$clave]->getnombreFichero());
 				$eventos->setFecha(new \Datetime());
-				$eventos->setRuta($sub_ficheros[$clave]->getRuta()); //$eventos->setRuta($ficheros->getRuta());
+				$eventos->setRuta($sub_ficheros[$clave]->getRuta());
 				if($sub_ficheros[$clave]->getTipo()=='fichero'){
 				$eventos->setaccion("Has borrado el fichero ".$sub_ficheros[$clave]->getnombreFichero());
 				}else{

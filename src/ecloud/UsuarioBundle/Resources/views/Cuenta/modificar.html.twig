@@ -4,6 +4,74 @@
 {% block article %}
 <section>
 	<h1>{{ block('title') }}</h1>
+	
+	<script type="text/javascript">
+	function caracteresprohibidos(cadena){
+	var a=false;
+		if(cadena.match(/\//)){ a=true;}
+		if(cadena.match(/\\/)){ a=true;}
+		if(cadena.match(/:/)){ a=true;}
+		if(cadena.match(/\?/)){ a=true;}
+		if(cadena.match(/</)){ a=true;}
+		if(cadena.match(/>/)){ a=true;}
+		if(cadena.match(/'/)){ a=true;}
+		if(cadena.match(/"/)){ a=true;}
+		if(cadena.match(/~/)){ a=true;} //Aqui hay un bug que hace que se ejecute dos veces el alert del warning,
+		if(cadena.match(/\*/)){ a=true;}
+		if(cadena.match(/\|/)){ a=true;}
+		
+		return a;
+	}
+	
+	//Igual que la anterior pero solo para rutas, esta permite / pero no permite ../ para evitar escalada de rutas.
+	function caracteresprohibidos2(cadena){
+	var a=false;
+		if(cadena.match(/\.\.\//)){ a=true;}
+		if(cadena.match(/\\/)){ a=true;}
+		if(cadena.match(/:/)){ a=true;}
+		if(cadena.match(/\?/)){ a=true;}
+		if(cadena.match(/</)){ a=true;}
+		if(cadena.match(/>/)){ a=true;}
+		if(cadena.match(/'/)){ a=true;}
+		if(cadena.match(/"/)){ a=true;}
+		if(cadena.match(/~/)){ a=true;} //Aqui hay un bug que hace que se ejecute dos veces el alert del warning,
+		if(cadena.match(/\*/)){ a=true;}
+		if(cadena.match(/\|/)){ a=true;}
+		
+		return a;
+	}
+	
+	function escalada(cadena){
+	var a=false;
+		if(cadena.match(/\.\.\//)){ a=true;}
+		return a;
+	}
+	
+	function comprobarFichero(elemento) {
+	var cadena=elemento.value;
+		if (caracteresprohibidos(cadena)==true){
+			alert("Esta prohibido crear ficheros con caracteres prohibidos ( \\ : ? < > \' \" ~ * | ).");
+			elemento.value=cadena.slice(0,cadena.length-1);
+		}
+	
+	}
+	
+	function comprobarRuta(elemento) {
+	var cadena=elemento.value;
+		if (escalada(cadena)==true){
+			alert("Esta prohibido utilizar rutas con ../");
+			elemento.value="";
+			cadena="";
+		}
+		if (caracteresprohibidos2(cadena)==true){
+			alert("Esta prohibido crear rutas con caracteres prohibidos ( ../ \\ : ? < > \' \" ~ * | ).");
+			elemento.value=cadena.slice(0,cadena.length-1);
+		}
+	
+	}
+	
+	</script>
+	
 	<form action="{{ path('modificar', { 'fichero': fichero }) }}" method="post" {{ form_enctype(formulario) }}>
 		<div class="errors">
 		{{ form_errors(formulario) }}
@@ -30,11 +98,11 @@
 				</tr>
 				<tr>
 					<td> Nuevo Nombre Fichero </td>
-					<td>{{ form_widget(formulario.nombrefichero) }} </td>
+					<td><div>{{ form_errors(formulario.nombrefichero) }}{{ form_widget(formulario.nombrefichero, {'attr': {'onkeyup': 'comprobarFichero(this)'}}) }} </div></td>
 				</tr>
 				<tr>
 					<td> Nueva Ruta </td>
-					<td>{{ form_widget(formulario.ruta) }} </td>
+					<td><div>{{ form_errors(formulario.ruta) }}{{ form_widget(formulario.ruta, {'attr': {'onkeyup': 'comprobarRuta(this)'}}) }} </div> </td>
 				</tr>
 			</tbody>
 		</table>
@@ -42,10 +110,7 @@
 		</div>
 
 		{% endfor %}
-		{# ... #}
 		<div>
-		{# {{ form_errors(formulario.permite_email) }} #}
-		{# {{ form_widget(formulario.permite_email) }} #}
 		</div>
 		{{ form_rest(formulario) }}
 		<input class="boton" type="submit" value="Guardar cambios" />
