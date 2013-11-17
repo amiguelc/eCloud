@@ -114,6 +114,16 @@
 							color="#FFFF00";									
 							attrValue="Has cambiado el nombre a la carpeta "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
 						}
+						else if(attrValue.match(/^Has movido el fichero /)!=null){
+							//Has cambiado el nombre al fichero...
+							color="#FFFF00";				
+							attrValue="Has movido el fichero "+obj['nombreFicheroNuevo']+" a "+obj['ruta'];
+						}
+						else if(attrValue.match(/^Has movido la carpeta /)!=null){
+							//Has cambiado el nombre a la carpeta...
+							color="#FFFF00";									
+							attrValue="Has movido la carpeta "+obj['nombreFicheroNuevo']+" a "+obj['ruta'];
+						}
 						else if(attrValue=="&iexcl;Te has registrado!"){color="#95FF95";}
 						else {color="";}
 						

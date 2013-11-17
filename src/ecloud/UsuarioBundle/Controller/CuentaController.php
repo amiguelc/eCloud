@@ -336,12 +336,19 @@ class CuentaController extends Controller{
 							if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['ruta'])==1){ return  $response = new Response("Error en la ruta de la carpeta");}
 							if(preg_match("/\.\.\//",$_POST['form']['ruta'])==1){ return  $response = new Response("No se permite rutas con ../");}
 							
-							$query=$em->createQuery("SELECT f.nombreFichero FROM UsuarioBundle:Ficheros f WHERE f.propietario=?1 and f.ruta like ?2 and f.nombreFichero like ?3 and f.tipo like 'carpeta'");
+							$query=$em->createQuery("SELECT f.tipo FROM UsuarioBundle:Ficheros f WHERE f.propietario=?1 and f.ruta like ?2 and f.nombreFichero like ?3");
 							$query->setParameter(1, $userid);
 							$query->setParameter(2, $_POST['form']['ruta']);
 							$query->setParameter(3, $_POST['form']['nombrefichero']);
 							$mismacarpeta = $query->getOneOrNullResult();
-							if($mismacarpeta!=null){return  $response = new Response("Esa carpeta ya existe en el directorio actual");}
+							if($mismacarpeta!=null){
+								if($mismacarpeta['tipo']=="carpeta"){
+									return  $response = new Response("Esa carpeta ya existe en el directorio actual");
+								}
+								else{
+									return  $response = new Response("En esa carpeta existe un fichero con el mismo nombre");
+								}
+							}
 						}
 						else{
 						//Comprobaciones a fichero			
@@ -349,12 +356,20 @@ class CuentaController extends Controller{
 							if(preg_match("/\.\.\//",$_POST['form']['ruta'])==1){ return  $response = new Response("No se permite rutas con ../");}
 							if(preg_match("/(\/|\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_FILES['form']['name']['file'])==1){ return  $response = new Response("Error en el nombre del fichero");}
 							
-							$query=$em->createQuery("SELECT f.nombreFichero FROM UsuarioBundle:Ficheros f WHERE f.propietario=?1 and f.ruta like ?2 and f.nombreFichero like ?3 and f.tipo like 'fichero'");
+							$query=$em->createQuery("SELECT f.tipo FROM UsuarioBundle:Ficheros f WHERE f.propietario=?1 and f.ruta like ?2 and f.nombreFichero like ?3");
 							$query->setParameter(1, $userid);
 							$query->setParameter(2, $_POST['form']['ruta']);
 							$query->setParameter(3, $_FILES['form']['name']['file']);
 							$mismofichero = $query->getOneOrNullResult();
-							if($mismofichero!=null){return  $response = new Response("Ese fichero ya existe en el directorio actual");}
+							//if($mismofichero!=null){return  $response = new Response("Ese fichero ya existe en el directorio actual");}
+							if($mismofichero!=null){
+								if($mismofichero['tipo']=="carpeta"){
+									return  $response = new Response("En esa carpeta existe una carpeta con el mismo nombre");
+								}
+								else{
+									return  $response = new Response("En esa carpeta existe un fichero con el mismo nombre");
+								}
+							}
 						}
 						
 						//Ficheros normales///
@@ -455,12 +470,8 @@ class CuentaController extends Controller{
 				//guardar datos modificados
 				$formulario->bind($this->getRequest());
 				if ($formulario->isValid()) {
-					
-					//Si solo cambia ruta lo que ha hecho es MOVER en cuyo caso hay que comprobar que la carpeta destino existe y crear el evento correspondiente.
-					//Si solo cambia el nombre o las dos cosas solo se notificará en los eventos como que ha cambiado de nombre.
-					//Falta comprobar si ya existe un nombre con ese fichero.
-					
-					//Validar datos
+									
+					//Validar datos.
 					if($_POST['form']['ruta']=="" || $_POST['form']['nombrefichero']==""){ return  $response = new Response("Faltan datos");}
 					if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['ruta'])==1){ return  $response = new Response("Error en la ruta del fichero");}
 					if(preg_match("/\.\.\//",$_POST['form']['ruta'])==1){ return  $response = new Response("No se permite rutas con ../");}
@@ -468,14 +479,17 @@ class CuentaController extends Controller{
 					
 					$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
 					if ($ficheros==null){ return  $response = new Response("Ese fichero no es tuyo");}
+					
 					if($_POST['form']['nombrefichero']==$ficheros->getNombreFichero() && $_POST['form']['ruta']==$ficheros->getRuta()){return $this->redirect($this->generateUrl('ficheros'),303);} //Ningun cambio
-					if($_POST['form']['nombrefichero']==$ficheros->getNombreFichero() && $_POST['form']['ruta']!=$ficheros->getRuta()){return  $response = new Response("Mover fichero");}
-					if($_POST['form']['nombrefichero']!=$ficheros->getNombreFichero() && $_POST['form']['ruta']!=$ficheros->getRuta()){return  $response = new Response("Cambiar nombre fichero y mover fichero");}
-					if($_POST['form']['nombrefichero']!=$ficheros->getNombreFichero() && $_POST['form']['ruta']==$ficheros->getRuta()){return  $response = new Response("Cambiar nombre fichero");}
+					elseif($_POST['form']['nombrefichero']==$ficheros->getNombreFichero() && $_POST['form']['ruta']!=$ficheros->getRuta()){$accion="mover";} //Mover fichero, comprobar que la nueva carpeta existe y que en ella no exista la misma carpeta o fichero.
+					elseif($_POST['form']['nombrefichero']!=$ficheros->getNombreFichero() && $_POST['form']['ruta']!=$ficheros->getRuta()){$accion="mover y cambiar";} //Comprobar si carpeta nueva existe, si fichero existe y evento has modificado el nombre y movido a...
+					elseif($_POST['form']['nombrefichero']!=$ficheros->getNombreFichero() && $_POST['form']['ruta']==$ficheros->getRuta()){$accion="cambiar";}//Has cambiado de nombre..Comprobar si fichero ya existe.
+					else{ return $response=new Response("Error");}
 					
 					$nombre_antiguo=$ficheros->getNombreFichero();
 					$nombre_nuevo=$formulario["nombrefichero"]->getData();
-					$ruta_nueva=$formulario["ruta"]->getData();					
+					$ruta_nueva=$formulario["ruta"]->getData();	
+					if (strlen($ruta_nueva)>1 && $ruta_nueva[strlen($ruta_nueva)-1]=="/"){$ruta_nueva=substr($ruta_nueva, 0, -1);}//Para quitar el ultimo / de la ruta si lo tuviera. Cuidao con la raiz
 					$ruta_antigua=$ficheros->getRuta();
 					$ruta_absoluta_antigua=$this->container->getParameter('var_archivos').$userid.$ficheros->getRuta()."\\".$nombre_antiguo;
 					$ruta_absoluta_nueva=$this->container->getParameter('var_archivos').$userid.$ruta_nueva."\\".$nombre_nuevo;
@@ -487,7 +501,86 @@ class CuentaController extends Controller{
 					//Eventos//
 					$eventos=new Eventos();
 					$eventos->setIdUser($userid);
-					if($ficheros->getTipo()=='fichero'){$eventos->setaccion("Has cambiado el nombre al fichero ".$nombre_antiguo." por ".$nombre_nuevo);}else{$eventos->setaccion("Has cambiado el nombre a la carpeta ".$nombre_antiguo." por ".$nombre_nuevo);}
+					
+					if($accion=="cambiar"){
+						if($ficheros->getTipo()=='fichero'){
+							$eventos->setaccion("Has cambiado el nombre al fichero ".$nombre_antiguo." por ".$nombre_nuevo);
+						}
+						else{
+							$eventos->setaccion("Has cambiado el nombre a la carpeta ".$nombre_antiguo." por ".$nombre_nuevo);
+						}
+					}elseif($accion=="mover"){
+						//Comprobacion de si carpeta nueva existe.
+						if($ruta_antigua=="/"){$pattern="/^".addcslashes("/".$nombre_antiguo,"/")."/";}else{$pattern="/^".addcslashes($ruta_antigua."/".$nombre_antiguo,"/")."/";}
+						if(preg_match($pattern,$ruta_nueva)==1){ return  $response = new Response("No se puede mover a subcarpeta");}
+						$posicion_barra=strrpos($ruta_nueva, "/");
+						$nombre_carpeta_nueva=substr($ruta_nueva, $posicion_barra+1);
+						$ruta_carpeta_nueva=substr($ruta_nueva, 0, $posicion_barra);
+						if($nombre_carpeta_nueva==""){$nombre_carpeta_nueva="/";} //Mover a la raiz, evitar sql directamente. La raiz existe siempre.
+						if($ruta_carpeta_nueva==""){$ruta_carpeta_nueva="/";}
+						//return $response = new Response($nombre_carpeta_nueva."<br>".$ruta_carpeta_nueva);
+						
+						if($nombre_carpeta_nueva!="/"){
+							$query = $em->createQuery('SELECT f.nombreFichero FROM UsuarioBundle:Ficheros f WHERE f.nombreFichero LIKE ?1 and f.ruta LIKE ?2 and f.propietario=?3 and f.tipo like ?4');
+							$query->setParameter(1, $nombre_carpeta_nueva);
+							$query->setParameter(2, $ruta_carpeta_nueva);
+							$query->setParameter(3, $userid);
+							$query->setParameter(4, "carpeta");
+							$res=$query->getOneOrNullResult();
+							if($res==null){return $response = new Response("No existe esa carpeta");}
+						}
+					
+						if($ficheros->getTipo()=='fichero'){
+							$eventos->setaccion("Has movido el fichero ".$nombre_nuevo." a ".$ruta_nueva);
+						}
+						else{
+							$eventos->setaccion("Has movido la carpeta ".$nombre_nuevo." a ".$ruta_nueva);
+						}
+					}elseif($accion=="mover y cambiar"){
+						//Comprobacion de si carpeta nueva existe. //Copiado integramente de la anterior.
+						if($ruta_antigua=="/"){$pattern="/^".addcslashes("/".$nombre_antiguo,"/")."/";}else{$pattern="/^".addcslashes($ruta_antigua."/".$nombre_antiguo,"/")."/";}
+						if(preg_match($pattern,$ruta_nueva)==1){ return  $response = new Response("No se puede mover a subcarpeta");}
+						$posicion_barra=strrpos($ruta_nueva, "/");
+						$nombre_carpeta_nueva=substr($ruta_nueva, $posicion_barra+1);
+						$ruta_carpeta_nueva=substr($ruta_nueva, 0, $posicion_barra);
+						if($nombre_carpeta_nueva==""){$nombre_carpeta_nueva="/";} //Mover a la raiz, evitar sql directamente. La raiz existe siempre.
+						if($ruta_carpeta_nueva==""){$ruta_carpeta_nueva="/";}
+						//return $response = new Response($nombre_carpeta_nueva."<br>".$ruta_carpeta_nueva);
+						
+						if($nombre_carpeta_nueva!="/"){
+							$query = $em->createQuery('SELECT f.nombreFichero FROM UsuarioBundle:Ficheros f WHERE f.nombreFichero LIKE ?1 and f.ruta LIKE ?2 and f.propietario=?3 and f.tipo like ?4');
+							$query->setParameter(1, $nombre_carpeta_nueva);
+							$query->setParameter(2, $ruta_carpeta_nueva);
+							$query->setParameter(3, $userid);
+							$query->setParameter(4, "carpeta");
+							$res=$query->getOneOrNullResult();
+							if($res==null){return $response = new Response("No existe esa carpeta");}
+						}
+						if($ficheros->getTipo()=='fichero'){
+							$eventos->setaccion("Has cambiado el nombre al fichero ".$nombre_antiguo." por ".$nombre_nuevo." y lo has movido a ".$ruta_nueva);
+						}
+						else{
+							$eventos->setaccion("Has cambiado el nombre a la carpeta ".$nombre_antiguo." por ".$nombre_nuevo." y lo has movido a ".$ruta_nueva);
+						}
+					
+					}else{return $response=new Response("Error");}
+					
+					//Comprobacion de si fichero ya existe en esa carpeta independientemente de su tipo.
+					$query = $em->createQuery('SELECT f.nombreFichero FROM UsuarioBundle:Ficheros f WHERE f.nombreFichero LIKE ?1 and f.ruta LIKE ?2 and f.propietario=?3');
+					$query->setParameter(1, $nombre_nuevo);
+					$query->setParameter(2, $ruta_nueva);
+					$query->setParameter(3, $userid);
+					$res=$query->getOneOrNullResult();
+					if($res['nombreFichero']==$nombre_nuevo){
+						if($ficheros->getTipo()=="fichero"){
+							return $response = new Response("Ya existe un fichero en esa carpeta con el mismo nombre");
+						}
+						else{
+							return $response = new Response("Ya existe una carpeta en esa carpeta con el mismo nombre");
+						}
+					}
+					
+					
 					$eventos->setIdFichero($ficheros->getIdFichero());
 					$eventos->setNombreFicheroAntiguo($nombre_antiguo);
 					$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
@@ -502,7 +595,6 @@ class CuentaController extends Controller{
 					if($ruta_nueva=="/"){$query->setParameter(1, "/".$nombre_nuevo);}else{$query->setParameter(1, $ruta_nueva."/".$nombre_nuevo);}
 					if ($ruta_antigua=="/"){$query->setParameter(2, $ruta_antigua.$nombre_antiguo);}else{$query->setParameter(2, $ruta_antigua."/".$nombre_antiguo);}
 					$query->setParameter(3, $userid);
-					//return  $response = new Response(print_r($query, true));
 					$query->getResult();
 					
 					
@@ -515,6 +607,7 @@ class CuentaController extends Controller{
 					//Cambiar la ruta del principio
 					if ($ruta_antigua=="/"){$patron=$ruta_antigua.$nombre_antiguo."/";}else{$patron=$ruta_antigua."/".$nombre_antiguo.'/';}
 					if ($ruta_nueva=="/"){$sustitucion="/".$nombre_nuevo;}else{$sustitucion=$ruta_nueva."/".$nombre_nuevo;}
+					//Foreach que por cada subfichero cambia su ruta
 					foreach ($archivos as $clave => $valor){
 						$ruta_modificada_sub_subficheros=preg_replace(":^".$patron.":",$sustitucion."/",$archivos[$clave]['ruta']);
 						
