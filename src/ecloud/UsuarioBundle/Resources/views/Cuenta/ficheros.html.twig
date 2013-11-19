@@ -221,6 +221,184 @@
 	
 	}
 	
+	function mostrarOpciones(elemento,event){
+	var idfichero=$("#"+elemento.id).attr("idfichero");
+	var url="{{ path('borrar', { 'fichero': '000000000000000000000000000000000000000000' }) }}";
+	url_borrar=url.replace("000000000000000000000000000000000000000000", idfichero);
+	url_modificar=url_borrar.replace("borrar", "modificar");
+	url_propiedades=url_borrar.replace("borrar", "fichero");
+	$("#cambiar_nombre_tr").attr("onclick","window.location.href='"+url_modificar+"'");
+	$("#mover_tr").attr("onclick","window.location.href='"+url_modificar+"'");
+	$("#eliminar_tr").attr("onclick","borrarNodo('"+elemento.id+"', '"+url_borrar+"')");
+	$("#propiedades_tr").attr("onclick","window.location.href='"+url_propiedades+"'");
+	$("#menu").menu();
+	$("#menu").css("left", event.clientX);
+	$("#menu").css("top", event.clientY);
+	$("#menu").show();
+	
+	/*
+	//Primero borrar otras opciones
+	$(".clickderecho").remove();
+
+	//Añadir div con opciones.
+	document.body.innerHTML+="<div class='clickderecho' style='position:fixed;top:"+event.clientY+"px;left:"+event.clientX+"px;background-color:yellow'><table><tr><td>Eliminar</td></tr><tr><td>Cambiar nombre</td></tr><tr><td>Mover</td></tr></table></div>"
+	*/
+	}
+	
+	$(document).click(function (e) { $("#menu").hide(); $("#menu").css("top", ""); $("#menu").css("left", ""); });
+	
+	
+	
+	$(document).ready(function(){
+	  $("#button_subir").click(function(){
+		$("#itsthetable").fadeTo("slow",0.15);
+		$("#crear_carpeta").hide();
+		$("#file_upload").show();
+	  });
+	  $("#button_carpeta").click(function(){
+		$("#itsthetable").fadeTo("slow",0.15);
+		$("#file_upload").hide();
+		$("#crear_carpeta").show();
+	  });
+	  $("#cerrar_file_upload").click(function(){
+		$("#crear_carpeta").hide();
+		$("#file_upload").hide();
+		$("#itsthetable").fadeTo("slow",1);
+	  });
+	  $("#cerrar_crear_carpeta").click(function(){
+		$("#crear_carpeta").hide();
+		$("#file_upload").hide();
+		$("#itsthetable").fadeTo("slow",1);
+	  });
+	  $("#button_dialogo_subir").click(function(){
+		$("#crear_carpeta").hide();
+		$("#file_upload").hide();
+		$("#itsthetable").fadeTo("slow",0.15);
+		//var posicionx=($(window).height() / 2) - ($("#dialogo_subir").outerHeight() / 2);
+		//var posiciony=($(window).width() / 2) - ($("#dialogo_subir").outerWidth() / 2));
+		$("#dialogo_subir").dialog({
+			close: function( event, ui ) {$("#itsthetable").fadeTo("slow",1)},
+			position: { my: "center bottom" , at: "center center", of: window },
+			width: 600, 
+			//height: 400, 
+			modal: true,
+			title: "Subir archivos"
+		});
+		//$('#dialogo_subir').center();
+		//var $a = $("#dialogo_subir");
+		//$a.css('margin-top', $(document).height()/2 - $a.height()/2);
+		$("#dialogo_subir").show();
+	  });
+	});
+	
+	$(function() {
+		var name = $( "#name" ),
+		//email = $( "#email" ),
+		//password = $( "#password" ),
+		allFields = $( [] ).add( name ),
+		tips = $( ".validateTips" );
+		function updateTips( t ) {
+		tips
+		.text( t )
+		.addClass( "ui-state-highlight" );
+		setTimeout(function() {
+		tips.removeClass( "ui-state-highlight", 1500 );
+		}, 500 );
+		}
+		function checkLength( o, n, min, max ) {
+		if ( o.val().length > max || o.val().length < min ) {
+		o.addClass( "ui-state-error" );
+		updateTips( "Length of " + n + " must be between " +
+		min + " and " + max + "." );
+		return false;
+		} else {
+		return true;
+		}
+		}
+		function checkRegexp( o, regexp, n ) {
+		if ( !( regexp.test( o.val() ) ) ) {
+		o.addClass( "ui-state-error" );
+		updateTips( n );
+		return false;
+		} else {
+		return true;
+		}
+	}
+	
+	 $( "#dialogo_crear_carpeta" ).dialog({
+			autoOpen: false,
+			//height: 300,
+			width: 550,
+			modal: true,
+			title: "Crear carpeta",
+			buttons: {
+			"Crear carpeta": function() {
+			
+			//Igual a crearCarpeta().
+			
+			var bValid = true;
+			allFields.removeClass( "ui-state-error" );
+			bValid = bValid && checkLength( name, "carpeta", 1, 255 );
+			//bValid = bValid && checkLength( email, "email", 6, 80 );
+			//bValid = bValid && checkLength( password, "password", 5, 16 );
+			bValid = bValid && checkRegexp( name, /^[a-z]([0-9a-z_])+$/i, "Username may consist of a-z, 0-9, underscores, begin with a letter." );
+			// From jquery.validate.js (by joern), contributed by Scott Gonzalez: http://projects.scottsplayground.com/email_address_validation/
+			//bValid = bValid && checkRegexp( email, /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i, "eg. ui@jquery.com" );
+			//bValid = bValid && checkRegexp( password, /^([0-9a-zA-Z])+$/, "Password field only allow : a-z 0-9" );
+			if ( bValid ) {
+			//$( "#users tbody" ).append( "<tr>" +
+			//"<td>" + name.val() + "</td>" +
+			//"<td>" + email.val() + "</td>" +
+			//"<td>" + password.val() + "</td>" +
+			//"</tr>" );
+			//Enviar, y esperar respuesta ajax-> si respuesta correcta cerra, si no, mostrar error. Es sinonimo de crearCarpeta().
+			
+			$( this ).dialog( "close" );
+			}
+			},
+			Cancel: function() {
+			$( this ).dialog( "close" );
+			}
+			},
+			close: function() {
+			allFields.val( "" ).removeClass( "ui-state-error" );
+			}
+		});
+	  $("#button_crear_carpeta").click(function(){
+		//$("#crear_carpeta").hide();
+		//$("#file_upload").hide();
+		//$("#itsthetable").fadeTo("slow",0.15);
+		//$("#dialogo_crear_carpeta").dialog({
+		//	close: function( event, ui ) {$("#itsthetable").fadeTo("slow",1)},
+		//	position: { my: "center bottom" , at: "center center", of: window },
+		//	width: 600, 
+			//height: 400, 
+		//	modal: true,
+		//	title: "Crear carpeta"
+		//});
+		//$("#dialogo_crear_carpeta").show();
+		$( "#dialogo_crear_carpeta" ).dialog( "open" );
+	  });  
+	});
+	
+	
+	
+	
+
+	jQuery.fn.center = function (){
+		this.css("position","fixed");
+		this.css("top", ($(window).height() / 2) - (this.outerHeight() / 2));
+		this.css("left", ($(window).width() / 2) - (this.outerWidth() / 2));
+		return this;
+	}
+
+	
+	$(window).resize(function(){
+	  // $('#dialogo_subir').center();
+	});
+		
+	
+	
 	
 </script>
 
@@ -228,7 +406,7 @@
 	<h1 id='titulo'>{{ block('title') }}</h1>
 	<div class="tabla" id='itsthetable'>
 	<table>
-	<caption>{{ app.user.nombreusuario }}<a href="{{ path('ficheros') }}">/{{ ruta }}</a> <div style='float:right'><button id='button_subir'>Subir archivo</button> <button id='button_carpeta'>Crear carpeta</button></div></caption>
+	<caption>{{ app.user.nombreusuario }}<a href="{{ path('ficheros') }}">/{{ ruta }}</a> <div style='float:right'><button id='button_dialogo_subir'>Subir dialogo</button><button id='button_crear_carpeta'>Crear carpeta</button> <button id='button_subir'>Subir archivo</button> <button id='button_carpeta'>Crear carpeta</button></div></caption>
 
 	<thead><tr><th style='width:80%;'>Nombre</th><th>Tama&ntilde;o</th><th>Modificado</th><th></th></tr></thead>
 	<tbody id="tbody">
@@ -236,9 +414,11 @@
 		{% for ficheros in ficheros %}
 		
 		{% set var1 = var1 + 1 %}
-
-		<tr id="tr{{var1}}" {% if var1 is divisibleby(2) %} class="odd" {% endif %}>
+		
+		<tr id="tr{{var1}}" idfichero="{{ficheros.idfichero}}" =class='tr' {% if var1 is divisibleby(2) %} class="odd" {% endif %} oncontextmenu="mostrarOpciones(this,event);return false;">
+			
 			<th>
+			<div id='div_{{var1}}' fichero='{{var1}}'>
 				{% if ficheros.tipo == 'carpeta' %}
 					{% if ficheros.ruta == '/' %}
 						<a href="{{ path('ficheros') }}{{ ['/',ficheros.nombrefichero]|join }}">{{ ficheros.nombrefichero }}/</a> 
@@ -249,6 +429,7 @@
 				{% else %}
 					<a href="{{ path('descargar', { 'fichero': ficheros.idfichero }) }}">{{ ficheros.nombrefichero }}</a> 
 				{% endif %}
+			</div>
 			</th>
 			<th style='text-align:right;'> {{ficheros.filesize}} Mb</th>
 			<th>{{ ficheros.fechasubida|date('d-m-Y') }}</th>
@@ -257,7 +438,9 @@
 				<!-- <a href="{{ path('borrar', { 'fichero': ficheros.idfichero }) }}">  <img alt="Eliminar" src="{{ asset('bundles/usuario/images/delete.png') }}"></a> -->
 				<a href="#" onclick="borrarNodo('tr{{var1}}','{{ path('borrar', { 'fichero': ficheros.idfichero }) }}')">  <img alt="Eliminar" src="{{ asset('bundles/usuario/images/delete.png') }}"></a> 
 			</th>
+			
 		</tr>
+		
 		{% endfor %}
 		{% if var1 == 0 %}<tr><th><a href="{{ app.request.getRequestURI() }}/../"/>../</a></th><th></th><th></th><th></th></tr>{% endif %}
 	</tbody>
@@ -277,12 +460,13 @@
 					<td><button id='cerrar_file_upload'>Cerrar</button></td>
 			</tr>
 		</table>
-		<div id="subiendofichero">
+	
+	<div id="subiendofichero">
 			<div id="fileName"></div>
 			<div id="fileSize"></div>
 			<div id="fileType"></div>
-		</div>
-		<div id="progressNumber"></div>
+	</div>
+	<div id="progressNumber"></div>
 	</div>
 	
 	<div id='crear_carpeta' class='div_amagado'>
@@ -299,30 +483,40 @@
 		</table>
 	</div>
 	
+	<div id='dialogo_subir' style='position:fixed;display:none;'>
+		<table>
+			<tr>
+					<form id="form1" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario) }}>
+						{{ form_errors(formulario) }}
+						<td><div>{{ form_label(formulario.file) }}{{ form_errors(formulario.file) }}{{ form_widget(formulario.file, {'attr': {'onchange': 'fileSelected()'}}) }} </div></td>
+						<td><input id="subir" type="button" onclick="uploadFile()" value="Subir" /></td>
+						<td>{{ form_row(formulario.ruta) }}{{ form_rest(formulario) }} <input id="max_file_size" type="hidden" name="MAX_FILE_SIZE" value="" /></td>
+
+					</form>
+			</tr>
+		</table>
+	</div>
 	
-	<script>
-		$(document).ready(function(){
-		  $("#button_subir").click(function(){
-			$("#itsthetable").fadeTo("slow",0.15);
-			$("#crear_carpeta").hide();
-			$("#file_upload").show();
-		  });
-		  $("#button_carpeta").click(function(){
-			$("#itsthetable").fadeTo("slow",0.15);
-			$("#file_upload").hide();
-			$("#crear_carpeta").show();
-		  });
-		  $("#cerrar_file_upload").click(function(){
-			$("#crear_carpeta").hide();
-			$("#file_upload").hide();
-			$("#itsthetable").fadeTo("slow",1);
-		  });
-		  $("#cerrar_crear_carpeta").click(function(){
-			$("#crear_carpeta").hide();
-			$("#file_upload").hide();
-			$("#itsthetable").fadeTo("slow",1);
-		  });
-		});
-	</script>
+	<div id='dialogo_crear_carpeta'>
+		 <p class="validateTips"></p>
+		<form id="form2" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
+			<fieldset>
+				<label for="name">Nombre </label>
+				<input style='display:block;' type="text" name="name" id="name" class="text ui-widget-content ui-corner-all" onkeyup='comprobarCarpeta(this)' size='37' />
+				<label for="ruta">Ruta </label>
+				<input style='display:block;' type="text" name="ruta" id="ruta" class="text ui-widget-content ui-corner-all" size='37' disabled value='{{ formulario_carpeta.ruta.vars.value }}' />
+			</fieldset>
+		</form>
+	</div>
+	
+	
+		<ul id="menu" style='position:fixed;display:none;'>
+			<li id="cambiar_nombre_tr"><a>Cambiar Nombre</a></li>
+			<li id="mover_tr"><a>Mover</a></li>
+			<li id="eliminar_tr"><a>Eliminar</a></li>
+			<li id="propiedades_tr"><a>Propiedades</a></li>
+		</ul>
+	
+	
 </section>
 {% endblock %}

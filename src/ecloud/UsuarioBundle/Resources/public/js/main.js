@@ -1,4 +1,5 @@
 function jsonToTable() {
+
     if(peticion.readyState == 4) {
 	 
       if(peticion.status == 200) {
@@ -42,5 +43,4 @@ function jsonToTable() {
 		
       }
     }
-	
   }

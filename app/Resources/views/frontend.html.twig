@@ -1,12 +1,18 @@
 {% extends '::base.html.twig' %}
 {% block stylesheets %}
-	{% stylesheets '@UsuarioBundle/Resources/public/css/*' filter='cssrewrite' %}
+	
+	{% stylesheets 'bundles/usuario/css/*' %}
 		<link rel="stylesheet" href="{{ asset_url }}" />
 	{% endstylesheets %}
+	{% stylesheets 'bundles/usuario/css/smoothness/*' filter='cssrewrite' output='css/smoothness/jqueryui.css' %}
+		<link rel="stylesheet" href="{{ asset_url }}" />
+	{% endstylesheets %}
+	
+	
 {% endblock %}
 
 {% block javascripts %}
-	{% javascripts '@UsuarioBundle/Resources/public/js/*' %}
+	{% javascripts 'bundles/usuario/js/*' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
 	{% endjavascripts %}
 {% endblock %}
