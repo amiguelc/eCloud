@@ -28,6 +28,13 @@ class Eventos
      */
     private $idUser;
 	
+	/**
+     * @var integer
+     *
+     * @ORM\Column(name="tipo", type="integer")
+     */
+    private $tipo;
+	
     /**
      * @var string
      *
@@ -250,5 +257,28 @@ class Eventos
     public function getRuta()
     {
         return $this->ruta;
+    }
+
+    /**
+     * Set tipo
+     *
+     * @param integer $tipo
+     * @return Eventos
+     */
+    public function setTipo($tipo)
+    {
+        $this->tipo = $tipo;
+    
+        return $this;
+    }
+
+    /**
+     * Get tipo
+     *
+     * @return integer 
+     */
+    public function getTipo()
+    {
+        return $this->tipo;
     }
 }

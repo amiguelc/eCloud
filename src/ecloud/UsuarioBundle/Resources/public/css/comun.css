@@ -91,6 +91,9 @@ padding: 8px 14px 9px;
 .yellow.button, .yellow.button:visited { background-color: #FFB515; }
 .yellow.button:hover{ background-color: #FC9200; }
 
+.grey.button, .grey.button:visited { background-color: #bbb; }
+.grey.button:hover{ background-color: #888; }
+
 
 
 

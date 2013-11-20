@@ -215,7 +215,7 @@
 	function comprobarCarpeta(elemento) {
 	var cadena=elemento.value;
 		if (caracteresprohibidos(cadena)==true){
-			alert("Esta prohibido crear carpetas con caracteres prohibidos ( / \\ : ? < > \' \" ~ * | ).");
+			alert("Esta prohibido crear carpetas con caracteres prohibidos ( / \\ : ? < > \' \" ~ * | )."); // Modificar para que haga un tooltip en vez de un alert.
 			elemento.value=cadena.slice(0,cadena.length-1);
 		}
 	
@@ -235,14 +235,6 @@
 	$("#menu").css("left", event.clientX);
 	$("#menu").css("top", event.clientY);
 	$("#menu").show();
-	
-	/*
-	//Primero borrar otras opciones
-	$(".clickderecho").remove();
-
-	//Añadir div con opciones.
-	document.body.innerHTML+="<div class='clickderecho' style='position:fixed;top:"+event.clientY+"px;left:"+event.clientX+"px;background-color:yellow'><table><tr><td>Eliminar</td></tr><tr><td>Cambiar nombre</td></tr><tr><td>Mover</td></tr></table></div>"
-	*/
 	}
 	
 	$(document).click(function (e) { $("#menu").hide(); $("#menu").css("top", ""); $("#menu").css("left", ""); });
@@ -274,8 +266,6 @@
 		$("#crear_carpeta").hide();
 		$("#file_upload").hide();
 		$("#itsthetable").fadeTo("slow",0.15);
-		//var posicionx=($(window).height() / 2) - ($("#dialogo_subir").outerHeight() / 2);
-		//var posiciony=($(window).width() / 2) - ($("#dialogo_subir").outerWidth() / 2));
 		$("#dialogo_subir").dialog({
 			close: function( event, ui ) {$("#itsthetable").fadeTo("slow",1)},
 			position: { my: "center bottom" , at: "center center", of: window },
@@ -284,9 +274,6 @@
 			modal: true,
 			title: "Subir archivos"
 		});
-		//$('#dialogo_subir').center();
-		//var $a = $("#dialogo_subir");
-		//$a.css('margin-top', $(document).height()/2 - $a.height()/2);
 		$("#dialogo_subir").show();
 	  });
 	});
@@ -298,32 +285,32 @@
 		allFields = $( [] ).add( name ),
 		tips = $( ".validateTips" );
 		function updateTips( t ) {
-		tips
-		.text( t )
-		.addClass( "ui-state-highlight" );
-		setTimeout(function() {
-		tips.removeClass( "ui-state-highlight", 1500 );
-		}, 500 );
+			tips
+			.text( t )
+			.addClass( "ui-state-highlight" );
+			setTimeout(function() {
+			tips.removeClass( "ui-state-highlight", 1500 );
+			}, 500 );
 		}
 		function checkLength( o, n, min, max ) {
-		if ( o.val().length > max || o.val().length < min ) {
-		o.addClass( "ui-state-error" );
-		updateTips( "Length of " + n + " must be between " +
-		min + " and " + max + "." );
-		return false;
-		} else {
-		return true;
-		}
+			if ( o.val().length > max || o.val().length < min ) {
+				o.addClass( "ui-state-error" );
+				updateTips( "Length of " + n + " must be between " +
+				min + " and " + max + "." );
+				return false;
+			} else {
+				return true;
+			}
 		}
 		function checkRegexp( o, regexp, n ) {
-		if ( !( regexp.test( o.val() ) ) ) {
-		o.addClass( "ui-state-error" );
-		updateTips( n );
-		return false;
-		} else {
-		return true;
+			if ( !( regexp.test( o.val() ) ) ) {
+				o.addClass( "ui-state-error" );
+				updateTips( n );
+				return false;
+			} else {
+				return true;
+			}
 		}
-	}
 	
 	 $( "#dialogo_crear_carpeta" ).dialog({
 			autoOpen: false,
@@ -334,7 +321,7 @@
 			buttons: {
 			"Crear carpeta": function() {
 			
-			//Igual a crearCarpeta().
+			//Igual a comprobarCarpeta().
 			
 			var bValid = true;
 			allFields.removeClass( "ui-state-error" );
@@ -406,7 +393,7 @@
 	<h1 id='titulo'>{{ block('title') }}</h1>
 	<div class="tabla" id='itsthetable'>
 	<table>
-	<caption>{{ app.user.nombreusuario }}<a href="{{ path('ficheros') }}">/{{ ruta }}</a> <div style='float:right'><button id='button_dialogo_subir'>Subir dialogo</button><button id='button_crear_carpeta'>Crear carpeta</button> <button id='button_subir'>Subir archivo</button> <button id='button_carpeta'>Crear carpeta</button></div></caption>
+	<caption>{{ app.user.nombreusuario }}<a href="{{ path('ficheros') }}">/{{ ruta }}</a> <div style='float:right'><button class='small grey button' id='button_dialogo_subir'>Subir</button> <button class='small grey button' id='button_crear_carpeta'>Crear carpeta</button> <button id='button_subir'>Subir archivo</button> <button id='button_carpeta'>Crear carpeta</button></div></caption>
 
 	<thead><tr><th style='width:80%;'>Nombre</th><th>Tama&ntilde;o</th><th>Modificado</th><th></th></tr></thead>
 	<tbody id="tbody">
@@ -502,9 +489,9 @@
 		<form id="form2" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
 			<fieldset>
 				<label for="name">Nombre </label>
-				<input style='display:block;' type="text" name="name" id="name" class="text ui-widget-content ui-corner-all" onkeyup='comprobarCarpeta(this)' size='37' />
+				<input style='display:block;' type="text" name="name" id="name" class="text ui-widget-content ui-corner-all" onkeyup='comprobarCarpeta(this)' size='50' />
 				<label for="ruta">Ruta </label>
-				<input style='display:block;' type="text" name="ruta" id="ruta" class="text ui-widget-content ui-corner-all" size='37' disabled value='{{ formulario_carpeta.ruta.vars.value }}' />
+				<input style='display:block;' type="text" name="ruta" id="ruta" class="text ui-widget-content ui-corner-all" size='50' disabled value='{{ formulario_carpeta.ruta.vars.value }}' />
 			</fieldset>
 		</form>
 	</div>

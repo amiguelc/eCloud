@@ -31,10 +31,6 @@ class CuentaController extends Controller{
 			$entity_usuarios=new Usuarios();
 			$usuario=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
 			$formulario=$this->createFormBuilder($entity_usuarios)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')->getForm();
-			
-			//$formulario = $this->createFormBuilder($document)->add('nombrefichero','text', array('data'=> $ficheros2->getNombreFichero()))->add('ruta','text',array ('data'=> $ficheros2->getRuta()))->getForm();
-			//$formulario = $this->createForm(new UsuarioType(), $usuario);
-			
 
 			if ($this->getRequest()->isMethod('POST')) {
 				$formulario->bind($this->getRequest());
