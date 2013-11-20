@@ -422,7 +422,8 @@ class CuentaController extends Controller{
 						$eventos=new Eventos();
 						//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
 						$eventos->setIdUser($userid);
-						if ($carpeta==FALSE){$eventos->setaccion("Has subido el fichero ".$ficheros->getnombreFichero());}else{$eventos->setaccion("Has creado la carpeta ".$ficheros->getnombreFichero()." en ".$ficheros->getRuta());}
+						if ($carpeta==FALSE){$eventos->setaccion("Has subido el fichero ".$ficheros->getnombreFichero());$eventos->setTipo("10");}
+						else{$eventos->setaccion("Has creado la carpeta ".$ficheros->getnombreFichero()." en ".$ficheros->getRuta());$eventos->setTipo("11");}
 						$eventos->setIdFichero($ficheros->getIdFichero());
 						$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
 						$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
@@ -501,9 +502,11 @@ class CuentaController extends Controller{
 					if($accion=="cambiar"){
 						if($ficheros->getTipo()=='fichero'){
 							$eventos->setaccion("Has cambiado el nombre al fichero ".$nombre_antiguo." por ".$nombre_nuevo);
+							$eventos->setTipo("20");
 						}
 						else{
 							$eventos->setaccion("Has cambiado el nombre a la carpeta ".$nombre_antiguo." por ".$nombre_nuevo);
+							$eventos->setTipo("21");
 						}
 					}elseif($accion=="mover"){
 						//Comprobacion de si carpeta nueva existe.
@@ -528,9 +531,11 @@ class CuentaController extends Controller{
 					
 						if($ficheros->getTipo()=='fichero'){
 							$eventos->setaccion("Has movido el fichero ".$nombre_nuevo." a ".$ruta_nueva);
+							$eventos->setTipo("30");
 						}
 						else{
 							$eventos->setaccion("Has movido la carpeta ".$nombre_nuevo." a ".$ruta_nueva);
+							$eventos->setTipo("31");
 						}
 					}elseif($accion=="mover y cambiar"){
 						//Comprobacion de si carpeta nueva existe. //Copiado integramente de la anterior.
@@ -554,11 +559,12 @@ class CuentaController extends Controller{
 						}
 						if($ficheros->getTipo()=='fichero'){
 							$eventos->setaccion("Has cambiado el nombre al fichero ".$nombre_antiguo." por ".$nombre_nuevo." y lo has movido a ".$ruta_nueva);
+							$eventos->setTipo("40");
 						}
 						else{
 							$eventos->setaccion("Has cambiado el nombre a la carpeta ".$nombre_antiguo." por ".$nombre_nuevo." y lo has movido a ".$ruta_nueva);
+							$eventos->setTipo("41");
 						}
-					
 					}else{return $response=new Response("Error");}
 					
 					//Comprobacion de si fichero ya existe en esa carpeta independientemente de su tipo.
@@ -664,6 +670,8 @@ class CuentaController extends Controller{
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
 				$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 				$em=$this->getDoctrine()->getManager();
+				//Falta antes de hacer la SQL validar la variable fichero.
+				
 				$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
 				if ($ficheros==null){ return  $response = new Response("Ese fichero no es tuyo");}
 				$ruta_local=$this->container->getParameter('var_archivos').$userid.print_r($ficheros->getRuta(), true).print_r($ficheros->getNombreFichero(), true);
@@ -677,8 +685,8 @@ class CuentaController extends Controller{
 					//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
 					$eventos->setIdUser($userid);
 					$eventos->setaccion("Has borrado el fichero ".$ficheros->getnombreFichero());
-					//$eventos->setIdFichero($document->getIdFichero());
-					$eventos->setIdFichero(0); //Falta: Problema es que el idFichero se genera despues con el autoincremento de SQL.
+					$eventos->setTipo("50");
+					$eventos->setIdFichero($fichero);
 					$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
 					$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
 					$eventos->setFecha(new \Datetime());
@@ -726,15 +734,17 @@ class CuentaController extends Controller{
 				//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
 				$eventos->setIdUser($userid);
 				//$eventos->setIdFichero($document->getIdFichero());
-				$eventos->setIdFichero(0); //Falta: Problema es que el idFichero se genera despues con el autoincremento de SQL.
+				$eventos->setIdFichero($sub_ficheros[$clave]->getidFichero());
 				$eventos->setNombreFicheroAntiguo($sub_ficheros[$clave]->getnombreFichero());
 				$eventos->setNombreFicheroNuevo($sub_ficheros[$clave]->getnombreFichero());
 				$eventos->setFecha(new \Datetime());
 				$eventos->setRuta($sub_ficheros[$clave]->getRuta());
 				if($sub_ficheros[$clave]->getTipo()=='fichero'){
 				$eventos->setaccion("Has borrado el fichero ".$sub_ficheros[$clave]->getnombreFichero());
+				$eventos->setTipo("50");
 				}else{
 				$eventos->setaccion("Has borrado la carpeta ".$sub_ficheros[$clave]->getnombreFichero());
+				$eventos->setTipo("51");
 				}
 				
 				$em->remove($sub_ficheros[$clave]);
@@ -750,13 +760,13 @@ class CuentaController extends Controller{
 				//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
 				$eventos->setIdUser($userid);
 				$eventos->setaccion("Has borrado la carpeta ".$ficheros->getnombreFichero());
-				//$eventos->setIdFichero($document->getIdFichero());
-				$eventos->setIdFichero(0); //Falta: Problema es que el idFichero se genera despues con el autoincremento de SQL.
+				$eventos->setTipo("51");
+				$eventos->setIdFichero($ficheros->getidFichero());
 				$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
 				$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
 				$eventos->setFecha(new \Datetime());
 				$eventos->setRuta($ficheros->getRuta());
-
+				
 				$em->remove($ficheros);
 				$em->persist($eventos);
 				
@@ -847,29 +857,52 @@ class CuentaController extends Controller{
 			}
 		}
 		
-		public function eventosJSONAction(){
+		public function eventosJSONAction($info){
        
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 			$em=$this->getDoctrine()->getManager();
+			
+			//return new Response (var_dump($eventos));
+			if ($info!="all"){
+			//Enviar solo lo pedido [tipo,idfichero,ruta,nombreficheroantiguo,nombreficheronuevo,fecha] sin JSON
+				switch ($info){
+				case "min":
+					$query = $em->createQuery('SELECT e.tipo, e.idFichero, e.ruta, e.nombreFicheroAntiguo, e.nombreFicheroNuevo, e.fecha FROM UsuarioBundle:Eventos e WHERE e.idUser=?1 ORDER BY e.fecha DESC');
+					$query->setParameter(1, $userid);
+					$min=$query->getResult();
+					$encoders = array(new XmlEncoder(), new JsonEncoder());
+					$normalizers = array(new GetSetMethodNormalizer());
+					$serializer = new Serializer($normalizers, $encoders);
+					$jsonContent = $serializer->serialize($min, 'json');
+					return new Response ($jsonContent);
+					break;
+				default:
+					//Envia todo...
+					$eventos=$em->getRepository('UsuarioBundle:Eventos')->findBy(array('idUser' => $userid),array('fecha' => 'DESC'));
+					$encoders = array(new XmlEncoder(), new JsonEncoder());
+					$normalizers = array(new GetSetMethodNormalizer());
+					$serializer = new Serializer($normalizers, $encoders);
+					$jsonContent = $serializer->serialize($eventos, 'json');
+					return new Response ($jsonContent);
+					break;
+				}
+				
+			
+			}else{
+			//Enviar todo en formato JSON
 			$eventos=$em->getRepository('UsuarioBundle:Eventos')->findBy(array('idUser' => $userid),array('fecha' => 'DESC'));
-	
-			//Hay que devolver el resultado en JSON. Esta es la manera larga utilizando los componentes de Symfony
-	/*
-			$rows = array();
-			while($r = $resultado->fetch_assoc()) {
-				$rows[] = $r;
-			}
-			$eventos=json_encode($rows);
-	*/
 			$encoders = array(new XmlEncoder(), new JsonEncoder());
 			$normalizers = array(new GetSetMethodNormalizer());
-
 			$serializer = new Serializer($normalizers, $encoders);
-			
 			$jsonContent = $serializer->serialize($eventos, 'json');
-
 			return new Response ($jsonContent);
+			}
+			
+			
+				
+	
+			
 			}
 			else{
 				return $this->redirect($this->generateUrl('login'), 301);

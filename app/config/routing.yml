@@ -82,8 +82,8 @@ api_fichero:
     pattern: /api/fichero/{id}
     defaults: { _controller: UsuarioBundle:Cuenta:ficherojson, id: 0 }
 api_eventos:
-    pattern: /api/eventos
-    defaults: { _controller: UsuarioBundle:Cuenta:eventosjson }
+    pattern: /api/eventos/{info}
+    defaults: { _controller: UsuarioBundle:Cuenta:eventosjson, info: all }
 ################################################################################################ Descarga Externa
 download:
     pattern: /!{descarga}

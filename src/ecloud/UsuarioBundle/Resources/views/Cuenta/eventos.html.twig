@@ -23,13 +23,13 @@
     switch (location.pathname){
 	
 	case "/eventos":
-	cargarContenido('GET','api/eventos?nocache='+Math.random(), muestraEventos);
+	cargarContenido('GET','api/eventos/min?nocache='+Math.random(), muestraEventos);
 	break;
 	case "/app_dev.php/eventos":
-	cargarContenido('GET','api/eventos?nocache='+Math.random(), muestraEventos);
+	cargarContenido('GET','api/eventos/min?nocache='+Math.random(), muestraEventos);
 	break;
 	case "/app.php/eventos":
-	cargarContenido('GET','api/eventos?nocache='+Math.random(), muestraEventos);
+	cargarContenido('GET','api/eventos/min?nocache='+Math.random(), muestraEventos);
 	break;
   }
   
@@ -79,55 +79,68 @@
 			for(var key in obj){
 				//Para saltar campos
 				//alert(key);
-				if(key=="accion" || key=="fecha"){
+				if(key=="tipo" || key=="fecha"){
 				
 					var attrName = key;
 					var attrValue = obj[key];
-					if(attrName=="accion"){
-
-						if(attrValue.match(/^Has subido el fichero/)!=null){
-							//Has subido...
+					
+					if(attrName=="tipo"){
+					var texto="";
+						if(attrValue=="10" ){
+							//Has subido fichero...
 							color="#B5FFB5";
-							attrValue="Has subido el fichero <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
+							texto="Has subido el fichero <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
 							
 						}
-						else if(attrValue.match(/^Has creado la carpeta/)!=null){
+						else if(attrValue=="11"){
 							//Has creado la carpeta...
 							color="#B5FFB5";
-							attrValue="Has creado la carpeta <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a> en "+obj['ruta'];
+							texto="Has creado la carpeta <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a> en "+obj['ruta'];
 						}
-						else if(attrValue.match(/^Has borrado el fichero/)!=null){
-							//Has borrado... 
-							color="#FFB5B5";
-							}
-						else if(attrValue.match(/^Has borrado la carpeta/)!=null){
-							//Has borrado... //Procesar accion para sacar el idfichero del fichero borrado
-							color="#FFB5B5";
-							}
-						else if(attrValue.match(/^Has cambiado el nombre al fichero /)!=null){
+						else if(attrValue=="20"){
 							//Has cambiado el nombre al fichero...
 							color="#FFFF00";				
-							attrValue="Has cambiado el nombre al fichero "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
+							texto="Has cambiado el nombre al fichero "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
 						}
-						else if(attrValue.match(/^Has cambiado el nombre a la carpeta /)!=null){
+						else if(attrValue=="21"){
 							//Has cambiado el nombre a la carpeta...
 							color="#FFFF00";									
-							attrValue="Has cambiado el nombre a la carpeta "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
+							texto="Has cambiado el nombre a la carpeta "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
 						}
-						else if(attrValue.match(/^Has movido el fichero /)!=null){
-							//Has cambiado el nombre al fichero...
+						else if(attrValue=="30"){
+							//Has movido el fichero...
 							color="#FFFF00";				
-							attrValue="Has movido el fichero "+obj['nombreFicheroNuevo']+" a "+obj['ruta'];
+							texto="Has movido el fichero "+obj['nombreFicheroNuevo']+" a "+obj['ruta'];
 						}
-						else if(attrValue.match(/^Has movido la carpeta /)!=null){
-							//Has cambiado el nombre a la carpeta...
+						else if(attrValue=="31"){
+							//Has movido la carpeta...
 							color="#FFFF00";									
-							attrValue="Has movido la carpeta "+obj['nombreFicheroNuevo']+" a "+obj['ruta'];
+							texto="Has movido la carpeta "+obj['nombreFicheroNuevo']+" a "+obj['ruta'];
 						}
-						else if(attrValue=="&iexcl;Te has registrado!"){color="#95FF95";}
+						else if(attrValue=="40"){
+							//Has cambiado el fichero...y lo has movido a...
+							color="#FFFF00";				
+							texto="Has cambiado el nombre al fichero "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+"</a> y lo has movido a "+obj['ruta']+"";
+						}
+						else if(attrValue=="41"){
+							//Has cambiado el nombre a la carpeta...y lo has movido a...
+							color="#FFFF00";									
+							texto="Has cambiado el nombre a la carpeta "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+"</a> y lo has movido a "+obj['ruta']+"";
+						}
+						else if(attrValue=="50"){
+							//Has borrado fichero... 
+							color="#FFB5B5";
+							texto="Has borrado el fichero "+obj['nombreFicheroNuevo']+" de "+obj['ruta'];
+						}
+						else if(attrValue=="51"){
+							//Has borrado carpeta...
+							color="#FFB5B5";
+							texto="Has borrado la carpeta "+obj['nombreFicheroNuevo']+" de "+obj['ruta'];
+						}
+						else if(attrValue=="0"){color="#95FF95";}
 						else {color="";}
 						
-						cuerpo = cuerpo + "<td style='background-color:"+color+";' > "+attrValue+"</td>";
+						cuerpo = cuerpo + "<td style='background-color:"+color+";' > "+texto+"</td>";
 						idFichero="";
 					}
 					else if(attrName=="fecha"){
@@ -137,7 +150,7 @@
 						var _anyo=date.getFullYear();
 						cuerpo = cuerpo + "<td style='text-align:right;background-color:"+color+";'>" + _dia+"/"+_mes+"/"+_anyo + " "+addZeroo(date.getHours())+":"+addZeroo(date.getMinutes())+"</td>";
 					}
-					else if(attrValue==null){cuerpo = cuerpo +"<td></td>";}
+					else if(attrName==null){cuerpo = cuerpo +"<td></td>";}
 					else{cuerpo = cuerpo + "<td>" + attrValue + "</td>";
 					}
 					

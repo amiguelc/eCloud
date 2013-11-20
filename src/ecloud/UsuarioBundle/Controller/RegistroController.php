@@ -53,6 +53,7 @@ class RegistroController extends Controller{
 			//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
 			$eventos->setIdUser($usuario->getidUser());
 			$eventos->setaccion("&iexcl;Te has registrado!");
+			$eventos->setTipo("0");
 			$eventos->setFecha(new \Datetime());
 			$eventos->setRuta("-");
 			
