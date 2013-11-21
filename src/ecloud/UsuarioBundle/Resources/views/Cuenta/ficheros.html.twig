@@ -81,6 +81,48 @@
 	  }
 	}
 	
+	function fileSelected2() {
+	  var file = document.getElementById('form_file2').files[0];
+	  if (file) {
+		var fileSize = 0;
+		if (file.size > 1024 * 1024){
+		  fileSize = (Math.round(file.size * 100 / (1024 * 1024)) / 100).toString() + 'MB';
+		}
+		else{
+		  fileSize = (Math.round(file.size * 100 / 1024) / 100).toString() + 'KB';
+		}
+		//Recuperar el espacio ocupado del usuario
+		if (location.pathname.match(/^\/app_dev.php\/ficheros/)!=null){
+			var dir=location.protocol+"//"+location.hostname+"/app_dev.php/api/perfil/espacio";
+		}
+		else if(location.pathname.match(/^\/app.php\/ficheros/)!=null){
+			var dir=location.protocol+"//"+location.hostname+"/app.php/api/perfil/espacio";
+		}
+		else{
+			var dir=location.protocol+"//"+location.hostname+"/api/perfil/espacio";
+		}
+		var xhr_ocupado = $.get( dir, function( datos ) {
+		document.getElementById('max_file_size').value = datos.libre;
+		//Comprobacion de si el fichero seleccionado es mayor al espacio disponible
+		if (file.size>datos.libre){
+				if (datos.libre > 1024 * 1024){
+				  datos.libre = (Math.round(datos.libre * 100 / (1024 * 1024)) / 100).toString() + 'MB';
+				}
+				else{
+				  datos.libre = (Math.round(datos.libre * 100 / 1024) / 100).toString() + 'KB';
+				}
+			document.getElementById('fileName2').innerHTML = 'Name: ' + file.name +"<br>Error: Te quedan solo "+datos.libre+" libres. Y el fichero seleccionado ocupa "+fileSize;
+			document.getElementById('form_file2').value="";
+		}
+		else{
+		document.getElementById('fileName2').innerHTML = 'Name: ' + file.name;
+		document.getElementById('fileSize2').innerHTML = 'Size: ' + fileSize;
+		document.getElementById('fileType2').innerHTML = 'Type: ' + file.type;
+		}
+		}, 'json');
+	  }
+	}
+	
 	function uploadFile() {
 	
 	//Comprobaciones de que no falten datos, form_ruta y max_file_size, en el lado del servidor tambien.
@@ -149,8 +191,7 @@
 	function uploadCanceled(evt) {
 	  alert("The upload has been canceled by the user or the browser dropped the connection.");
 	}  
-	
-	
+		
 	function crearCarpeta() {
 	//Comprobaciones de que no falten datos, form_ruta y max_file_size, en el lado del servidor tambien.
 	if(document.getElementById('form_nombrefichero').value==="" || document.getElementById('form_ruta').value===undefined || document.getElementById('form__token').value===undefined){
@@ -195,9 +236,9 @@
 	}
 	
 	//Funcion para comprobar caracteres prohibidos. ( / \ : ? < > ' " ~ * | ). Falta mejorar para detectar el caracter prohibido y devolverlo. Y ademas poder enviar un array con los simbolos a ignorar.
-	function caracteresprohibidos(cadena){
+	function caracteresprohibidos(cadena,array){
 	var a=false;
-		if(cadena.match(/\//)){ a=true;}
+		if (array!="/"){if(cadena.match(/\//)){ a=true;}}
 		if(cadena.match(/\\/)){ a=true;}
 		if(cadena.match(/:/)){ a=true;}
 		if(cadena.match(/\?/)){ a=true;}
@@ -212,7 +253,7 @@
 		return a;
 	}
 	
-	function comprobarCarpeta(elemento) {
+	function comprobarNombreCarpeta(elemento) {
 	var cadena=elemento.value;
 		if (caracteresprohibidos(cadena)==true){
 			alert("Esta prohibido crear carpetas con caracteres prohibidos ( / \\ : ? < > \' \" ~ * | )."); // Modificar para que haga un tooltip en vez de un alert.
@@ -236,51 +277,11 @@
 	$("#menu").css("top", event.clientY);
 	$("#menu").show();
 	}
-	
-	$(document).click(function (e) { $("#menu").hide(); $("#menu").css("top", ""); $("#menu").css("left", ""); });
-	
-	
-	
+		
 	$(document).ready(function(){
-	  $("#button_subir").click(function(){
-		$("#itsthetable").fadeTo("slow",0.15);
-		$("#crear_carpeta").hide();
-		$("#file_upload").show();
-	  });
-	  $("#button_carpeta").click(function(){
-		$("#itsthetable").fadeTo("slow",0.15);
-		$("#file_upload").hide();
-		$("#crear_carpeta").show();
-	  });
-	  $("#cerrar_file_upload").click(function(){
-		$("#crear_carpeta").hide();
-		$("#file_upload").hide();
-		$("#itsthetable").fadeTo("slow",1);
-	  });
-	  $("#cerrar_crear_carpeta").click(function(){
-		$("#crear_carpeta").hide();
-		$("#file_upload").hide();
-		$("#itsthetable").fadeTo("slow",1);
-	  });
-	  $("#button_dialogo_subir").click(function(){
-		$("#crear_carpeta").hide();
-		$("#file_upload").hide();
-		$("#itsthetable").fadeTo("slow",0.15);
-		$("#dialogo_subir").dialog({
-			close: function( event, ui ) {$("#itsthetable").fadeTo("slow",1)},
-			position: { my: "center bottom" , at: "center center", of: window },
-			width: 600, 
-			//height: 400, 
-			modal: true,
-			title: "Subir archivos"
-		});
-		$("#dialogo_subir").show();
-	  });
-	});
 	
-	$(function() {
-		var nombre = $( "#crear_carpeta_nombre" ), ruta = $( "#crear_carpeta_ruta" ),
-		allFields = $( [] ).add( nombre ).add( ruta ),
+		var nombre_carpeta = $( "#crear_carpeta_nombre" ), ruta = $( "#ruta" ), fichero = $( "#form_file2" ),
+		allFields = $( [] ).add( nombre_carpeta ).add( ruta ).add ( fichero ),
 		tips = $( ".validateTips" );
 		function updateTips( t ) {
 			tips
@@ -308,47 +309,189 @@
 				return true;
 			}
 		}
+		function respuestaAjax(evt) {
+			/* This event is raised when the server send back a response */
+			if(evt.target.responseText=="Subido correctamente"){alert(evt.target.responseText);location.reload(true);}else{
+			//mostrar error
+			//nombre_carpeta.addClass( "ui-state-error" );
+			updateTips(evt.target.responseText);
+			
+			}
+			//Recargar pagina
+			//location.reload(true);
+		}
 	
 	 $( "#dialogo_crear_carpeta" ).dialog({
-			autoOpen: false,
-			//height: 300,
-			width: 550,
-			modal: true,
-			title: "Crear carpeta",
-			buttons: {
-			"Crear carpeta": function() {
-						
-			var bValid = true;
-			allFields.removeClass( "ui-state-error" );
-			bValid = bValid && checkLength( nombre, " del nombre de carpeta", 1, 255 );
-			//Igual a comprobarCarpeta().
-			if (caracteresprohibidos(nombre.val())==true){nombre.addClass( "ui-state-error" );updateTips("No se permiten caracters raros");bValid = bValid && false;}
-			//if (caracteresprohibidos(ruta.val())==true){ruta.addClass( "ui-state-error" );updateTips("No se permiten caracters raros");bValid = bValid && false;}
-			//bValid = bValid && checkLength( email, "email", 6, 80 );
-			//bValid = bValid && checkLength( password, "password", 5, 16 );
-			//bValid = bValid && checkRegexp( name, /^[a-z]([0-9a-z_])+$/i, "Username may consist of a-z, 0-9, underscores, begin with a letter." );
-			// From jquery.validate.js (by joern), contributed by Scott Gonzalez: http://projects.scottsplayground.com/email_address_validation/
-			//bValid = bValid && checkRegexp( email, /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i, "eg. ui@jquery.com" );
-			//bValid = bValid && checkRegexp( password, /^([0-9a-zA-Z])+$/, "Password field only allow : a-z 0-9" );
-			
-			if ( bValid ) {
-			//Enviar, y esperar respuesta ajax-> si respuesta correcta cierra y actualiza la tabla ficheros o pagina, si no, mostrar error. Es sinonimo de crearCarpeta().
-			
-			$( this ).dialog( "close" );
+		autoOpen: false,
+		//height: 300,
+		width: 550,
+		modal: true,
+		title: "Crear carpeta",
+		buttons: {
+		"Crear carpeta": function() {
+					
+		var bValid = true;
+		allFields.removeClass( "ui-state-error" );
+		bValid = bValid && checkLength( nombre_carpeta, " del nombre de carpeta", 1, 255 );
+		//Igual a comprobarNombreCarpeta().
+		if (caracteresprohibidos(nombre_carpeta.val())==true){nombre_carpeta.addClass( "ui-state-error" );updateTips("No se permiten caracters raros");bValid = bValid && false;}
+		if (caracteresprohibidos(ruta.val(), "/")==true){ruta.addClass( "ui-state-error" );updateTips("No se permiten caracters raros");bValid = bValid && false;}
+		if ( bValid ) {
+		//Enviar, y esperar respuesta ajax-> si respuesta correcta cierra y actualiza la tabla ficheros o pagina, si no, mostrar error. Es sinonimo de crearCarpeta().
+		
+			if (location.pathname.match(/^\/app_dev.php\/ficheros/)!=null){
+				var dir=location.protocol+"//"+location.hostname+"/app_dev.php/subir";
 			}
-			},
-			Cancel: function() {
-			$( this ).dialog( "close" );
+			else if(location.pathname.match(/^\/app.php\/ficheros/)!=null){
+				var dir=location.protocol+"//"+location.hostname+"/app.php/subir";
 			}
-			},
-			close: function() {
+			else{
+				var dir=location.protocol+"//"+location.hostname+"/subir";
+			}
+			
+			if(window.XMLHttpRequest) {
+			  xhr = new XMLHttpRequest();
+			}
+			else {
+			  xhr = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			
+			var fd = new FormData();
+			fd.append("form[nombrefichero]", nombre_carpeta.val());
+			fd.append("form[ruta]", ruta.val());
+			fd.append("form[_token]", document.getElementById("form__token").value);
+			console.log(fd);
+			/* event listners */
+			//xhr.upload.addEventListener("progress", uploadProgress, false);
+			xhr.addEventListener("load", respuestaAjax, false);
+			xhr.addEventListener("error", uploadFailed, false);
+			xhr.addEventListener("abort", uploadCanceled, false);
+			/* Be sure to change the url below to the url of your upload server side script */
+			xhr.open("POST", dir);
+			xhr.send(fd);				
+			
+			//$( this ).dialog( "close" );
+			}
+		},
+		Cancel: function() {
+			$( this ).dialog( "close" );
+		}
+	},
+		close: function() {
 			allFields.val( "" ).removeClass( "ui-state-error" );
+		}
+	});
+	
+	 $( "#dialogo_subir" ).dialog({
+		autoOpen: false,
+		//height: 300,
+		width: 550,
+		modal: true,
+		title: "Subir archivo",
+		buttons: {
+		"Subir": function() {
+					
+		var bValid = true;
+		allFields.removeClass( "ui-state-error" );
+		//bValid = bValid && checkLength( nombre_carpeta, " del nombre del fichero", 1, 255 );
+		//Igual a comprobarNombreCarpeta().
+		//if (caracteresprohibidos(nombre_carpeta.val())==true){nombre_carpeta.addClass( "ui-state-error" );updateTips("No se permiten caracters raros");bValid = bValid && false;}
+		//if (caracteresprohibidos(ruta.val(), "/")==true){ruta.addClass( "ui-state-error" );updateTips("No se permiten caracters raros");bValid = bValid && false;}
+		if ( bValid ) {
+		//Enviar, y esperar respuesta ajax-> si respuesta correcta cierra y actualiza la tabla ficheros o pagina, si no, mostrar error. Es sinonimo de crearCarpeta().
+			
+			if (location.pathname.match(/^\/app_dev.php\/ficheros/)!=null){
+				var dir=location.protocol+"//"+location.hostname+"/app_dev.php/subir";
 			}
+			else if(location.pathname.match(/^\/app.php\/ficheros/)!=null){
+				var dir=location.protocol+"//"+location.hostname+"/app.php/subir";
+			}
+			else{
+				var dir=location.protocol+"//"+location.hostname+"/subir";
+			}
+			
+			if(window.XMLHttpRequest) {
+			  xhr = new XMLHttpRequest();
+			}
+			else {
+			  xhr = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			/*
+			var fd = new FormData();
+			fd.append("form[nombrefichero]", fichero.val());
+			fd.append("form[ruta]", ruta.val());
+			fd.append("form[_token]", document.getElementById("form__token").value);
+			console.log(fd);
+			//event listners
+			//xhr.upload.addEventListener("progress", uploadProgress, false);
+			xhr.addEventListener("load", respuestaAjax, false);
+			xhr.addEventListener("error", uploadFailed, false);
+			xhr.addEventListener("abort", uploadCanceled, false);
+			//Be sure to change the url below to the url of your upload server side script
+			xhr.open("POST", dir);
+			xhr.send(fd);				
+			
+			//$( this ).dialog( "close" );
+			*/
+			}
+		},
+		Cancel: function() {
+			$( this ).dialog( "close" );
+		}
+	},
+		close: function() {
+			allFields.val( "" ).removeClass( "ui-state-error" );
+		}
+	});
+		
+		//Con un click cerrar el menu de fichero.
+		$(document).click(function (e) { $("#menu").hide(); $("#menu").css("top", ""); $("#menu").css("left", ""); });
+		
+		//Abrir Dialogos
+		$("#button_crear_carpeta").click(function(){
+			$( "#dialogo_crear_carpeta" ).dialog( "open" );
 		});
-	  $("#button_crear_carpeta").click(function(){
-		$( "#dialogo_crear_carpeta" ).dialog( "open" );
-	  });
-	  
+		$("#button_dialogo_subir").click(function(){
+			$( "#dialogo_subir" ).dialog( "open" );
+		});	
+		
+		//Antiguamente
+		$("#button_subir").click(function(){
+			$("#itsthetable").fadeTo("slow",0.15);
+			$("#crear_carpeta").hide();
+			$("#file_upload").show();
+		});
+		$("#button_carpeta").click(function(){
+			$("#itsthetable").fadeTo("slow",0.15);
+			$("#file_upload").hide();
+			$("#crear_carpeta").show();
+		});
+		$("#cerrar_file_upload").click(function(){
+			$("#crear_carpeta").hide();
+			$("#file_upload").hide();
+			$("#itsthetable").fadeTo("slow",1);
+		});
+		$("#cerrar_crear_carpeta").click(function(){
+			$("#crear_carpeta").hide();
+			$("#file_upload").hide();
+			$("#itsthetable").fadeTo("slow",1);
+		});
+		/*
+		$("#button_dialogo_subir").click(function(){
+			$("#crear_carpeta").hide();
+			$("#file_upload").hide();
+			$("#itsthetable").fadeTo("slow",0.15);
+			$("#dialogo_subir").dialog({
+			close: function( event, ui ) {$("#itsthetable").fadeTo("slow",1)},
+			position: { my: "center bottom" , at: "center center", of: window },
+			width: 600, 
+			//height: 400, 
+			modal: true,
+			title: "Subir archivos"
+			});
+			$("#dialogo_subir").show();
+		});
+		*/
 	});
 	
 	
@@ -367,16 +510,13 @@
 	  // $('#dialogo_subir').center();
 	});
 		
-	
-	
-	
 </script>
 
 <section>
 	<h1 id='titulo'>{{ block('title') }}</h1>
 	<div class="tabla" id='itsthetable'>
 	<table>
-	<caption>{{ app.user.nombreusuario }}<a href="{{ path('ficheros') }}">/{{ ruta }}</a> <div style='float:right'><button class='small grey button' id='button_dialogo_subir'>Subir</button> <button class='small grey button' id='button_crear_carpeta'>Crear carpeta</button> <button id='button_subir'>Subir archivo</button> <button id='button_carpeta'>Crear carpeta</button></div></caption>
+	<caption>{{ app.user.nombreusuario }}<a href="{{ path('ficheros') }}">/{{ ruta }}</a> <div style='float:right'><button class='small grey button' id='button_dialogo_subir'>Subir</button> <button class='small grey button' id='button_crear_carpeta'>Crear carpeta</button> <button id='button_subir'>Subir archivo</button> <button id='button_carpeta'style="display:none;">Crear carpeta</button></div></caption>
 
 	<thead><tr><th style='width:80%;'>Nombre</th><th>Tama&ntilde;o</th><th>Modificado</th><th></th></tr></thead>
 	<tbody id="tbody">
@@ -385,7 +525,7 @@
 		
 		{% set var1 = var1 + 1 %}
 		
-		<tr id="tr{{var1}}" idfichero="{{ficheros.idfichero}}" =class='tr' {% if var1 is divisibleby(2) %} class="odd" {% endif %} oncontextmenu="mostrarOpciones(this,event);return false;">
+		<tr id="tr{{var1}}" idfichero="{{ficheros.idfichero}}" class='tr' {% if var1 is divisibleby(2) %} class="odd" {% endif %} oncontextmenu="mostrarOpciones(this,event);return false;">
 			
 			<th>
 			<div id='div_{{var1}}' fichero='{{var1}}'>
@@ -438,13 +578,13 @@
 	</div>
 	<div id="progressNumber"></div>
 	</div>
-	
+	<!--
 	<div id='crear_carpeta' class='div_amagado'>
 		<table class='no_class'>
 			<tr>
 				<form id="form2" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
 					{{ form_errors(formulario_carpeta) }}
-					<td><div>{{ form_label(formulario_carpeta.nombrefichero) }}{{ form_errors(formulario_carpeta.nombrefichero) }}{{ form_widget(formulario_carpeta.nombrefichero, {'attr': {'onkeyup': 'comprobarCarpeta(this)'}}) }}</div></td>
+					<td><div>{{ form_label(formulario_carpeta.nombrefichero) }}{{ form_errors(formulario_carpeta.nombrefichero) }}{{ form_widget(formulario_carpeta.nombrefichero, {'attr': {'onkeyup': 'comprobarNombreCarpeta(this)'}}) }}</div></td>
 					<td><input type="button" onclick="crearCarpeta()" value="Crear" /></td>
 					<td>{{ form_rest(formulario_carpeta) }}</td>
 				</form>
@@ -452,29 +592,37 @@
 			</tr>
 		</table>
 	</div>
+	-->
 	
-	<div id='dialogo_subir' style='position:fixed;display:none;'>
-		<table>
-			<tr>
-					<form id="form1" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario) }}>
-						{{ form_errors(formulario) }}
-						<td><div>{{ form_label(formulario.file) }}{{ form_errors(formulario.file) }}{{ form_widget(formulario.file, {'attr': {'onchange': 'fileSelected()'}}) }} </div></td>
-						<td><input id="subir" type="button" onclick="uploadFile()" value="Subir" /></td>
-						<td>{{ form_row(formulario.ruta) }}{{ form_rest(formulario) }} <input id="max_file_size" type="hidden" name="MAX_FILE_SIZE" value="" /></td>
-
-					</form>
-			</tr>
-		</table>
+	<div id='dialogo_subir'>
+		<p class="validateTips"></p>
+		<form id="form1" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario) }}>
+			<fieldset>
+				<label for="form[file]">Selecciona fichero... </label>
+				<input style='display:block;' type="file" id="form_file2" name="form[file]" required="required" onchange="fileSelected2()" />
+				<label for="subir_nombre">Fichero </label>
+				<input style='display:block;' type="text" name="subir_nombre" id="subir_nombre" class="text ui-widget-content ui-corner-all" size='50' onchange='comprobarNombreCarpeta(this)' />
+				<label for="ruta">Ruta </label>
+				<input style='display:block;' type="text" name="ruta" id="ruta" class="text ui-widget-content ui-corner-all" size='50' disabled value='{{ formulario.ruta.vars.value }}' />
+				<input id="max_file_size" type="hidden" name="MAX_FILE_SIZE" value="" /></td>
+			</fieldset>
+		</form>
+		<div id="subiendofichero">
+			<div id="fileName2"></div>
+			<div id="fileSize2"></div>
+			<div id="fileType2"></div>
+		</div>
+		<div id="progressNumber2"></div>
 	</div>
 	
 	<div id='dialogo_crear_carpeta'>
-		 <p class="validateTips"></p>
+		<p class="validateTips"></p>
 		<form id="form2" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
 			<fieldset>
 				<label for="crear_carpeta_nombre">Nombre </label>
-				<input style='display:block;' type="text" name="crear_carpeta_nombre" id="crear_carpeta_nombre" class="text ui-widget-content ui-corner-all" size='50' onkeyup='comprobarCarpeta(this)' />
-				<label for="crear_carpeta_ruta">Ruta </label>
-				<input style='display:block;' type="text" name="crear_carpeta_ruta" id="crear_carpeta_ruta" class="text ui-widget-content ui-corner-all" size='50' disabled value='{{ formulario_carpeta.ruta.vars.value }}' />
+				<input style='display:block;' type="text" name="crear_carpeta_nombre" id="crear_carpeta_nombre" class="text ui-widget-content ui-corner-all" size='50' onkeyup='comprobarNombreCarpeta(this)' />
+				<label for="ruta">Ruta </label>
+				<input style='display:block;' type="text" name="ruta" id="ruta" class="text ui-widget-content ui-corner-all" size='50' disabled value='{{ formulario_carpeta.ruta.vars.value }}' />
 			</fieldset>
 		</form>
 	</div>

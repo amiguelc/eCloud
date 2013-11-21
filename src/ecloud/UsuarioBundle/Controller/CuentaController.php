@@ -145,8 +145,7 @@ class CuentaController extends Controller{
 		
 		public function ficherosAction($ruta){
 		
-		//falta ajaxificar
-		//con codigo javascript a la hora de subir ficheros tener en cuenta el espacio libre y en base a ello permitir la subida del fichero, calcular checksum.
+		//falta ajaxificar lista ficheros, y calcular checksum lado cliente.
 		
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
 			
