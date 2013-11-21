@@ -194,7 +194,7 @@
 	  }
 	}
 	
-	//Funcion para comprobar caracteres prohibidos. ( / \ : ? < > ' " ~ * | ). Falta mejorar para detectar el caracter prohibido y devolverlo.
+	//Funcion para comprobar caracteres prohibidos. ( / \ : ? < > ' " ~ * | ). Falta mejorar para detectar el caracter prohibido y devolverlo. Y ademas poder enviar un array con los simbolos a ignorar.
 	function caracteresprohibidos(cadena){
 	var a=false;
 		if(cadena.match(/\//)){ a=true;}
@@ -279,10 +279,8 @@
 	});
 	
 	$(function() {
-		var name = $( "#name" ),
-		//email = $( "#email" ),
-		//password = $( "#password" ),
-		allFields = $( [] ).add( name ),
+		var nombre = $( "#crear_carpeta_nombre" ), ruta = $( "#crear_carpeta_ruta" ),
+		allFields = $( [] ).add( nombre ).add( ruta ),
 		tips = $( ".validateTips" );
 		function updateTips( t ) {
 			tips
@@ -295,8 +293,7 @@
 		function checkLength( o, n, min, max ) {
 			if ( o.val().length > max || o.val().length < min ) {
 				o.addClass( "ui-state-error" );
-				updateTips( "Length of " + n + " must be between " +
-				min + " and " + max + "." );
+				updateTips( "El tama\u00f1o " + n + " debe estar entre " + min + " y " + max + "." );
 				return false;
 			} else {
 				return true;
@@ -320,25 +317,22 @@
 			title: "Crear carpeta",
 			buttons: {
 			"Crear carpeta": function() {
-			
-			//Igual a comprobarCarpeta().
-			
+						
 			var bValid = true;
 			allFields.removeClass( "ui-state-error" );
-			bValid = bValid && checkLength( name, "carpeta", 1, 255 );
+			bValid = bValid && checkLength( nombre, " del nombre de carpeta", 1, 255 );
+			//Igual a comprobarCarpeta().
+			if (caracteresprohibidos(nombre.val())==true){nombre.addClass( "ui-state-error" );updateTips("No se permiten caracters raros");bValid = bValid && false;}
+			//if (caracteresprohibidos(ruta.val())==true){ruta.addClass( "ui-state-error" );updateTips("No se permiten caracters raros");bValid = bValid && false;}
 			//bValid = bValid && checkLength( email, "email", 6, 80 );
 			//bValid = bValid && checkLength( password, "password", 5, 16 );
-			bValid = bValid && checkRegexp( name, /^[a-z]([0-9a-z_])+$/i, "Username may consist of a-z, 0-9, underscores, begin with a letter." );
+			//bValid = bValid && checkRegexp( name, /^[a-z]([0-9a-z_])+$/i, "Username may consist of a-z, 0-9, underscores, begin with a letter." );
 			// From jquery.validate.js (by joern), contributed by Scott Gonzalez: http://projects.scottsplayground.com/email_address_validation/
 			//bValid = bValid && checkRegexp( email, /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i, "eg. ui@jquery.com" );
 			//bValid = bValid && checkRegexp( password, /^([0-9a-zA-Z])+$/, "Password field only allow : a-z 0-9" );
+			
 			if ( bValid ) {
-			//$( "#users tbody" ).append( "<tr>" +
-			//"<td>" + name.val() + "</td>" +
-			//"<td>" + email.val() + "</td>" +
-			//"<td>" + password.val() + "</td>" +
-			//"</tr>" );
-			//Enviar, y esperar respuesta ajax-> si respuesta correcta cerra, si no, mostrar error. Es sinonimo de crearCarpeta().
+			//Enviar, y esperar respuesta ajax-> si respuesta correcta cierra y actualiza la tabla ficheros o pagina, si no, mostrar error. Es sinonimo de crearCarpeta().
 			
 			$( this ).dialog( "close" );
 			}
@@ -352,20 +346,9 @@
 			}
 		});
 	  $("#button_crear_carpeta").click(function(){
-		//$("#crear_carpeta").hide();
-		//$("#file_upload").hide();
-		//$("#itsthetable").fadeTo("slow",0.15);
-		//$("#dialogo_crear_carpeta").dialog({
-		//	close: function( event, ui ) {$("#itsthetable").fadeTo("slow",1)},
-		//	position: { my: "center bottom" , at: "center center", of: window },
-		//	width: 600, 
-			//height: 400, 
-		//	modal: true,
-		//	title: "Crear carpeta"
-		//});
-		//$("#dialogo_crear_carpeta").show();
 		$( "#dialogo_crear_carpeta" ).dialog( "open" );
-	  });  
+	  });
+	  
 	});
 	
 	
@@ -488,10 +471,10 @@
 		 <p class="validateTips"></p>
 		<form id="form2" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
 			<fieldset>
-				<label for="name">Nombre </label>
-				<input style='display:block;' type="text" name="name" id="name" class="text ui-widget-content ui-corner-all" onkeyup='comprobarCarpeta(this)' size='50' />
-				<label for="ruta">Ruta </label>
-				<input style='display:block;' type="text" name="ruta" id="ruta" class="text ui-widget-content ui-corner-all" size='50' disabled value='{{ formulario_carpeta.ruta.vars.value }}' />
+				<label for="crear_carpeta_nombre">Nombre </label>
+				<input style='display:block;' type="text" name="crear_carpeta_nombre" id="crear_carpeta_nombre" class="text ui-widget-content ui-corner-all" size='50' onkeyup='comprobarCarpeta(this)' />
+				<label for="crear_carpeta_ruta">Ruta </label>
+				<input style='display:block;' type="text" name="crear_carpeta_ruta" id="crear_carpeta_ruta" class="text ui-widget-content ui-corner-all" size='50' disabled value='{{ formulario_carpeta.ruta.vars.value }}' />
 			</fieldset>
 		</form>
 	</div>

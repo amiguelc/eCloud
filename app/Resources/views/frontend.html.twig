@@ -17,7 +17,7 @@
 	{% endjavascripts %}
 {% endblock %}
 {% block body %}
-<div id="contenedor">
+<section id="contenedor">
 	<header>
 		<a href="{{ path('home') }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>
 		
@@ -84,13 +84,10 @@
 	<img class='bgbox' src="{{ asset('bundles/usuario/images/imagen_portada.png') }}">
 		{% block article %}{% endblock %}
 	</article>
+	
+</section>
 	<!--
 	<aside>
-		## FORMULARIO DE LOGIN ##
-		<section id="nosotros">
-		<h2>Sobre nosotros</h2>
-		<p>Lorem ipsum dolor sit amet...</p>
-		</section>
 	</aside>
 	-->
 	<footer>
@@ -100,7 +97,4 @@
 		<a class='footer_links' href="{{ path('privacidad') }}">Privacidad</a>
 		<a class='footer_links' href="{{ path('sobre-nosotros') }}">Sobre nosotros</a>
 	</footer>
-</div>
-
-
 {% endblock %}
