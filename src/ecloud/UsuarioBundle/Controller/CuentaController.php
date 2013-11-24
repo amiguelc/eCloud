@@ -346,7 +346,7 @@ class CuentaController extends Controller{
 							}
 						}
 						else{
-						//Comprobaciones a fichero			
+						//Comprobaciones a fichero. Falta añadir if is sets.	
 							if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['ruta'])==1){ return  $response = new Response("Error en la ruta del fichero");}
 							if(preg_match("/\.\.\//",$_POST['form']['ruta'])==1){ return  $response = new Response("No se permite rutas con ../");}
 							if(preg_match("/(\/|\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_FILES['form']['name']['file'])==1){ return  $response = new Response("Error en el nombre del fichero");}

@@ -111,13 +111,27 @@
 				else{
 				  datos.libre = (Math.round(datos.libre * 100 / 1024) / 100).toString() + 'KB';
 				}
-			document.getElementById('fileName2').innerHTML = 'Name: ' + file.name +"<br>Error: Te quedan solo "+datos.libre+" libres. Y el fichero seleccionado ocupa "+fileSize;
+			//document.getElementById('fileName2').innerHTML = 'Name: ' + file.name +"<br>Error: Te quedan solo "+datos.libre+" libres. Y el fichero seleccionado ocupa "+fileSize;
+			//document.getElementById('form_file2').value="";
+			document.getElementById('subiendofichero2').innerHTML='<fieldset>Nombre: ' + file.name +"<br><br><span style='color:red;'>Error: Te quedan solo "+datos.libre+" libres. Y el fichero seleccionado ocupa "+fileSize+"</span></fieldset>";
 			document.getElementById('form_file2').value="";
 		}
 		else{
-		document.getElementById('fileName2').innerHTML = 'Name: ' + file.name;
-		document.getElementById('fileSize2').innerHTML = 'Size: ' + fileSize;
-		document.getElementById('fileType2').innerHTML = 'Type: ' + file.type;
+		// En vez de coger el elemento, crearlo directamente.
+		/*
+		<div id="subiendofichero">
+			<div id="ruta2">{{ formulario.ruta.vars.value }}</div>
+			<div id="fileName2"></div>
+			<div id="fileSize2"></div>
+			<div id="fileType2"></div>
+			
+		</div>
+		<div id="progressNumber2"></div>
+		*/
+		document.getElementById('subiendofichero2').innerHTML="<fieldset>Nombre: "+file.name+"<br> Tama&ntilde;o: "+fileSize+"<br>Ruta: "+document.getElementById('ruta').value+"</fieldset>";
+		//document.getElementById('fileName2').innerHTML = 'Name: ' + file.name;
+		//document.getElementById('fileSize2').innerHTML = 'Size: ' + fileSize;
+		//document.getElementById('fileType2').innerHTML = 'Type: ' + file.type;
 		}
 		}, 'json');
 	  }
@@ -155,6 +169,51 @@
 			}
 			
 		  var fd = new FormData(document.getElementById('form1'));
+		  //console.log(fd);
+		  /* event listners */
+		  xhr.upload.addEventListener("progress", uploadProgress, false);
+		  xhr.addEventListener("load", uploadComplete, false);
+		  xhr.addEventListener("error", uploadFailed, false);
+		  xhr.addEventListener("abort", uploadCanceled, false);
+		  /* Be sure to change the url below to the url of your upload server side script */
+		  xhr.open("POST", dir);
+		  xhr.send(fd);
+		   }
+		}
+	}
+	
+	function uploadFile2() {
+	
+	//Comprobaciones de que no falten datos, form_ruta y max_file_size, en el lado del servidor tambien.
+	if(document.getElementById('form_file2').value==="" || document.getElementById('ruta').value===undefined || document.getElementById('form__token').value===undefined){
+		 alert("Error en la subida. Faltan datos");
+	}
+	else{
+		//Comrpobaciones de nombres con caracteres no permitidos.
+		var cadena=document.getElementById('form_file2').value;
+		if (caracteresprohibidos(cadena)==true){
+			alert("El nombre del fichero tiene caracteres no permitidos");
+			document.getElementById('form_file').value="";
+		}
+		else{
+			if (location.pathname.match(/^\/app_dev.php\/ficheros/)!=null){
+				var dir=location.protocol+"//"+location.hostname+"/app_dev.php/subir";
+			}
+			else if(location.pathname.match(/^\/app.php\/ficheros/)!=null){
+				var dir=location.protocol+"//"+location.hostname+"/app.php/subir";
+			}
+			else{
+				var dir=location.protocol+"//"+location.hostname+"/subir";
+			}
+			
+			if(window.XMLHttpRequest) {
+			  xhr = new XMLHttpRequest();
+			}
+			else {
+			  xhr = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			
+		  var fd = new FormData(document.getElementById('form2'));
 		  /* event listners */
 		  xhr.upload.addEventListener("progress", uploadProgress, false);
 		  xhr.addEventListener("load", uploadComplete, false);
@@ -263,6 +322,7 @@
 	}
 	
 	function mostrarOpciones(elemento,event){
+	$('#'+elemento.id).css("background-color", "#e3e3e3");
 	var idfichero=$("#"+elemento.id).attr("idfichero");
 	var url="{{ path('borrar', { 'fichero': '000000000000000000000000000000000000000000' }) }}";
 	url_borrar=url.replace("000000000000000000000000000000000000000000", idfichero);
@@ -271,7 +331,9 @@
 	$("#cambiar_nombre_tr").attr("onclick","window.location.href='"+url_modificar+"'");
 	$("#mover_tr").attr("onclick","window.location.href='"+url_modificar+"'");
 	$("#eliminar_tr").attr("onclick","borrarNodo('"+elemento.id+"', '"+url_borrar+"')");
-	$("#propiedades_tr").attr("onclick","window.location.href='"+url_propiedades+"'");
+	//$("#propiedades_tr").attr("onclick","window.location.href='"+url_propiedades+"'");
+	$("#propiedades_tr").attr("idfichero",$('#'+elemento.id).attr("idfichero"));
+	//alert($('#'+elemento.id).attr("idfichero"));
 	$("#menu").menu();
 	$("#menu").css("left", event.clientX);
 	$("#menu").css("top", event.clientY);
@@ -321,6 +383,7 @@
 			//location.reload(true);
 		}
 	
+	// DIALOGOS //
 	 $( "#dialogo_crear_carpeta" ).dialog({
 		autoOpen: false,
 		//height: 300,
@@ -387,7 +450,7 @@
 		//height: 300,
 		width: 550,
 		modal: true,
-		title: "Subir archivo",
+		title: "Subir archivo a "+document.getElementById('ruta').value,
 		buttons: {
 		"Subir": function() {
 					
@@ -395,6 +458,7 @@
 		allFields.removeClass( "ui-state-error" );
 		//bValid = bValid && checkLength( nombre_carpeta, " del nombre del fichero", 1, 255 );
 		//Igual a comprobarNombreCarpeta().
+		//sacar nombre, ruta, validar ambos y comprobar si existe. aunque como de momento se hace en el servidor tmb...
 		//if (caracteresprohibidos(nombre_carpeta.val())==true){nombre_carpeta.addClass( "ui-state-error" );updateTips("No se permiten caracters raros");bValid = bValid && false;}
 		//if (caracteresprohibidos(ruta.val(), "/")==true){ruta.addClass( "ui-state-error" );updateTips("No se permiten caracters raros");bValid = bValid && false;}
 		if ( bValid ) {
@@ -416,12 +480,14 @@
 			else {
 			  xhr = new ActiveXObject("Microsoft.XMLHTTP");
 			}
-			/*
+			
 			var fd = new FormData();
-			fd.append("form[nombrefichero]", fichero.val());
+			fd.append("form[file]", document.getElementById('form_file2').files[0]);
 			fd.append("form[ruta]", ruta.val());
 			fd.append("form[_token]", document.getElementById("form__token").value);
+			fd.append("MAX_FILE_SIZE", document.getElementById("max_file_size").value);
 			console.log(fd);
+			
 			//event listners
 			//xhr.upload.addEventListener("progress", uploadProgress, false);
 			xhr.addEventListener("load", respuestaAjax, false);
@@ -432,7 +498,7 @@
 			xhr.send(fd);				
 			
 			//$( this ).dialog( "close" );
-			*/
+			
 			}
 		},
 		Cancel: function() {
@@ -443,9 +509,74 @@
 			allFields.val( "" ).removeClass( "ui-state-error" );
 		}
 	});
+	
+	
+	$( "#dialogo_propiedades" ).dialog({
+		autoOpen: false,
+		//height: 300,
+		width: "auto",
+		modal: true,
+		title: "Propiedades",
+		buttons: {
+		cerrar: function() {
+			//innnerHTML="";
+			$(this).dialog("close");
+			}
+		},
+		open: function( event, ui ) {
+		//peticion ajax a fichero/id
+		//alert("e");
+		var idfichero=$('#propiedades_tr').attr("idfichero");
+		$.ajax({
+			url: "api/fichero/"+idfichero,
+			type: 'GET',
+			data: {},
+			success: function(data,textStatus,jqXHR){
+				if (data[0].tipo=="fichero"){
+					//Procesar fecha
+					var date = new Date(data[0].fechaSubida['timestamp']*1000);
+					var _mes=date.getMonth()+1; //getMonth devuelve el mes empezando por 0
+					var _dia=date.getDate(); //getDate devuelve el dia del mes
+					var _anyo=date.getFullYear();
+					var fechaSubida=_dia+"-"+_mes+"-"+_anyo+" "+addZeroo(date.getHours())+":"+addZeroo(date.getMinutes());
+					//Falta procesar tamaño
+					var tamanyo=data[0].filesize;
+					var contenido="Nombre: "+data[0].nombreFichero+"<br>Ruta: "+data[0].ruta+"<br>Tama&ntilde;o: "+tamanyo+"<br> Fecha Subida: "+fechaSubida+"<br>Checksum: "+data[0].checksum;
+				}else if(data[0].tipo=="carpeta"){
+					//Procesar fecha
+					var date = new Date(data[0].fechaSubida['timestamp']*1000);
+					var _mes=date.getMonth()+1; //getMonth devuelve el mes empezando por 0
+					var _dia=date.getDate(); //getDate devuelve el dia del mes
+					var _anyo=date.getFullYear();
+					var fechaSubida=_dia+"-"+_mes+"-"+_anyo+" "+addZeroo(date.getHours())+":"+addZeroo(date.getMinutes());
+					//Falta procesar tamaño
+					var tamanyo=data[0].filesize;
+					
+					var contenido="Carpeta: "+data[0].nombreFichero+"<br> Ruta: "+data[0].ruta+"<br>Fecha subida: "+fechaSubida;
+				}
+				else{
+					var contenido="Fichero no encontrado";
+				}
+				$('#respuesta_propiedades').html(contenido);
+			},
+			dataType: "json"
+		})
+		
+		}
+	});
+	
+	
+	
+	
+	
 		
 		//Con un click cerrar el menu de fichero.
-		$(document).click(function (e) { $("#menu").hide(); $("#menu").css("top", ""); $("#menu").css("left", ""); });
+		$(document).click(function (e) { 
+			$("#menu").hide(); 
+			$("#menu").css("top", "");
+			$("#menu").css("left", ""); 
+			$(".tr").css("background-color","");
+		});
 		
 		//Abrir Dialogos
 		$("#button_crear_carpeta").click(function(){
@@ -453,7 +584,21 @@
 		});
 		$("#button_dialogo_subir").click(function(){
 			$( "#dialogo_subir" ).dialog( "open" );
+		});
+		//$("#button_dialogo_subir").click(function(){
+		//	$( "#dialogo_subir" ).dialog( "open" );
+		//});
+		$("#propiedades_tr").click(function(){
+			var idfichero="49";
+			$( "#dialogo_propiedades" ).dialog( "open" );
+			
 		});	
+		
+		//Hover del botton de file form_file2
+		$( "#form_file2" ).hover(
+			function() {$( "#button_form_file2" ).css( "background-color", "#888" ) ;},
+			function() {$( "#button_form_file2" ).css( "background-color", "#bbb" ) ;}
+		);
 		
 		//Antiguamente
 		$("#button_subir").click(function(){
@@ -509,7 +654,14 @@
 	$(window).resize(function(){
 	  // $('#dialogo_subir').center();
 	});
-		
+	
+	function addZeroo(num){
+		if (num<10){
+			num="0"+num;
+		}
+		return num;
+	}
+	
 </script>
 
 <section>
@@ -594,28 +746,27 @@
 	</div>
 	-->
 	
-	<div id='dialogo_subir'>
+	<div id='dialogo_subir' style="display:none;">
 		<p class="validateTips"></p>
 		<form id="form1" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario) }}>
 			<fieldset>
-				<label for="form[file]">Selecciona fichero... </label>
-				<input style='display:block;' type="file" id="form_file2" name="form[file]" required="required" onchange="fileSelected2()" />
-				<label for="subir_nombre">Fichero </label>
+				Selecciona fichero...   <button id="button_form_file2" class='medium grey button'>Examinar...</button><input style='position:relative;width:110px;top:-2px;left:-105px;z-index:2;opacity:0;-moz-opacity:0;filter:alpha(opacity:0);' type="file" id="form_file2" name="form[file]" required="required" onchange="fileSelected2()" />
+				<br>
+				
+				<!--<label for="subir_nombre">Fichero </label>
 				<input style='display:block;' type="text" name="subir_nombre" id="subir_nombre" class="text ui-widget-content ui-corner-all" size='50' onchange='comprobarNombreCarpeta(this)' />
 				<label for="ruta">Ruta </label>
 				<input style='display:block;' type="text" name="ruta" id="ruta" class="text ui-widget-content ui-corner-all" size='50' disabled value='{{ formulario.ruta.vars.value }}' />
-				<input id="max_file_size" type="hidden" name="MAX_FILE_SIZE" value="" /></td>
+				-->
+				<input id="max_file_size" type="hidden" name="MAX_FILE_SIZE" value="" />
 			</fieldset>
-		</form>
-		<div id="subiendofichero">
-			<div id="fileName2"></div>
-			<div id="fileSize2"></div>
-			<div id="fileType2"></div>
-		</div>
-		<div id="progressNumber2"></div>
+			
+			<div id="subiendofichero2">
+			</div>
+		</form>	
 	</div>
 	
-	<div id='dialogo_crear_carpeta'>
+	<div id='dialogo_crear_carpeta'  style="display:none;">
 		<p class="validateTips"></p>
 		<form id="form2" action="{{ path('subir') }}" method="POST" {{ form_enctype(formulario_carpeta) }}>
 			<fieldset>
@@ -625,6 +776,12 @@
 				<input style='display:block;' type="text" name="ruta" id="ruta" class="text ui-widget-content ui-corner-all" size='50' disabled value='{{ formulario_carpeta.ruta.vars.value }}' />
 			</fieldset>
 		</form>
+	</div>
+	
+	<div id='dialogo_propiedades' style="display:none;">
+		<div id="respuesta_propiedades">
+		
+		</div>		
 	</div>
 	
 	
