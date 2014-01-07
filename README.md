@@ -1,8 +1,15 @@
 <h1>eCloud</h1>
 
-<h2>Tu servidor de descargas -> En construcción, todavia no es funcional.</h2>
+<h2>Tu servidor de descargas -> En construcción, todavia no es funcional, ni lo será.</h2>
+
+<h3>¿Que es?</h3>
 
 
+Un servidor de descargas programado con el framework de php Symfony2.<br>
+Lo utilizo como método de aprendizaje de php, javascript, ajax, jquery, symfony2 y github.com. <br>
+Ademas pretendo agregarle un cliente en java y android, todo para aprender programación.<br>
+
+<br><br>
 Requisitos
 <ul>
 	<li>Windows.</li>
@@ -35,7 +42,7 @@ Requisitos
 		&#60;VirtualHost *:80&#62;
 			DocumentRoot "[ruta a espacio web]\symfony\web"
 			DirectoryIndex app.php
-			ServerName ecloud
+			ServerName [dominio de tu web]
 		&#60;Directory "[ruta a espacio web]\symfony\web"&#62;
 			AllowOverride All
 			Order allow,deny

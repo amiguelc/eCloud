@@ -12,125 +12,141 @@ root:
         path: /home
         permanent: true
 home:
-    pattern: /home
+    path: /home
     defaults: { _controller: UsuarioBundle:Sitio:Home }
 
 ################################################################################################ USUARIOS
 login:
-    pattern: /login
+    path: /login
     defaults: { _controller: UsuarioBundle:Security:login }
 login_check:
-    pattern: /login_check
+    path: /login_check
 logout:
-    pattern: /logout
+    path: /logout
 registro:
     path: /registro
     defaults: { _controller: UsuarioBundle:Registro:Registro}
 
 #PERFILES, PROTEGIDO BAJO FIREWALL
 perfil:
-    pattern: /perfil
+    path: /perfil
     defaults: { _controller: UsuarioBundle:Cuenta:perfil }
 ficheros:
-    pattern: /ficheros
+    path: /ficheros
     defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
 _ficheros:
-    pattern: /ficheros/
+    path: /ficheros/
     defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
 ficheros2:
-    pattern: /ficheros/{ruta}
+    path: /ficheros/{ruta}
     defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
     requirements:
         ruta: ".+"
 _ficheros2:
-    pattern: /ficheros/{ruta}/
+    path: /ficheros/{ruta}/
     defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
     requirements:
         ruta: ".+"
 fichero:
-    pattern: /fichero/{id}
+    path: /fichero/{id}
     defaults: { _controller: UsuarioBundle:Cuenta:fichero, id: 0 }
 subir:
-    pattern: /subir
+    path: /subir
     defaults: { _controller: UsuarioBundle:Cuenta:subir }
 modificar:
-    pattern: /modificar/{fichero}
+    path: /modificar/{fichero}
     defaults: { _controller: UsuarioBundle:Cuenta:modificar, fichero: 0 }
 borrar:
-    pattern: /borrar/{fichero}
+    path: /borrar/{fichero}
     defaults: { _controller: UsuarioBundle:Cuenta:borrar }
 descargar:
-    pattern: /descargar/{fichero}
+    path: /descargar/{fichero}
     defaults: { _controller: UsuarioBundle:Cuenta:descargar }
 eventos:
-    pattern: /eventos
+    path: /eventos
     defaults: { _controller: UsuarioBundle:Cuenta:eventos }
 links:
-    pattern: /links
+    path: /links
     defaults: { _controller: UsuarioBundle:Cuenta:links, id: 0 }
 borrarlink:
-    pattern: /borrarlink/{id}
+    path: /borrarlink/{id}
     defaults: { _controller: UsuarioBundle:Cuenta:borrarlink, id: 0 }
 ################################################################################################ API
+api_conectado:
+    path: /api/conectado
+    defaults: { _controller: UsuarioBundle:Cuenta:conectado }
 api_perfil:
-    pattern: /api/perfil/{info}
+    path: /api/perfil/{info}
     defaults: { _controller: UsuarioBundle:Cuenta:perfiljson, info: all }
 api_ficheros:
-    pattern: /api/ficheros
-    defaults: { _controller: UsuarioBundle:Cuenta:ficherosjson }
+    path: /api/ficheros
+    defaults: { _controller: UsuarioBundle:Cuenta:ficherosjson, ruta: / }
+_api_ficheros:
+    path: /api/ficheros/
+    defaults: { _controller: UsuarioBundle:Cuenta:ficherosjson, ruta: / }
+api_ficheros2:
+    path: /api/ficheros/{ruta}
+    defaults: { _controller: UsuarioBundle:Cuenta:ficherosjson, ruta: / }
+    requirements:
+        ruta: ".+"
 api_fichero:
-    pattern: /api/fichero/{id}
+    path: /api/fichero/{id}
     defaults: { _controller: UsuarioBundle:Cuenta:ficherojson, id: 0 }
 api_eventos:
-    pattern: /api/eventos/{info}
-    defaults: { _controller: UsuarioBundle:Cuenta:eventosjson, info: all }
+    path: /api/eventos/desde={desde}&hasta={hasta}&start={start}&cantidad={cantidad}&nocache={nocache}
+    defaults: { _controller: UsuarioBundle:Cuenta:eventosjson, desde: 1, hasta: 1, start: 0, cantidad: 100000}
+    requirements:
+        desde: "^(([0-2]\d|[3][0-1])\-([0]\d|[1][0-2])\-[2][0]\d{2})$"
+        hasta: "^(([0-2]\d|[3][0-1])\-([0]\d|[1][0-2])\-[2][0]\d{2})$"
+        start: "^[0-9]{1,6}"
+        cantidad: "^[0-9]{1,6}"
 ################################################################################################ Descarga Externa
 download:
-    pattern: /!{descarga}
+    path: /!{descarga}
     defaults: { _controller: UsuarioBundle:Cuenta:download, descarga: 0 }
 ############################################################################################## SECCION ADMIN
 admin_home:
-    pattern: /admin
+    path: /admin
     defaults: { _controller: AdminBundle:Admin:home }
 _admin_home:
-    pattern: /admin/
+    path: /admin/
     defaults: { _controller: AdminBundle:Admin:home }
 admin_usuarios:
-    pattern: /admin/usuarios/{id}
+    path: /admin/usuarios/{id}
     defaults: { _controller: AdminBundle:Admin:usuarios, id: 0 }
 admin_usuarios_modificar:
-    pattern: /admin/usuarios/modificar/{id}
+    path: /admin/usuarios/modificar/{id}
     defaults: { _controller: AdminBundle:Admin:modificarusuarios, id: 0 }
 admin_usuarios_borrar:
-    pattern: /admin/usuarios/borrar/{id}
+    path: /admin/usuarios/borrar/{id}
     defaults: { _controller: AdminBundle:Admin:borrarusuarios }
 admin_stats:
-    pattern: /admin/stats
+    path: /admin/stats
     defaults: { _controller: AdminBundle:Admin:stats }
 admin_login:
-    pattern: /admin/login
+    path: /admin/login
     defaults: { _controller: AdminBundle:AdminSecurity:login }
 admin_login_check:
-    pattern: /admin/login_check
+    path: /admin/login_check
 admin_logout:
-    pattern: /admin/logout
+    path: /admin/logout
 
 ################################################################################################ PAGINAS ESTATICAS FRONTEND AL FINAL, YA QUE ES CUANDO LAS OTRAS NO LAS ENCUENTRA
 ayuda:
-    pattern: /ayuda
+    path: /ayuda
     defaults: { _controller: UsuarioBundle:Sitio:ayuda }
 contacto:
-    pattern: /contacto
+    path: /contacto
     defaults: { _controller: UsuarioBundle:Sitio:contacto }
 privacidad:
-    pattern: /privacidad
+    path: /privacidad
     defaults: { _controller: UsuarioBundle:Sitio:privacidad }
 sobre-nosotros:
-    pattern: /sobre-nosotros
+    path: /sobre-nosotros
     defaults: { _controller: UsuarioBundle:Sitio:sobrenosotros }
 #No encontrado -> Home
 Noencontrado:
-    pattern: /{pagina}
+    path: /{pagina}
     defaults:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /home

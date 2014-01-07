@@ -18,39 +18,183 @@
                       replace(/%3E/g, '&gt;'));
   }
   
- 
-    // Cargar JSON según URL
-    switch (location.pathname){
+	//AL cargar la página
+	$( document ).ready(function() {
+		// Handler for .ready() called.
+		dibujarTabla();
+		if (location.pathname.match(/eventos$/)!=null){
+			cargarContenido('GET','api/eventos/desde=22-09-2013&hasta=22-12-2013&start=0&cantidad=20&nocache='+Math.random(), agregarEventos);
+		}					
+	});
 	
-	case "/eventos":
-	cargarContenido('GET','api/eventos/min?nocache='+Math.random(), muestraEventos);
-	break;
-	case "/app_dev.php/eventos":
-	cargarContenido('GET','api/eventos/min?nocache='+Math.random(), muestraEventos);
-	break;
-	case "/app.php/eventos":
-	cargarContenido('GET','api/eventos/min?nocache='+Math.random(), muestraEventos);
-	break;
+	function cargarEventos(desde,hasta,start,cantidad){
+		//Falta: comprobaciones y tal.
+		desde2=desde[0]+desde[1]+"-"+desde[3]+desde[4]+"-"+desde[6]+desde[7]+desde[8]+desde[9];
+		hasta2=hasta[0]+hasta[1]+"-"+hasta[3]+hasta[4]+"-"+hasta[6]+hasta[7]+hasta[8]+hasta[9];
+		cargarContenido('GET','api/eventos/desde='+desde2+'&hasta='+hasta2+'&start='+start+'&cantidad='+cantidad+'&nocache='+Math.random(), agregarEventos);
+		
+		document.getElementById('desde').value=desde;		
+		document.getElementById('hasta').value=hasta;		
+		
+		document.getElementById('start').value=start+cantidad;		
+		document.getElementById('cantidadAnterior').value=cantidad;
+	}
+	
+	
+	
+	
+  
+	function cargarContenido(metodo,url,funcion) {
+  
+		// Instanciar objeto XMLHttpRequest
+		if(window.XMLHttpRequest) {
+		  peticion = new XMLHttpRequest();
+		}
+		else {
+		  peticion = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		
+		// Preparar función de respuesta
+		//if(contenedor==''){peticion.onreadystatechange = funcion;}else{peticion.onreadystatechange = funcion(contenedor);}
+		peticion.onreadystatechange = funcion;
+		// Realizar petición
+		peticion.open(metodo, url, true);
+		peticion.send(null);
   }
   
-  function cargarContenido(metodo,url,funcion) {
   
-    // Instanciar objeto XMLHttpRequest
-    if(window.XMLHttpRequest) {
-      peticion = new XMLHttpRequest();
-    }
-    else {
-      peticion = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    
-    // Preparar función de respuesta
-	//if(contenedor==''){peticion.onreadystatechange = funcion;}else{peticion.onreadystatechange = funcion(contenedor);}
-	peticion.onreadystatechange = funcion;
-    // Realizar petición
-    peticion.open(metodo, url, true);
-    peticion.send(null);
-  }
+	function dibujarTabla(){
+		div = document.getElementById('tabla');
   
+		var tabla;		
+		var caption = "<caption>{{ app.user.nombreusuario }} <div style='float:right;font-weight:normal;font-size: 0.8em' id='opcionesTabla'><input id='cantidadAnterior' type='hidden' value='20'><input id='start' type='hidden' value='20'> Mostrar <input id='cantidad' type='text' value='20' size='2' maxlength='3'> Desde: <input type='text' id='desde' maxlength='10' size='10' > Hasta: <input type='text' id='hasta' maxlength='10' size='10' > </caption>";
+		var cab = "<tr>";
+		var cuerpo = "";
+		cab="<tr><th style='width:87%;'>Acci&oacuten</th><th> </th>";
+		tabla = "<table id='tabla1'>"+ caption + cab + "</tr>" + cuerpo + "</table>";
+		tabla += "<br><div id='mostrarMas' > <div id='mostrarMas1' style='margin-left:auto;margin-right:auto;width:7em;'>";
+		tabla += "<a href='#' onclick=\"cargarEventos(document.getElementById('desde').value,document.getElementById('hasta').value,document.getElementById('start').value,document.getElementById('cantidad').value)\"> Mostrar mas</a>";
+		tabla += "</div><br><br></div>";
+		div.innerHTML = tabla;
+		
+		$( "#desde" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", "-3m");;		
+		$( "#hasta" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", new Date());
+		$( "#mostrarMas").css("width", $( "#tabla1").width()-$("#mostrarMas1").width()); 
+		
+		//tooltipear();
+		
+    }
+	
+
+	function agregarEventos(){
+		
+		if(peticion.readyState == 4) {
+		 
+		  if(peticion.status == 200) {
+		 
+			// Borrar datos anteriores
+			//limpia(contenedor);
+		  
+			div = document.getElementById('tabla');
+			
+			//JSON
+			var arr = eval ("(" + peticion.responseText+ ")"); 
+			
+			var cuerpo = "";
+			var color="";
+			var idfichero="";
+			for(var i=0;i<arr.length;i++){
+				var obj = arr[i];
+				cuerpo = cuerpo + "<tr>";
+				for(var key in obj){
+					//Para saltar campos
+					//alert(key);
+					if(key=="tipo" || key=="fecha"){
+					
+						var attrName = key;
+						var attrValue = obj[key];
+						
+						if(attrName=="tipo"){
+						var texto="";
+							if(attrValue=="10" ){
+								//Has subido fichero...
+								color="#B5FFB5";
+								texto="Has subido el fichero <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
+								
+							}
+							else if(attrValue=="11"){
+								//Has creado la carpeta...
+								color="#B5FFB5";
+								texto="Has creado la carpeta <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a> en "+obj['ruta'];
+							}
+							else if(attrValue=="20"){
+								//Has cambiado el nombre al fichero...
+								color="#FFFF00";				
+								texto="Has cambiado el nombre al fichero "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
+							}
+							else if(attrValue=="21"){
+								//Has cambiado el nombre a la carpeta...
+								color="#FFFF00";									
+								texto="Has cambiado el nombre a la carpeta "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
+							}
+							else if(attrValue=="30"){
+								//Has movido el fichero...
+								color="#FFFF00";				
+								texto="Has movido el fichero "+obj['nombreFicheroNuevo']+" a "+obj['ruta'];
+							}
+							else if(attrValue=="31"){
+								//Has movido la carpeta...
+								color="#FFFF00";									
+								texto="Has movido la carpeta "+obj['nombreFicheroNuevo']+" a "+obj['ruta'];
+							}
+							else if(attrValue=="40"){
+								//Has cambiado el fichero...y lo has movido a...
+								color="#FFFF00";				
+								texto="Has cambiado el nombre al fichero "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+"</a> y lo has movido a "+obj['ruta']+"";
+							}
+							else if(attrValue=="41"){
+								//Has cambiado el nombre a la carpeta...y lo has movido a...
+								color="#FFFF00";									
+								texto="Has cambiado el nombre a la carpeta "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+"</a> y lo has movido a "+obj['ruta']+"";
+							}
+							else if(attrValue=="50"){
+								//Has borrado fichero... 
+								color="#FFB5B5";
+								texto="Has borrado el fichero "+obj['nombreFicheroNuevo']+" de "+obj['ruta'];
+							}
+							else if(attrValue=="51"){
+								//Has borrado carpeta...
+								color="#FFB5B5";
+								texto="Has borrado la carpeta "+obj['nombreFicheroNuevo']+" de "+obj['ruta'];
+							}
+							else if(attrValue=="0"){texto="Te has registrado!";color="#95FF95";}
+							else {color="";}
+							
+							cuerpo = cuerpo + "<td style='background-color:"+color+";' > "+texto+"</td>";
+							idFichero="";
+						}
+						else if(attrName=="fecha"){
+							var date = new Date(attrValue['timestamp']*1000);
+							var _mes=date.getMonth()+1; //getMonth devuelve el mes empezando por 0
+							var _dia=date.getDate(); //getDate devuelve el dia del mes
+							var _anyo=date.getFullYear();
+							cuerpo = cuerpo + "<td style='text-align:right;background-color:"+color+";'>" + _dia+"/"+_mes+"/"+_anyo + " "+addZeroo(date.getHours())+":"+addZeroo(date.getMinutes())+"</td>";
+						}
+						else if(attrName==null){cuerpo = cuerpo +"<td></td>";}
+						else{cuerpo = cuerpo + "<td>" + attrValue + "</td>";
+						}
+					}
+				}
+				cuerpo = cuerpo + "</tr>";
+			}
+				
+			//Agregar datos a la tabla
+			//$("#tabla1:last-child").html();
+			$("#tabla1").append(cuerpo);
+			}
+		}
+	}
+ 
   
   // Función de respuesta
   function muestraEventos() {
@@ -68,7 +212,8 @@
 		
 		
 		// Formatear JSON en una tabla
-		var tabla;
+		var tabla; 
+		var caption = "<caption>{{ app.user.nombreusuario }} <div style='float:right;font-weight:normal;font-size: 0.8em' id='opcionesTabla'><input id='cantidadAnterior' type='hidden' value='20'><input id='start' type='hidden' value='20'> Mostrar <input id='cantidad' type='text' value='20' size='2' maxlength='3'> Desde: <input type='text' id='desde' maxlength='10' size='10' > Hasta: <input type='text' id='hasta' maxlength='10' size='10' > </caption>";
 		var cab = "<tr>";
 		var cuerpo = "";
 		var color="";
@@ -137,7 +282,7 @@
 							color="#FFB5B5";
 							texto="Has borrado la carpeta "+obj['nombreFicheroNuevo']+" de "+obj['ruta'];
 						}
-						else if(attrValue=="0"){color="#95FF95";}
+						else if(attrValue=="0"){texto="Te has registrado!";color="#95FF95";}
 						else {color="";}
 						
 						cuerpo = cuerpo + "<td style='background-color:"+color+";' > "+texto+"</td>";
@@ -163,15 +308,27 @@
 			cuerpo = cuerpo + "</tr>";
 		}
 		cab="<tr><th style='width:87%;'>Acci&oacuten</th><th> </th>";
-		tabla = "<table>" + cab + "</tr>" + cuerpo + "</table>";
+		tabla = "<table id='tabla1'>"+ caption + cab + "</tr>" + cuerpo + "</table>";
+		tabla += "<br><div id='mostrarMas' > <div id='mostrarMas1' style='margin-left:auto;margin-right:auto;width:7em;'>";
+		tabla += "<a href='#' onclick=\"cargarEventos(document.getElementById('desde').value,document.getElementById('hasta').value,document.getElementById('start').value,document.getElementById('cantidad').value)\"> Mostrar mas</a>";
+		tabla += "</div><br><br></div>";
 		div.innerHTML = tabla;
-		
 		peticion="";
+		
+		$( "#desde" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", "-3m");;		
+		$( "#hasta" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", new Date());
+		$( "#mostrarMas").css("width", $( "#tabla1").width()-$("#mostrarMas1").width()); 
+		
 		tooltipear();
+		
       }
     }
 	
   }
+ 
+  
+  
+  
   
   //Sin terminar, es la plantilla para crear tablas.
   function muestraFicheros() {
@@ -311,8 +468,8 @@
 		return num;
 	}
 	
-	
 	</script>
+	
 	
 	<div class="tabla" id="tabla">
 	

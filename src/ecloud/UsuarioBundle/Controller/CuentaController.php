@@ -95,6 +95,12 @@ class CuentaController extends Controller{
 					case "email":
 						$jsonContent=$usuario->getEmail();
 						break;
+					case "perfil":
+						$jsonContent="{\"email\":\"".$usuario->getemail()."\", \"nombreUsuario\":\"".$usuario->getNombreUsuario()."\", \"nombre\":\"".$usuario->getNombre()."\", \"apellidos\":\"".$usuario->getApellidos()."\", \"direccion\":\"".$usuario->getdireccion()."\", \"ciudad\":\"".$usuario->getciudad()."\", \"pais\":\"".$usuario->getpais()."\", \"fechaRegistro\":\"".$usuario->getfechaRegistro()->format('d/m/Y H:i:s')."\", \"limite\":\"".$usuario->getlimite()."\", \"ocupado\":\"".$usuario->getocupado()."\"}";
+						break;
+					case "min":
+						$jsonContent="{\"idUser\":\"".$usuario->getidUser()."\",\"email\":\"".$usuario->getemail()."\", \"nombreUsuario\":\"".$usuario->getNombreUsuario()."\"}";
+						break;
 					case "nombreusuario":
 						$jsonContent=$usuario->getNombreUsuario();
 						break;
@@ -217,40 +223,37 @@ class CuentaController extends Controller{
 		
 		}
 		
-		public function ficherosjsonAction(){
-		
-		//leer los ficheros de la base de datos y pasarselos a twig con ajax, aqui se complica mucho la cosa
-		//quizas con codigo javascript se pueda subir algun fichero
+		public function ficherosjsonAction($ruta){
 		
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
 			
-			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
-			
-			if ($this->getRequest()->isMethod('POST')) {
-			}else{
-				$ficheros=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid));
+				$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 				
-				//PASAR BYTES A MB
-				
-				foreach ($ficheros as $clave => $valor){
-				$ficheros[$clave]->setFilesize(round(($ficheros[$clave]->getFilesize()/1024/1024),2));
+				if ($this->getRequest()->isMethod('POST')) {
+				}else{
+						//Validar y procesar ruta para que no falle en el SQL. Se podria utilizar el id de la carpeta en vez del nombre y ruta.. Seria mas rapido, sencillo y seguro. Ademas si id no existe dar error.
+						if ($ruta!="/"){$ruta="/".$ruta;}
+						
+						$ficheros=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'ruta' => $ruta));
+					
+						//PASAR BYTES A MB
+						
+						foreach ($ficheros as $clave => $valor){
+							$ficheros[$clave]->setFilesize(round(($ficheros[$clave]->getFilesize()/1024/1024),2));
+						}
+						
+					
+						//JSON
+						$encoders = array(new XmlEncoder(), new JsonEncoder());
+						$normalizers = array(new GetSetMethodNormalizer());
+						$serializer = new Serializer($normalizers, $encoders);		
+						$jsonContent = $serializer->serialize($ficheros, 'json');
+						return new Response ($jsonContent);
 				}
-				
-			}
-			
-			//JSON
-			$encoders = array(new XmlEncoder(), new JsonEncoder());
-			$normalizers = array(new GetSetMethodNormalizer());
-			$serializer = new Serializer($normalizers, $encoders);		
-			$jsonContent = $serializer->serialize($ficheros, 'json');
-			return new Response ($jsonContent);
-			//JSON
-			
-			}
+			}			
 			else{
 					return $this->redirect($this->generateUrl('login'), 301);
-			}
-		
+			}		
 		}
 		
 		
@@ -849,59 +852,75 @@ class CuentaController extends Controller{
        
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
 
-			return $this->render('UsuarioBundle:Cuenta:eventos.html.twig');
+				return $this->render('UsuarioBundle:Cuenta:eventos.html.twig');
 			}
 			else{
 				return $this->redirect($this->generateUrl('login'), 301);
 			}
 		}
 		
-		public function eventosJSONAction($info){
+		public function eventosJSONAction($desde, $hasta, $start, $cantidad){
        
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 			$em=$this->getDoctrine()->getManager();
 			
-			//return new Response (var_dump($eventos));
-			if ($info!="all"){
-			//Enviar solo lo pedido [tipo,idfichero,ruta,nombreficheroantiguo,nombreficheronuevo,fecha] sin JSON
-				switch ($info){
-				case "min":
-					$query = $em->createQuery('SELECT e.tipo, e.idFichero, e.ruta, e.nombreFicheroAntiguo, e.nombreFicheroNuevo, e.fecha FROM UsuarioBundle:Eventos e WHERE e.idUser=?1 ORDER BY e.fecha DESC');
-					$query->setParameter(1, $userid);
-					$min=$query->getResult();
-					$encoders = array(new XmlEncoder(), new JsonEncoder());
-					$normalizers = array(new GetSetMethodNormalizer());
-					$serializer = new Serializer($normalizers, $encoders);
-					$jsonContent = $serializer->serialize($min, 'json');
-					return new Response ($jsonContent);
-					break;
-				default:
-					//Envia todo...
-					$eventos=$em->getRepository('UsuarioBundle:Eventos')->findBy(array('idUser' => $userid),array('fecha' => 'DESC'));
-					$encoders = array(new XmlEncoder(), new JsonEncoder());
-					$normalizers = array(new GetSetMethodNormalizer());
-					$serializer = new Serializer($normalizers, $encoders);
-					$jsonContent = $serializer->serialize($eventos, 'json');
-					return new Response ($jsonContent);
-					break;
-				}
-				
-			
+			//Falta mejorar la creacion del objeto datetime para utilizar timezone Europe/Madrid u otro según el país del usuario.
+			//return new Response ($desde." ".$hasta);
+			if ($desde==1){
+				$desde=date_create();
+				$desde->modify("-3 month");
+				//$desde=$desde->format("d/m/Y");
 			}else{
-			//Enviar todo en formato JSON
+				//Recoger datos y validarlos.
+				$a=date_create();
+				$desde=$a->createFromFormat("d-m-Y H:i:s", $desde." 00:00:01");
+				//$desde=$desde->format("d/m/Y");
+			}
+			
+			if ($hasta==1){
+				$hasta=date_create();
+				$hasta=$hasta->format("d/m/Y");
+			}else{
+				//Recoger datos y validarlos.
+				$a=date_create();
+				$hasta=$a->createFromFormat("d-m-Y H:i:s", $hasta." 23:59:59");
+				//$hasta=$hasta->format("d/m/Y");
+			}
+			
+			//Falta: Comprobar que desde es anterior a la otra.
+			
+		
+			
+			
+			//return new Response ($start." ".$cantidad);
+			
+			//Enviar solo [tipo,idfichero,ruta,nombreficheroantiguo,nombreficheronuevo,fecha] sin JSON
+			
+			$query = $em->createQuery('SELECT e.tipo, e.idFichero, e.ruta, e.nombreFicheroAntiguo, e.nombreFicheroNuevo, e.fecha FROM UsuarioBundle:Eventos e WHERE e.idUser=?1 and e.fecha>=?2 and e.fecha<=?3 ORDER BY e.fecha DESC');
+			$query->setParameter(1, $userid);
+			$query->setParameter(2, $desde);
+			$query->setParameter(3, $hasta);
+			//$query->setParameter(4, $start);
+			//$query->setParameter(5, $cantidad);
+			$query->setFirstResult($start);
+			$query->setMaxResults($cantidad);
+			$min=$query->getResult();
+			$encoders = array(new XmlEncoder(), new JsonEncoder());
+			$normalizers = array(new GetSetMethodNormalizer());
+			$serializer = new Serializer($normalizers, $encoders);
+			$jsonContent = $serializer->serialize($min, 'json');
+			return new Response ($jsonContent);
+					
+			/*
+			//Envia todo...
 			$eventos=$em->getRepository('UsuarioBundle:Eventos')->findBy(array('idUser' => $userid),array('fecha' => 'DESC'));
 			$encoders = array(new XmlEncoder(), new JsonEncoder());
 			$normalizers = array(new GetSetMethodNormalizer());
 			$serializer = new Serializer($normalizers, $encoders);
 			$jsonContent = $serializer->serialize($eventos, 'json');
 			return new Response ($jsonContent);
-			}
-			
-			
-				
-	
-			
+			*/
 			}
 			else{
 				return $this->redirect($this->generateUrl('login'), 301);
@@ -1048,6 +1067,13 @@ class CuentaController extends Controller{
 				//return $this->redirect($this->generateUrl('login'), 301);
 			}
 		}
-		
+	
+		public function conectadoAction(){
+			if ($this->get('security.context')->isGranted('ROLE_USER')){
+				return new Response("true");
+			}else{
+				return new Response("false");
+			}			
+		}
 		
 }

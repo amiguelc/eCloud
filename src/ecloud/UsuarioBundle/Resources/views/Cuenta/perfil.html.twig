@@ -41,6 +41,10 @@
 			</tr>
 			{{ form_rest(formulario) }}
 			<tr>
+				<td> Fecha de Registro</td>
+				<td>{{ usuario.fechaRegistro|date('d/m/Y H:i') }}</td>
+			</tr>
+			<tr>
 				<td> Limite</td>
 				<td>{{ usuario.limite }}</td>
 			</tr>
