@@ -61,12 +61,13 @@ class CuentaController extends Controller{
 			}
 			else{
 				//$formulario = $this->createFormBuilder($usuario)->add('nombrefichero','text', array('data'=> $ficheros2->getNombreFichero()))->add('ruta','text',array ('data'=> $ficheros2->getRuta()))->getForm();
-				$usuario->setLimite(round(($usuario->getLimite()/1024/1024),2)." MB");
+				$usuario->setLimite(round(($usuario->getLimite()/1024/1024),2).""); //MB
 				$usuario->setOcupado(round(($usuario->getOcupado()/1024/1024),2));
-				$usuario->setOcupado($usuario->getOcupado()." MB ");
+				$usuario->setOcupado($usuario->getOcupado().""); //MB
 				$libre=($usuario->getLimite()-$usuario->getOcupado())." MB (".round((($usuario->getOcupado()/$usuario->getLimite())*100),2)."%)";
+				$libre_porcentaje=round((($usuario->getOcupado()/$usuario->getLimite())*100),2);
 				$formulario=$this->createFormBuilder($usuario)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')->getForm();
-				return $this->render('UsuarioBundle:Cuenta:perfil.html.twig', array('usuario'=>$usuario,'formulario' => $formulario->createView(), 'libre'=> $libre));
+				return $this->render('UsuarioBundle:Cuenta:perfil.html.twig', array('usuario'=>$usuario,'formulario' => $formulario->createView(), 'libre'=> $libre, 'libre_porcentaje'=> $libre_porcentaje));
 			}
 			}
 			else{

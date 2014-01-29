@@ -13,7 +13,8 @@ Ademas pretendo agregarle un cliente en java y android, todo para aprender progr
 Requisitos
 <ul>
 	<li>Windows.</li>
-	<li>Habilitar las extensiones php_fileinfo y php_openssl.</li>
+	<li>Habilitar las extensiones de php php_fileinfo y php_openssl.</li>
+	<li>Habilitar el modulo de apache rewrite para hacer las rutas amigables.</li>
 	<li>Fichero php.ini. En el caso de wampserver vigilar que el fichero php.ini sea el que toca.
 		<ul>
 			<li>memory_limit = 6728M 				&#60;- Limite de memoria.</li>

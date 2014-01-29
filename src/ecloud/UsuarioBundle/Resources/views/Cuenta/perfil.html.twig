@@ -45,19 +45,19 @@
 				<td>{{ usuario.fechaRegistro|date('d/m/Y H:i') }}</td>
 			</tr>
 			<tr>
-				<td> Limite</td>
-				<td>{{ usuario.limite }}</td>
-			</tr>
-			<tr>
-				<td> Ocupado</td>
-				<td>{{ usuario.ocupado }} </td>
+				<td> Espacio ocupado</td>
+				<td> {{ usuario.ocupado }} de {{ usuario.limite }} MB</td>
 			</tr>
 			<tr>
 				<td> Libre</td>
-				<td>{{ libre }} </td>
+				<td>{{ libre }}</td>
+						
 			</tr>
 			<tr>
-				
+				<td colspan="2"><div>
+					<progress value="{{ libre_porcentaje }}" max="100"></progress>
+					<!-- <span style='position:relative;left:-105px;z-index:1;font-size:12pt'>{{ libre_porcentaje }}%  </span> -->
+				</div></td>		
 			</tr>
 		</div>
 		</tbody>

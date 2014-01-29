@@ -20,12 +20,49 @@
   
 	//AL cargar la página
 	$( document ).ready(function() {
-		// Handler for .ready() called.
 		dibujarTabla();
 		if (location.pathname.match(/eventos$/)!=null){
-			cargarContenido('GET','api/eventos/desde=22-09-2013&hasta=22-12-2013&start=0&cantidad=20&nocache='+Math.random(), agregarEventos);
+			
+			//Convertir "/" a "-".
+			/* Utilizando el objeto date de jquery.
+			var desde_date=$( "#desde" ).datepicker( "getDate" );
+			var _mes=desde_date.getMonth()+1; //getMonth devuelve el mes empezando por 0
+			var _dia=desde_date.getDate(); //getDate devuelve el dia del mes
+			var _anyo=desde_date.getFullYear();
+			desde=_dia+"-"+_mes+"-"+_anyo;
+			*/
+			
+			//La opcion cutre para sacar las fechas en el formato correcto
+			desde = document.getElementById('desde').value.replace("/","-"); desde = desde.replace("/","-"); 
+			hasta = document.getElementById('hasta').value.replace("/","-"); hasta = hasta.replace("/","-"); 
+			
+			//Cargar contenido
+			cargarContenido('GET','api/eventos/desde='+desde+'&hasta='+hasta+'&start=0&cantidad='+document.getElementById('cantidad').value+'&nocache='+Math.random(), agregarEventos);
 		}					
 	});
+	
+	function recargarContenido(){
+		
+		//$("#tabla").html("");
+		//dibujarTabla();
+		vaciarTabla();
+		
+		//La opcion cutre para sacar las fechas en el formato correcto
+		desde = document.getElementById('desde').value.replace("/","-"); desde = desde.replace("/","-"); 
+		hasta = document.getElementById('hasta').value.replace("/","-"); hasta = hasta.replace("/","-"); 
+		
+		//Cargar contenido
+		cargarContenido('GET','api/eventos/desde='+desde+'&hasta='+hasta+'&start=0&cantidad='+document.getElementById('cantidad').value+'&nocache='+Math.random(), agregarEventos);
+	
+	}
+	
+	function vaciarTabla(){
+		mydiv = document.getElementById('cuerpo');
+		while ( mydiv.firstChild ) mydiv.removeChild( mydiv.firstChild );
+	
+	}
+	
+	
 	
 	function cargarEventos(desde,hasta,start,cantidad){
 		//Falta: comprobaciones y tal.
@@ -36,7 +73,7 @@
 		document.getElementById('desde').value=desde;		
 		document.getElementById('hasta').value=hasta;		
 		
-		document.getElementById('start').value=start+cantidad;		
+		//document.getElementById('start').value=parseInt(start)+parseInt(cantidad);
 		document.getElementById('cantidadAnterior').value=cantidad;
 	}
 	
@@ -61,22 +98,26 @@
 		peticion.open(metodo, url, true);
 		peticion.send(null);
   }
-  
+	
+	function resetStart(){
+		document.getElementById('start').value='0';
+	}
   
 	function dibujarTabla(){
 		div = document.getElementById('tabla');
   
 		var tabla;		
-		var caption = "<caption>{{ app.user.nombreusuario }} <div style='float:right;font-weight:normal;font-size: 0.8em' id='opcionesTabla'><input id='cantidadAnterior' type='hidden' value='20'><input id='start' type='hidden' value='20'> Mostrar <input id='cantidad' type='text' value='20' size='2' maxlength='3'> Desde: <input type='text' id='desde' maxlength='10' size='10' > Hasta: <input type='text' id='hasta' maxlength='10' size='10' > </caption>";
-		var cab = "<tr>";
-		var cuerpo = "";
-		cab="<tr><th style='width:87%;'>Acci&oacuten</th><th> </th>";
-		tabla = "<table id='tabla1'>"+ caption + cab + "</tr>" + cuerpo + "</table>";
+		var caption = "<caption>{{ app.user.nombreusuario }} <div style='float:right;font-weight:normal;font-size: 0.8em' id='opcionesTabla'> <input id='cantidadAnterior' type='hidden' value='20'><input id='start' type='hidden' value='0'> Mostrar <input id='cantidad' type='text' onchange='createCookie(\"mostrar\",this.value,14);recargarContenido();resetStart();' value='20' size='2' maxlength='3'> Desde: <input type='text' id='desde' onchange='recargarContenido();resetStart();' maxlength='10' size='10' > Hasta: <input type='text'  onchange='recargarContenido();resetStart();' id='hasta' maxlength='10' size='10' > </caption>";
+		var cab="<tr><th style='width:87%;'>Acci&oacuten</th><th> </th></tr>";
+		var cuerpo = "<tbody id='cuerpo'></tbody>";
+		tabla = "<table id='tabla1'>"+ caption + cab + cuerpo + "</table>";
 		tabla += "<br><div id='mostrarMas' > <div id='mostrarMas1' style='margin-left:auto;margin-right:auto;width:7em;'>";
 		tabla += "<a href='#' onclick=\"cargarEventos(document.getElementById('desde').value,document.getElementById('hasta').value,document.getElementById('start').value,document.getElementById('cantidad').value)\"> Mostrar mas</a>";
 		tabla += "</div><br><br></div>";
 		div.innerHTML = tabla;
 		
+		document.getElementById('cantidad').value=readCookie('mostrar');
+		//document.getElementById('start').value=readCookie('mostrar');
 		$( "#desde" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", "-3m");;		
 		$( "#hasta" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", new Date());
 		$( "#mostrarMas").css("width", $( "#tabla1").width()-$("#mostrarMas1").width()); 
@@ -178,7 +219,7 @@
 							var _mes=date.getMonth()+1; //getMonth devuelve el mes empezando por 0
 							var _dia=date.getDate(); //getDate devuelve el dia del mes
 							var _anyo=date.getFullYear();
-							cuerpo = cuerpo + "<td style='text-align:right;background-color:"+color+";'>" + _dia+"/"+_mes+"/"+_anyo + " "+addZeroo(date.getHours())+":"+addZeroo(date.getMinutes())+"</td>";
+							cuerpo = cuerpo + "<td style='text-align:right;background-color:"+color+";'>" + _dia+"/"+addZeroo(_mes)+"/"+_anyo + " "+addZeroo(date.getHours())+":"+addZeroo(date.getMinutes())+"</td>";
 						}
 						else if(attrName==null){cuerpo = cuerpo +"<td></td>";}
 						else{cuerpo = cuerpo + "<td>" + attrValue + "</td>";
@@ -190,13 +231,18 @@
 				
 			//Agregar datos a la tabla
 			//$("#tabla1:last-child").html();
-			$("#tabla1").append(cuerpo);
+			//$("#tabla1").append(cuerpo);
+			document.getElementById("cuerpo").innerHTML+=cuerpo;
+			document.getElementById('start').value=parseInt(document.getElementById('start').value)+parseInt(document.getElementById('cantidad').value);// Falta comprobacion de si se ha respondido correctamente.
+			tooltipear();
 			}
 		}
+		
 	}
  
   
-  // Función de respuesta
+  // Función de respuesta antigua, no se usa.
+  /*
   function muestraEventos() {
     if(peticion.readyState == 4) {
 	 
@@ -325,12 +371,13 @@
     }
 	
   }
- 
+	*/
   
   
   
   
   //Sin terminar, es la plantilla para crear tablas.
+  /*
   function muestraFicheros() {
     if(peticion.readyState == 4) {
 	 
@@ -377,11 +424,10 @@
     }
 	
   }
-    
+    */
 	function oculta(id){
 	  document.getElementById(id).style.display="none";
 	}
-	  
 	  
 	function limpia(id) {
 	  document.getElementById(id).innerHTML = "";
@@ -461,6 +507,35 @@
 		})
 	*/
 	
+	function createCookie(name, value, days) {
+		var expires;
+
+		if (days) {
+			var date = new Date();
+			date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+			expires = "; expires=" + date.toGMTString();
+		} else {
+			expires = "";
+		}
+		document.cookie = escape(name) + "=" + escape(value) + expires + "; path=/";
+		}
+
+	function readCookie(name) {
+		var nameEQ = escape(name) + "=";
+		var ca = document.cookie.split(';');
+		for (var i = 0; i < ca.length; i++) {
+			var c = ca[i];
+			while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+			if (c.indexOf(nameEQ) === 0) return unescape(c.substring(nameEQ.length, c.length));
+		}
+		return null;
+	}
+
+	function eraseCookie(name) {
+		createCookie(name, "", -1);
+	}
+	
+	
 	function addZeroo(num){
 		if (num<10){
 			num="0"+num;
@@ -468,7 +543,7 @@
 		return num;
 	}
 	
-	</script>
+</script>
 	
 	
 	<div class="tabla" id="tabla">
