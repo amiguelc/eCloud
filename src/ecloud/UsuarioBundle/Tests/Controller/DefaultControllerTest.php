@@ -1,6 +1,6 @@
 <?php
 
-namespace ecloud\UsuarioBundle\Tests\Controller;
+namespace eCloud\UsuarioBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

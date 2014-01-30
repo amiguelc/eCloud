@@ -1,6 +1,6 @@
 <?php
 
-namespace ecloud\UsuarioBundle;
+namespace eCloud\UsuarioBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

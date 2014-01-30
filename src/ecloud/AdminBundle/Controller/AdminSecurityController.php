@@ -1,6 +1,6 @@
 <?php
 
-namespace ecloud\AdminBundle\Controller;
+namespace eCloud\AdminBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\SecurityContext;

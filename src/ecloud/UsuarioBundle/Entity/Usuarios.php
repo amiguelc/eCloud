@@ -1,7 +1,7 @@
 <?php
 
 
-namespace ecloud\UsuarioBundle\Entity;
+namespace eCloud\UsuarioBundle\Entity;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;

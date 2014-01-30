@@ -1,6 +1,6 @@
 <?php
 
-namespace ecloud\UsuarioBundle\Entity;
+namespace eCloud\UsuarioBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 

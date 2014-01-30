@@ -9,10 +9,10 @@ Un servidor de descargas programado con el framework de php Symfony2.<br>
 Lo utilizo como método de aprendizaje de php, javascript, ajax, jquery, symfony2 y github.com. <br>
 Ademas pretendo agregarle un cliente en java y android, todo para aprender programación.<br>
 
-<br><br>
+<br>
 Requisitos
 <ul>
-	<li>Windows.</li>
+	<li>Windows. PHP 5.4.11+ y Apache2.</li>
 	<li>Habilitar las extensiones de php php_fileinfo y php_openssl.</li>
 	<li>Habilitar el modulo de apache rewrite para hacer las rutas amigables.</li>
 	<li>Fichero php.ini. En el caso de wampserver vigilar que el fichero php.ini sea el que toca.
@@ -28,11 +28,11 @@ Requisitos
 
 <h3>Instalación de eCloud.</h3>
 <ol>
-	<li> Descargar el código de github.com/amiguelc/eCloud y descomprimirlo en el espacio web. Renombrar el fichero app/config/parameters.yml-dist a parameters.yml. Configurar en este fichero la BBDD.</li>
-	<li> Ejecutar php app/console check.php, para ver si el servidor cumple los requisitos.</li>
-	<li> Modificar el fichero app/config/config.yml para configurar la carpeta de ficheros global llamada var_archivos (y crear la oorrespondiente carpeta en el sistema) y limite-default que es el limite de bytes por usuario.</li>
+	<li> Descargar el código de github.com/amiguelc/eCloud y descomprimirlo en el espacio web. Copiar y renombrar el fichero app/config/parameters.yml-dist a parameters.yml y configurar en este fichero la BBDD.</li>
+	<li> Modificar el fichero app/config/config.yml para configurar la carpeta de ficheros global llamada var_archivos (y crear la oorrespondiente carpeta en el sistema) y limite-default que es el limite de bytes por usuario, al final del archivo.</li>
 	<li> Ejecutar Composer "curl -s https://getcomposer.org/installer | php" y "php composer.phar install" para buscar las dependencias y vendors. Obligatorio tener la extension openssl de php habilitada.</li>
-	<li> Crear BBDD llamada symfony y luego ejecutar "php app/console doctrine:schema:create".</li>
+	<li> Ejecutar php app/check.php, para ver si el servidor cumple los requisitos de symfony2.</li>
+	<li> Crear BBDD llamada como en el fichero parameters.yml y luego ejecutar "php app/console doctrine:schema:create".</li>
 	<li> Instalar los archivos de la web en su carpeta adeacuada con el comando "php app/console assets:install web".</li>
 	<li> Generar CSS Y JS "php app/console assetic:dump --env=prod –no-debug"</li>
 	<li> Configurar el usuario/contraseña administrador en app/config/security.yml por defecto admin:admin1.</li>
@@ -41,10 +41,10 @@ Requisitos
 <pre>
 	-Ejemplo de virtualhost, en apache 2.4 modificar el fichero apache/conf/extra/httpd-vhosts.conf tal que:
 		&#60;VirtualHost *:80&#62;
-			DocumentRoot "[ruta a espacio web]\symfony\web"
+			DocumentRoot "[ruta a espacio web]/web"
 			DirectoryIndex app.php
 			ServerName [dominio de tu web]
-		&#60;Directory "[ruta a espacio web]\symfony\web"&#62;
+		&#60;Directory "[ruta a espacio web]/web"&#62;
 			AllowOverride All
 			Order allow,deny
 			Allow from All
@@ -53,3 +53,13 @@ Requisitos
 		
 	-Y por ultimo descomentar "Include conf/extra/httpd-vhosts.conf" en el fichero apache/conf/httpd.conf, para permitir el uso de virtualhosts.
 </pre>
+
+<br><br>
+Versiones.<br>
+	- eCloud [En construccion]
+	- Symfony versión 2.3.6. Incluye Doctrine como gestor de bases de datos.
+	
+<br><br><br>
+<h3>Errores comúnes</h3>
+
+	-<b>"Fatal error: Uncaught exception 'RuntimeException' with message 'Failed to write cache file"</b> -> Error en los permisos de la carpeta de la cache y logs localizadas en /app. Solucion: En Linux chmod 777 cache logs -R

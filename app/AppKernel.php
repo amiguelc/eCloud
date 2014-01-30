@@ -19,7 +19,7 @@ class AppKernel extends Kernel
             //new JMS\AopBundle\JMSAopBundle(),
             //new JMS\DiExtraBundle\JMSDiExtraBundle($this),
             //new JMS\SecurityExtraBundle\JMSSecurityExtraBundle(),
-            new ecloud\UsuarioBundle\UsuarioBundle(),
+            new eCloud\UsuarioBundle\UsuarioBundle(),
             new eCloud\AdminBundle\AdminBundle(),
         );
 

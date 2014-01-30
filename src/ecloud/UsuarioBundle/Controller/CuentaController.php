@@ -1,6 +1,6 @@
 <?php
 
-namespace ecloud\UsuarioBundle\Controller;
+namespace eCloud\UsuarioBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
