@@ -116,6 +116,7 @@
 		tabla += "</div><br><br></div>";
 		div.innerHTML = tabla;
 		
+		//Falta: Comprobar primero si tal cookie existe.
 		document.getElementById('cantidad').value=readCookie('mostrar');
 		//document.getElementById('start').value=readCookie('mostrar');
 		$( "#desde" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", "-3m");;		

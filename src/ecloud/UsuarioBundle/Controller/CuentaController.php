@@ -391,7 +391,7 @@ class CuentaController extends Controller{
 							$ficheros->setChecksum('0');
 							$ficheros->setFilesize('0');
 							//crear carpeta en el caso de crear carpetas
-							if($carpeta==TRUE){mkdir($this->container->getParameter('var_archivos').$userid.$ficheros->getRuta()."\\".$ficheros->getnombreFichero());}
+							if($carpeta==TRUE){mkdir($this->container->getParameter('var_archivos').$userid.$ficheros->getRuta()."/".$ficheros->getnombreFichero());}
 						}else {
 							$ficheros->setTipo("fichero");
 							$var_archivos=$this->container->getParameter('var_archivos');
@@ -491,8 +491,8 @@ class CuentaController extends Controller{
 					$ruta_nueva=$formulario["ruta"]->getData();	
 					if (strlen($ruta_nueva)>1 && $ruta_nueva[strlen($ruta_nueva)-1]=="/"){$ruta_nueva=substr($ruta_nueva, 0, -1);}//Para quitar el ultimo / de la ruta si lo tuviera. Cuidao con la raiz
 					$ruta_antigua=$ficheros->getRuta();
-					$ruta_absoluta_antigua=$this->container->getParameter('var_archivos').$userid.$ficheros->getRuta()."\\".$nombre_antiguo;
-					$ruta_absoluta_nueva=$this->container->getParameter('var_archivos').$userid.$ruta_nueva."\\".$nombre_nuevo;
+					$ruta_absoluta_antigua=$this->container->getParameter('var_archivos').$userid.$ficheros->getRuta()."/".$nombre_antiguo;
+					$ruta_absoluta_nueva=$this->container->getParameter('var_archivos').$userid.$ruta_nueva."/".$nombre_nuevo;
 					
 					$ficheros->setRuta($ruta_nueva);
 					$ficheros->setNombreFichero($nombre_nuevo);
@@ -631,6 +631,7 @@ class CuentaController extends Controller{
 					$em->persist($ficheros);
 					$em->flush();
 					
+					/*
 					//Detectar SO y preparar ruta para ello.
 					if (PHP_OS=="WINNT"){
 					
@@ -639,6 +640,10 @@ class CuentaController extends Controller{
 					$ruta_absoluta_antigua=preg_replace(":\:","/",$ruta_absoluta_antigua);
 					$ruta_absoluta_nueva=preg_replace(":\:","/",$ruta_absoluta_nueva);
 					}
+					*/
+					$ruta_absoluta_antigua=str_replace("//", "/", $ruta_absoluta_antigua);
+					$ruta_absoluta_nueva=str_replace("//", "/", $ruta_absoluta_nueva);
+					
 					rename($ruta_absoluta_antigua,$ruta_absoluta_nueva);
 										
 					return $this->redirect($this->generateUrl('ficheros'),303);
@@ -677,9 +682,9 @@ class CuentaController extends Controller{
 				
 				$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
 				if ($ficheros==null){ return  $response = new Response("Ese fichero no es tuyo");}
-				$ruta_local=$this->container->getParameter('var_archivos').$userid.print_r($ficheros->getRuta(), true).print_r($ficheros->getNombreFichero(), true);
-				$ruta_local=str_replace("/", "\\", $ruta_local);
-				
+				$ruta_local=$this->container->getParameter('var_archivos').$userid.print_r($ficheros->getRuta(), true)."/".print_r($ficheros->getNombreFichero(), true);
+				//$ruta_local=str_replace("/", "\\", $ruta_local);
+				$ruta_local=str_replace("//", "/", $ruta_local);
 				
 				//Si es fichero
 				if ($ficheros->getTipo()=="fichero"){
@@ -815,7 +820,7 @@ class CuentaController extends Controller{
 			}
 		}
 		
-				
+		//Descarga INTERNA
 		public function descargarAction($fichero){
        
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
@@ -825,8 +830,8 @@ class CuentaController extends Controller{
 				if (!$ficheros) {throw $this->createNotFoundException('No existe el fichero '.$fichero);}
 				
 				//procesar ruta y descargar el archivo, sumar una descarga a la BD.
-				$ruta_local=$this->container->getParameter('var_archivos').$userid.print_r($ficheros->getRuta(), true)."\\".print_r($ficheros->getNombreFichero(), true);
-				$ruta_local=str_replace("/", "\\", $ruta_local);
+				$ruta_local=$this->container->getParameter('var_archivos').$userid.print_r($ficheros->getRuta(), true)."/".print_r($ficheros->getNombreFichero(), true);
+				$ruta_local=str_replace("//", "/", $ruta_local);
 				$ficheros->setTotalDescargas($ficheros->getTotalDescargas()+1);
 				$mime=$ficheros->getMime();
 				//sumar descarga a la bd
@@ -999,6 +1004,8 @@ class CuentaController extends Controller{
 				return $this->redirect($this->generateUrl('login'), 301);
 			}
 		}
+		
+		//Descarga EXTERNA ecloud/!idlink
 		public function downloadAction($descarga){
        
 			if ($this->get('security.context')->isGranted('ROLE_USER')){
@@ -1009,8 +1016,8 @@ class CuentaController extends Controller{
 				$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$enlace->getIdFichero()));
 				if (!$ficheros) {throw $this->createNotFoundException('No existe ese fichero');}
 				//procesar ruta y descargar el archivo, sumar una descarga a la BD.
-				$ruta_local=$this->container->getParameter('var_archivos').$ficheros->getPropietario().print_r($ficheros->getRuta(), true)."\\".print_r($ficheros->getNombreFichero(), true);
-				$ruta_local=str_replace("/", "\\", $ruta_local);
+				$ruta_local=$this->container->getParameter('var_archivos').$ficheros->getPropietario().print_r($ficheros->getRuta(), true)."/".print_r($ficheros->getNombreFichero(), true);
+				$ruta_local=str_replace("//", "/", $ruta_local);
 				$ficheros->setTotalDescargas($ficheros->getTotalDescargas()+1);
 				$mime=$ficheros->getMime();
 				//sumar descarga a la bd
@@ -1038,8 +1045,8 @@ class CuentaController extends Controller{
 				
 				if ($this->getRequest()->isMethod('POST')){
 				//procesar ruta y descargar el archivo, sumar una descarga a la BD.
-				$ruta_local=$this->container->getParameter('var_archivos').$ficheros->getPropietario().print_r($ficheros->getRuta(), true)."\\".print_r($ficheros->getNombreFichero(), true);
-				$ruta_local=str_replace("/", "\\", $ruta_local);
+				$ruta_local=$this->container->getParameter('var_archivos').$ficheros->getPropietario().print_r($ficheros->getRuta(), true)."/".print_r($ficheros->getNombreFichero(), true);
+				$ruta_local=str_replace("//", "/", $ruta_local);
 				$ficheros->setTotalDescargas($ficheros->getTotalDescargas()+1);
 				$mime=$ficheros->getMime();
 				//sumar descarga a la bd

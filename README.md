@@ -12,7 +12,7 @@ Ademas pretendo agregarle un cliente en java y android, todo para aprender progr
 <br>
 Requisitos
 <ul>
-	<li>Windows. PHP 5.4.11+ y Apache2.</li>
+	<li>Windows o Linux. PHP 5.4.11+ y Apache2.</li>
 	<li>Habilitar las extensiones de php php_fileinfo y php_openssl.</li>
 	<li>Habilitar el modulo de apache rewrite para hacer las rutas amigables.</li>
 	<li>Fichero php.ini. En el caso de wampserver vigilar que el fichero php.ini sea el que toca.
@@ -29,7 +29,7 @@ Requisitos
 <h3>Instalación de eCloud.</h3>
 <ol>
 	<li> Descargar el código de github.com/amiguelc/eCloud y descomprimirlo en el espacio web. Copiar y renombrar el fichero app/config/parameters.yml-dist a parameters.yml y configurar en este fichero la BBDD.</li>
-	<li> Modificar el fichero app/config/config.yml para configurar la carpeta de ficheros global llamada var_archivos (y crear la oorrespondiente carpeta en el sistema) y limite-default que es el limite de bytes por usuario, al final del archivo.</li>
+	<li> Modificar el fichero app/config/config.yml para configurar la carpeta de ficheros global llamada var_archivos (y crear la correspondiente carpeta en el sistema) y limite-default que es el limite de bytes por usuario, al final del archivo.</li>
 	<li> Ejecutar Composer "curl -s https://getcomposer.org/installer | php" y "php composer.phar install" para buscar las dependencias y vendors. Obligatorio tener la extension openssl de php habilitada.</li>
 	<li> Ejecutar php app/check.php, para ver si el servidor cumple los requisitos de symfony2.</li>
 	<li> Crear BBDD llamada como en el fichero parameters.yml y luego ejecutar "php app/console doctrine:schema:create".</li>
@@ -54,12 +54,21 @@ Requisitos
 	-Y por ultimo descomentar "Include conf/extra/httpd-vhosts.conf" en el fichero apache/conf/httpd.conf, para permitir el uso de virtualhosts.
 </pre>
 
-<br><br>
-Versiones.<br>
-	- eCloud [En construccion]
-	- Symfony versión 2.3.6. Incluye Doctrine como gestor de bases de datos.
-	
-<br><br><br>
+<br>
+
 <h3>Errores comúnes</h3>
 
-	-<b>"Fatal error: Uncaught exception 'RuntimeException' with message 'Failed to write cache file"</b> -> Error en los permisos de la carpeta de la cache y logs localizadas en /app. Solucion: En Linux chmod 777 cache logs -R
+	- "Fatal error: Uncaught exception 'RuntimeException' with message 'Failed to write cache file" -> Error en los permisos de la carpeta de la cache y logs localizadas en /app. Solucion: En Linux chmod 777 cache logs -R. O mejor la carpeta de eCloud entera.
+	- "Warning: require_once(../web/../app/bootstrap.php.cache". -> Sigue los siguientes pasos.
+			<br>- Borra todo el contenido del directorio cache/ (destruye cualquier carpeta o archivo que haya dentro, pero no borres el propio directorio cache/)
+			<br>- Borra todo el contenido del directorio vendor/ (borra lo de dentro, pero deja el directorio vendor/)
+			<br>- Elimina el archivo composer.lock (no borres el composer.json, sólo el que acaba en lock)
+			<br>- Ejecuta el comando php composer.phar install y espera un buen rato hasta que se instalen todos los vendors y se reconstruya el archivo app/bootstrap.php.cache.
+		
+	
+<br><br>	
+Versiones.<br>
+	- eCloud [En construccion] <br>
+	- Symfony versión 2.3.6. Incluye Doctrine como gestor de bases de datos.
+	
+<br>

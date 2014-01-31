@@ -408,7 +408,7 @@ class Ficheros
 			$this->path = $nombre;
 			
 			//Coger nombre, tamaño en bytes y checksum.
-			$fichero_subido=$var_archivos.print_r($this->getPropietario(), true).$this->getRuta()."\\".$nombre;
+			$fichero_subido=$var_archivos.print_r($this->getPropietario(), true).$this->getRuta()."/".$nombre;
 			$this->setChecksum(md5_file($fichero_subido));
 			$this->setNombreFichero($nombre);
 			$this->setnombrerealfisico($nombre);
@@ -421,7 +421,7 @@ class Ficheros
 		
 		public function remove($var_archivos){
 		
-		$fichero_subido=$var_archivos.print_r($this->getPropietario(), true).$this->getRuta()."\\".$this->getNombreFichero();
+		$fichero_subido=$var_archivos.print_r($this->getPropietario(), true).$this->getRuta()."/".$this->getNombreFichero();
 		if (file_exists($fichero_subido)){
 			unlink($fichero_subido);
 		}
