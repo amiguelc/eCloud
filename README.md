@@ -60,10 +60,10 @@ Requisitos
 
 	- "Fatal error: Uncaught exception 'RuntimeException' with message 'Failed to write cache file" -> Error en los permisos de la carpeta de la cache y logs localizadas en /app. Solucion: En Linux chmod 777 cache logs -R. O mejor la carpeta de eCloud entera.
 	- "Warning: require_once(../web/../app/bootstrap.php.cache". -> Sigue los siguientes pasos.
-			<br>- Borra todo el contenido del directorio cache/ (destruye cualquier carpeta o archivo que haya dentro, pero no borres el propio directorio cache/)
-			<br>- Borra todo el contenido del directorio vendor/ (borra lo de dentro, pero deja el directorio vendor/)
-			<br>- Elimina el archivo composer.lock (no borres el composer.json, sólo el que acaba en lock)
-			<br>- Ejecuta el comando php composer.phar install y espera un buen rato hasta que se instalen todos los vendors y se reconstruya el archivo app/bootstrap.php.cache.
+			- Borra todo el contenido del directorio cache/ (destruye cualquier carpeta o archivo que haya dentro, pero no borres el propio directorio cache/)
+			- Borra todo el contenido del directorio vendor/ (borra lo de dentro, pero deja el directorio vendor/)
+			- Elimina el archivo composer.lock (no borres el composer.json, sólo el que acaba en lock)
+			- Ejecuta el comando php composer.phar install y espera un buen rato hasta que se instalen todos los vendors y se reconstruya el archivo app/bootstrap.php.cache.
 		
 	
 <br><br>	
