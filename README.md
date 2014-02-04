@@ -27,6 +27,7 @@ Requisitos
 </ul>
 
 <h3>Instalación de eCloud.</h3>
+Siguiendo el instalador install.php o manualmente:
 <ol>
 	<li> Descargar el código de github.com/amiguelc/eCloud y descomprimirlo en el espacio web. Copiar y renombrar el fichero app/config/parameters.yml-dist a parameters.yml y configurar en este fichero la BBDD.</li>
 	<li> Modificar el fichero app/config/config.yml para configurar la carpeta de ficheros global llamada var_archivos (y crear la correspondiente carpeta en el sistema) y limite-default que es el limite de bytes por usuario, al final del archivo.</li>
@@ -55,6 +56,11 @@ Requisitos
 </pre>
 
 <br>
+<h3>Limitaciones</h3>
+
+En windows, su sistema de archivos no es case-sensitive, es decir "carpeta" es igual que "Carpeta", aunque conserve su nombre. Por eso es mas que recomendable utilizar como servidor un Linux.
+
+<br>
 
 <h3>Errores comúnes</h3>
 
@@ -69,6 +75,6 @@ Requisitos
 <br><br>	
 Versiones.<br>
 	- eCloud [En construccion] <br>
-	- Symfony versión 2.3.6. Incluye Doctrine como gestor de bases de datos.
+	- Symfony versión 2.4.1. Incluye Doctrine como gestor de bases de datos.
 	
 <br>

@@ -1,21 +1,23 @@
-﻿# Archivos de bootstrap (compilan las clases más usadas en Symfony2)
-app/bootstrap*
-
-#Esto
-composer.lock
-
-# Directorios de Symfony
+﻿# -- Symfony2 -----------------------------------------
+app/bootstrap.php.cache
+app/bootstrap_cache.php.cache
+app/config/parameters.ini
+app/config/parameters.yml
+app/cache/*
+app/logs/*
 vendor/*
-*/logs/*
-*/cache/*
-web/uploads/*
 web/bundles/*
 web/css/*
 web/js/*
+web/uploads/*
 
-# Archivos de configuración
-app/config/parameters.ini
-app/config/parameters.yml
+# -- Composer -----------------------------------------
+composer.phar
+composer.lock
+installer
+
+# -- PHPUnit ------------------------------------------
+app/phpunit.xml  
 
 # Archivos de entornos de desarrollo y editores de texto
 # (SublimeText, Eclipse, Zend Studio, Netbeans, PHPStorm, TextMate2)
@@ -29,3 +31,26 @@ nbproject
 #Bats
 /*.bat
 /.gitignore
+
+
+# -- Sistemas Operativos ------------------------------
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.*
+!.gitignore
+!.htaccess
+*~
+
+# Mac OS X
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
