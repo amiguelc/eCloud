@@ -22,26 +22,53 @@ if (isset($_SERVER['SERVER_ADDR'])){
 	$cli=FALSE;
 	if ($_SERVER['REMOTE_ADDR']!="127.0.0.1"){echo "Página acessible solo desde la ip 127.0.0.1."; die();}
 }
-$result="
+
+
+//DATOS DE CONFIG.YML
+if (file_exists("app/config/config.yml")){
+	$fichero = @fopen('app//config/config.yml', 'rb', true );
+	if(!$fichero)
+	{
+	   $result.= 'No se puede abrir el fichero.';
+	}
+	$raiz="";
+	$num=1;
+	while (!feof($fichero))
+	{
+		 $linea = fgets ($fichero) ;
+		// echo 'Linea '.$num.': '.$linea.'<br />';
+		if ($num==73){$linea=rtrim(substr($linea,18));$raiz.="Raiz: ".$linea." Permisos de escritura: ";if (is_writable("app/config/config.yml")){$raiz.= "TRUE";}else{$raiz.="FALSE";};}
+		if ($num==74){$default_limite=rtrim(substr($linea,20));}
+		
+		 $num++;
+	}
+}
+
+
+
+
+$result="<style> th, td{width:150px;background-color:#EEEEEE;padding:5px;} th, td:first-child{width:35px;text-align:center;} th, td:last-child{width:auto;} </style>
 <h3>Requisitos</h3>
 <hr></hr>";
 
 //Versiones de apps.
-$result.=  'Versión actual de PHP: ' . phpversion()."<br>";
-if ($cli==FAlSE){$result.=  "Version actual de Apache: ". apache_get_version()."<br>";}
-if (PHP_OS=="WINNT"){$result.= "Sistema Operativo: ".PHP_OS." <br>Recuerda que Windows no es case sensitive...<br>";}
+
+$result.=  "<table><tr><td>";if(version_compare(phpversion(), '5.4.11')==-1){$result.="error";}else{$result.="ok";}; $result.="</td><td>Versión PHP </td><td> " . phpversion()."</td><td>Necesaria version 5.4.11 o mayor</td></tr>\n";//PHP_VERSION
+if ($cli==FAlSE){$result.=  "<tr><td>ok</td><td>Version Apache</td><td> ". apache_get_version()."</td><td></td></tr>\n";}
+$result.= "<tr><td>ok</td><td>Sistema Operativo </td><td> ".PHP_OS."</td><td>";if (PHP_OS=="WINNT"){$result.="Windows no es case sensitive, esto afecta a como se almacenan los ficheros";} $result.="</td></tr></table>"; 
 
 //php.ini
 $result.="<h4>Fichero php.ini</h4>";
 
 $inipath = php_ini_loaded_file();
 if ($inipath) { $result.= 'Fichero php.ini cargado: ' . $inipath;} else { $result.= 'No se ha cargado ningun fichero php.ini';}
-$result.=  '<br><br>memory_limit = ' . ini_get('memory_limit') . "<br>";
-$result.=  'upload_max_filesize = ' . ini_get('upload_max_filesize') . "<br>";
-$result.=  'post_max_size in bytes = ' . return_bytes(ini_get('post_max_size'))."<br>";
-$result.=  'max_execution_time = ' . ini_get('max_execution_time') . " segundos<br>";
-$result.=  'xdebug.max_nesting_level = ' . ini_get('xdebug.max_nesting_level') . "<br>";
-$result.=  'php_version = ' .PHP_VERSION."<br>";
+$result.=  '<br><br><table><tr><td>ok</td><td>memory_limit </td><td> ' . ini_get('memory_limit') . "</td><td>Limite de memoria utilizado por php en el servidor.</td></tr>\n";
+
+$result.=  "<tr><td>";$result.= (return_bytes(ini_get('upload_max_filesize'))>=$default_limite) ? 'ok' : 'error'; $result.="</td><td>upload_max_filesize </td><td> " . ini_get('upload_max_filesize') . "</td><td>Tamaño maximo de un fichero a recibir. Logicamente debe ser igual o mayor al limite de espacio por cuenta (upload_max_filesize>=default_limite)</td></tr>\n";
+$result.=  "<tr><td>";$result.= (return_bytes(ini_get('post_max_size'))>=$default_limite) ? 'ok' : 'error'; $result.="</td><td>post_max_size </td><td> " . ini_get('post_max_size')."</td><td>Tamaño maximo de datos que php puede recibir por el metodo POST. Igual que la anterior (post_max_size>=default_limite)</td></tr>\n";
+$result.=  "<tr><td>";$result.= (ini_get('max_execution_time')>10799) ? 'ok' : 'error'; $result.="</td><td>max_execution_time </td><td> " . ini_get('max_execution_time') . " segundos </td><td>Tiempo de ejecucion maxima de los scripts php, necesario que sea alto debido a que mientras esta recibiendo ficheros el script sigue en ejecucion. Minimo 3 horas.</td></tr>\n";
+//Falta chequeo de si Xdebug esta activado.
+if(extension_loaded('xdebug')==TRUE){$result.=  "<tr><td>ok</td><td>xdebug.max_nesting_level </td><td> " . ini_get('xdebug.max_nesting_level') . "</td><td>Si tienes la extension de PHP Xdebug es para permitir mas anidaciones en las funciones. En caso de no estar por defecto, incluirla solo si tienes Xdebug activado.</td></tr></table><br>";}
 
 function return_bytes($val) {
     $val = trim($val);
@@ -62,9 +89,8 @@ function return_bytes($val) {
 //Extensiones php
 $result.= "<h4>Extensiones de php</h4>";
 
-
-$result.=  'php_fileinfo = '; if(extension_loaded('fileinfo')==TRUE){$result.=  "TRUE<br>";}else{$result.=  "FALSE<br>";}
-$result.=  'php_openssl = '; if(extension_loaded('openssl')==TRUE){$result.=  "TRUE<br>\n";}else{$result.=  "FALSE<br>";}
+$result.=  "<table><tr><td>";if(extension_loaded('fileinfo')==TRUE){$result.=  "ok";}else{$result.=  "error";}; $result.="</td><td>php_fileinfo </td><td> "; if(extension_loaded('fileinfo')==TRUE){$result.=  "TRUE";}else{$result.=  "FALSE";}; $result.= "</td><td>Utilizado para obtener datos de un fichero</td></tr>\n";
+$result.=  "<tr><td>";if(extension_loaded('fileinfo')==TRUE){$result.= "ok";}else{$result.=  "error";}; $result.="</td><td>php_openssl </td><td> "; if(extension_loaded('openssl')==TRUE){$result.=  "TRUE";}else{$result.=  "FALSE";}; $result.=  "</td><td>Utilizado para dar soporte a conexiones cifradas con SSL</td></tr></table>\n";
 
 
 //Modulos apache
@@ -81,10 +107,17 @@ function apache_module_exists($module_name){
 //var_dump(apache_module_exists('mod_headers'));
 
 
-$result.=  'mod_rewrite = '; if(apache_module_exists('mod_rewrite')==TRUE){$result.=  "TRUE<br>";}else{echo "FALSE<br>";}
+$result.=  "<table><tr><td>"; if(apache_module_exists('mod_rewrite')==TRUE){$result.=  "ok";}else{echo "error";}; $result .= "</td><td>mod_rewrite </td><td> "; if(apache_module_exists('mod_rewrite')==TRUE){$result.=  "TRUE";}else{echo "FALSE";}; $result .= "</td><td>Utilizado para hacer direcciones URL amigables</td></tr></table>";
 }
 
 
+//Carpeta de ecloud creada y con permiso. Acceso a la base de datos.
+
+$result.="<h4>Carpetas y permisos</h4>";
+
+$result .= $raiz;
+
+//carpeta
 
 if ($cli==FALSE){
 	echo $result;
@@ -96,6 +129,7 @@ if ($cli==FALSE){
 	$result=str_replace("</h4>", "\n\n", $result);
 	$result=str_replace("<hr>", "", $result);
 	$result=str_replace("</hr>", "\n", $result);
+	$result=strip_tags($result);
 	echo $result;
 }
 

@@ -30,7 +30,7 @@ Requisitos
 Siguiendo el instalador install.php o manualmente:
 <ol>
 	<li> Descargar el código de github.com/amiguelc/eCloud y descomprimirlo en el espacio web. Copiar y renombrar el fichero app/config/parameters.yml-dist a parameters.yml y configurar en este fichero la BBDD.</li>
-	<li> Modificar el fichero app/config/config.yml para configurar la carpeta de ficheros global llamada var_archivos (y crear la correspondiente carpeta en el sistema) y limite-default que es el limite de bytes por usuario, al final del archivo.</li>
+	<li> Modificar el fichero app/config/config.yml para configurar la carpeta de ficheros global llamada var_archivos (y crear la correspondiente carpeta en el sistema) y default_limite que es el limite de bytes por usuario, al final del archivo.</li>
 	<li> Ejecutar Composer "curl -s https://getcomposer.org/installer | php" y "php composer.phar install" para buscar las dependencias y vendors. Obligatorio tener la extension openssl de php habilitada.</li>
 	<li> Ejecutar php app/check.php, para ver si el servidor cumple los requisitos de symfony2.</li>
 	<li> Crear BBDD llamada como en el fichero parameters.yml y luego ejecutar "php app/console doctrine:schema:create".</li>

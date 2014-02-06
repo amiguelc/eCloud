@@ -67,7 +67,8 @@ swiftmailer:
     password:  %mailer_password%
     spool:     { type: memory }
 
-# Parametros a configurar. Var_archivos es la carpeta raiz desde donde colgaran todos los ficheros de eCloud. Importante que incluya la ultima barra /. En windows es importante que tambien incluya el nombre de la unidad de disco.
+# Parametros a configurar. Var_archivos es la carpeta raiz desde donde colgaran todos los ficheros de eCloud. Importante que incluya la ultima barra /.
+# En windows es importante que tambien incluya el nombre de la unidad de disco y cuanto mas corta sea la ruta mejor por posibles problemas de longitud.
 parameters:
     var_archivos: C:\ecloud\
     default_limite: 524288000

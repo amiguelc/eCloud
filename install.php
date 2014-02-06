@@ -1,5 +1,18 @@
 <?php
 /*
+use Symfony\Component\ClassLoader\UniversalClassLoader;
+use Symfony\Component\Yaml\Yaml;
+
+require_once 'vendor\symfony\symfony\src\Symfony\Component\ClassLoader/UniversalClassLoader.php';
+
+$loader = new UniversalClassLoader();
+$loader->register();
+
+$loader->registerNamespaces(array(
+    'Symfony' => 'vendor\symfony\symfony\src',
+));
+
+
 Página acessible solo desde la ip 127.0.0.1
 
 Requisitos
@@ -20,40 +33,68 @@ if ($_SERVER['REMOTE_ADDR']!="127.0.0.1"){echo "Página acessible solo desde la i
 
 if (!isset($_GET['paso'])){$_GET['paso']=1;}
 
-
 echo "<h2>Instalador de eCloud</h2>";
 echo "<hr></hr>";
 
 //Primer paso
+
 if ($_GET['paso']==1){
-	echo "<h3>Primer paso: Cumplir los requisitos</h3>";
+	//javascript para enviar los datos
+	echo "	<script>
+		function parameters(){alert('e');}
+		function config(){alert('e');}
+		function security(){alert('e');}
+	</script>";
+	//si datos enviados procesar.
+
+
+	echo "<h3>Primer paso: Configurar ficheros</h3>";
+	//Falta copiar este fichero a parameters.yml y crear un token cada vez que se abra el fichero al guardarlo.
+	if (file_exists("app/config/parameters.yml")) {
+		//echo "El fichero de app/config/parameters.yml ya ha sido creado";
+	}else{
+		if (!copy("app/config/parameters.yml.dist", "app/config/parameters.yml")) {
+			echo "Error al copiar del fichero app/config/parameters.yml.dist...<br>";
+		}else{
+			echo "Copiado fichero de app/config/parameters.yml-dist a app/config/parameters.yml..";
+		}
+	
+	}
+	//$array = Yaml::parse("app/config/parameters.yml");
+	//var_dump($array);
+	echo "<h4> Fichero app/config/parameters.yml para configurar la base de datos</h4>";
+	$parameters=file_get_contents("app/config/parameters.yml");
+	echo "<textarea cols='100' rows='15'>".$parameters."</textarea>";
+	echo "<br><input type='button' value='Guardar' onclick='parameters();'>";
+	
+	echo "<h4> Fichero app/config/config.yml para configurar las variables var_archivos y default_limite</h4>";
+	$config=file_get_contents("app/config/config.yml");
+	echo "<textarea cols='100' rows='15'>".$config."</textarea>";
+	echo "<br><table><tr><td>var_archivos</td><td> <input type='text' id='var_archivos'> </td><td> Carpeta raiz desde donde colgaran todos los ficheros de eCloud.</td></tr>";
+	echo "<br><tr><td>default_limite</td><td> <input type='text' id='default_limite'> </td><td> El limite de bytes por defecto por cada cuenta.</td></tr></table>";
+	echo "<br><input type='button' value='Guardar' onclick='config();'>";
+	
+	echo "<h4> Fichero app/config/security.yml para configurar la contraseña de administrador por defecto admin:admin1</h4>";
+	$security=file_get_contents("app/config/security.yml");
+	echo "<textarea cols='100' rows='15'>".$security."</textarea>";
+	echo "<br><input type='button' value='Guardar' onclick='security();'>";
+	
+	echo "<br><br><input type='button' value='Siguiente' onclick=\"location.search='?paso=2'\">";
+}
+
+//Segundo paso
+
+if ($_GET['paso']==2){
+	echo "<h3>Segundo paso: Cumplir los requisitos</h3>";
 	/*
 	$salida = shell_exec('php check.php');
 	echo "<pre>$salida</pre>";
 	*/
 	include "check.php";
 	
-	echo "<br><input type='button' value='Siguiente' onclick=\"location.search='?paso=2'\">";
+	echo "<br><br><input type='button' value='Siguiente' onclick=\"location.search='?paso=3'\">";
 }
 
-//Segundo paso
-if ($_GET['paso']==2){
-	echo "<h3>Segundo paso: Configurar ficheros</h3>";
-	//Falta copiar este fichero a parameters.yml y crear un token cada vez que se abra el fichero al guardarlo.
-	echo "<h4> Fichero app/config/parameters.yml para configurar la base de datos</h4>";
-	$parameters=file_get_contents("app/config/parameters.yml");
-	echo "<textarea cols='100' rows='15'>".$parameters."</textarea>";
-	
-	echo "<h4> Fichero app/config/config.yml para configurar las variables var_archivos y limite-default</h4>";
-	$config=file_get_contents("app/config/config.yml");
-	echo "<textarea cols='100' rows='15'>".$config."</textarea>";
-	
-	echo "<h4> Fichero app/config/security.yml para configurar la contraseña de administrador por defecto admin:admin1</h4>";
-	$security=file_get_contents("app/config/security.yml");
-	echo "<textarea cols='100' rows='15'>".$security."</textarea>";
-	
-	echo "<br><input type='button' value='Siguiente' onclick=\"location.search='?paso=3'\">";
-}
 
 //Tercer paso
 if ($_GET['paso']==3){
