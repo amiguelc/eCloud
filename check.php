@@ -27,18 +27,16 @@ if (isset($_SERVER['SERVER_ADDR'])){
 //DATOS DE CONFIG.YML
 if (file_exists("app/config/config.yml")){
 	$fichero = @fopen('app//config/config.yml', 'rb', true );
-	if(!$fichero)
-	{
+	if(!$fichero){
 	   $result.= 'No se puede abrir el fichero.';
 	}
 	$raiz="";
 	$num=1;
-	while (!feof($fichero))
-	{
+	while (!feof($fichero)){
 		 $linea = fgets ($fichero) ;
 		// echo 'Linea '.$num.': '.$linea.'<br />';
-		if ($num==73){$linea=rtrim(substr($linea,18));$raiz.="Raiz: ".$linea." Permisos de escritura: ";if (is_writable("app/config/config.yml")){$raiz.= "TRUE";}else{$raiz.="FALSE";};}
-		if ($num==74){$default_limite=rtrim(substr($linea,20));}
+		if ($num==73){$linea=trim(substr($linea,17));$raiz.="Raiz: ".$linea." <br>Permisos de escritura: ";if (is_writable("app/config/config.yml")){$raiz.= "TRUE";}else{$raiz.="FALSE";};}
+		if ($num==74){$default_limite=trim(substr($linea,19));}
 		
 		 $num++;
 	}
@@ -111,7 +109,7 @@ $result.=  "<table><tr><td>"; if(apache_module_exists('mod_rewrite')==TRUE){$res
 }
 
 
-//Carpeta de ecloud creada y con permiso. Acceso a la base de datos.
+//Carpeta de ecloud creada y con permiso. ¿Cache y log? Acceso a la base de datos.
 
 $result.="<h4>Carpetas y permisos</h4>";
 

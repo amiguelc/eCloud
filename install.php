@@ -1,18 +1,5 @@
 <?php
 /*
-use Symfony\Component\ClassLoader\UniversalClassLoader;
-use Symfony\Component\Yaml\Yaml;
-
-require_once 'vendor\symfony\symfony\src\Symfony\Component\ClassLoader/UniversalClassLoader.php';
-
-$loader = new UniversalClassLoader();
-$loader->register();
-
-$loader->registerNamespaces(array(
-    'Symfony' => 'vendor\symfony\symfony\src',
-));
-
-
 Página acessible solo desde la ip 127.0.0.1
 
 Requisitos
@@ -29,7 +16,7 @@ Requisitos
 
 */
 
-if ($_SERVER['REMOTE_ADDR']!="127.0.0.1"){echo "Página acessible solo desde la ip 127.0.0.1."; die();}
+if ($_SERVER['REMOTE_ADDR']!="127.0.0.1"){echo "Página accesible solo desde la ip 127.0.0.1."; die();}
 
 if (!isset($_GET['paso'])){$_GET['paso']=1;}
 
@@ -39,62 +26,169 @@ echo "<hr></hr>";
 //Primer paso
 
 if ($_GET['paso']==1){
-	//javascript para enviar los datos
-	echo "	<script>
-		function parameters(){alert('e');}
-		function config(){alert('e');}
-		function security(){alert('e');}
-	</script>";
-	//si datos enviados procesar.
-
 
 	echo "<h3>Primer paso: Configurar ficheros</h3>";
-	//Falta copiar este fichero a parameters.yml y crear un token cada vez que se abra el fichero al guardarlo.
-	if (file_exists("app/config/parameters.yml")) {
-		//echo "El fichero de app/config/parameters.yml ya ha sido creado";
-	}else{
+	echo "<b>Nota</b>: Estos ficheros de configuracion estan creados con el formato YAML, modificar un simple espacio destrozaria la configuracion. <br>Por eso se recomienda tan solo modificar lo necesario y respetar la estructura.<br>";
+	
+	if(isset($_POST["recup"])){
 		if (!copy("app/config/parameters.yml.dist", "app/config/parameters.yml")) {
-			echo "Error al copiar del fichero app/config/parameters.yml.dist...<br>";
+			echo "<br>Error al copiar del fichero app/config/parameters.yml.dist...<br>";
 		}else{
-			echo "Copiado fichero de app/config/parameters.yml-dist a app/config/parameters.yml..";
+			echo "<br>Recuperado fichero original app/config/parameters.yml.";
 		}
-	
 	}
-	//$array = Yaml::parse("app/config/parameters.yml");
-	//var_dump($array);
-	echo "<h4> Fichero app/config/parameters.yml para configurar la base de datos</h4>";
+	//hash('sha1', uniqid(mt_rand()));
+	if(isset($_POST["q"])){
+		file_put_contents("app/config/parameters.yml", $_POST['q']);
+	}
+	
+	if (!file_exists("app/config/parameters.yml")) {	
+		if (!copy("app/config/parameters.yml.dist", "app/config/parameters.yml")) {
+			echo "<br>Error al copiar del fichero app/config/parameters.yml.dist...<br>";
+		}else{
+			echo "<br>Copiado fichero de app/config/parameters.yml-dist a app/config/parameters.yml.";
+		}
+	}
+	//parameters.yml
+	echo "<h4> Fichero app/config/parameters.yml para configurar la base de datos y el secret token.</h4>";
 	$parameters=file_get_contents("app/config/parameters.yml");
-	echo "<textarea cols='100' rows='15'>".$parameters."</textarea>";
-	echo "<br><input type='button' value='Guardar' onclick='parameters();'>";
+	echo "<form name='parameters' action='' method='post' ><textarea name='q' cols='100' rows='15'>".$parameters."</textarea>";
+	echo "<br><input type='submit' value='Guardar' ></form>";
+	echo "<form name='recuperar_parameters' action='' method='post' ><input name='recup' type='submit' value='Recuperar original'></form>";
 	
-	echo "<h4> Fichero app/config/config.yml para configurar las variables var_archivos y default_limite</h4>";
-	$config=file_get_contents("app/config/config.yml");
-	echo "<textarea cols='100' rows='15'>".$config."</textarea>";
-	echo "<br><table><tr><td>var_archivos</td><td> <input type='text' id='var_archivos'> </td><td> Carpeta raiz desde donde colgaran todos los ficheros de eCloud.</td></tr>";
-	echo "<br><tr><td>default_limite</td><td> <input type='text' id='default_limite'> </td><td> El limite de bytes por defecto por cada cuenta.</td></tr></table>";
-	echo "<br><input type='button' value='Guardar' onclick='config();'>";
+	if(isset($_POST["q"])){ echo "Datos guardados.";}
 	
+	
+	/////////////////////////////////config.yml/////////////////////////////////////////////////////////////////////////////////////////////////
+	echo "<h4> Fichero app/config/config.yml para configurar las variables var_archivos y default_limite</h4>"; //Crear la carpeta var_archivos
+	
+	$config="";
+	$config_resum="\n\n...fichero resumido... \n\n";
+	if (file_exists("app/config/config.yml")){
+		$fichero = @fopen('app//config/config.yml', 'rb', true );
+		if(!$fichero){
+		   $result.= 'No se puede abrir el fichero.';
+		}
+		$num=1;
+		while (!feof($fichero)){
+
+			 $linea = fgets ($fichero) ;
+			 //$pieces = explode(":", $linea);
+			 //if ($pieces[0]=="parameters:"){}
+			if ($num==73){
+				if (isset($_POST['var_archivos'])){
+					$var_archivos=$_POST['var_archivos'];
+					if($var_archivos[strlen($var_archivos)-1]!="\\"){
+						if($var_archivos[strlen($var_archivos)-1]!="/"){
+							$var_archivos.="/";
+						}
+					}
+					$pieces = explode(":", $linea);
+					$linea=$pieces[0].": ".trim($var_archivos)."\r\n";
+				}else{
+					$var_archivos=trim(substr($linea,17));
+				}
+			}
+			if ($num==74){
+				if (isset($_POST['default_limite'])){
+					$default_limite=$_POST['default_limite'];
+					$pieces = explode(":", $linea);
+					$linea=$pieces[0].": ".trim($default_limite)."\r\n";
+				}else{
+					$default_limite=trim(substr($linea,19));
+				}
+			}
+
+			if ($num>68){$config_resum.=$linea;}
+			$config.=$linea;
+			$num++;
+		}
+	}
+
+	if(isset($_POST["var_archivos"]) || isset($_POST["default_limite"])){
+		file_put_contents("app/config/config.yml", $config);
+	}
+	
+	echo "<textarea cols='100' rows='15'>".$config_resum."</textarea>";
+	echo "<br><form name='config' action='' method='post'><table><tr><td>var_archivos</td><td> <input type='text' name='var_archivos' value='";if(isset($var_archivos)){echo $var_archivos;} echo "'> </td><td> Carpeta raiz desde donde colgaran todos los ficheros de eCloud.</td></tr>";
+	echo "<br><tr><td>default_limite</td><td> <input type='text' name='default_limite' value='";if(isset($default_limite)){echo $default_limite;} echo "'> </td><td> El limite de bytes por defecto por cada cuenta.</td></tr></table>";
+	echo "<br><input type='submit' value='Guardar'> </form>";
+	if(isset($_POST["var_archivos"]) || isset($_POST['default_limite'])){ echo "Datos guardados.";}
+	
+	//////////////////////////////////////////////////////////////security////////////////////////////////////////////////////
 	echo "<h4> Fichero app/config/security.yml para configurar la contraseña de administrador por defecto admin:admin1</h4>";
-	$security=file_get_contents("app/config/security.yml");
-	echo "<textarea cols='100' rows='15'>".$security."</textarea>";
-	echo "<br><input type='button' value='Guardar' onclick='security();'>";
 	
-	echo "<br><br><input type='button' value='Siguiente' onclick=\"location.search='?paso=2'\">";
+	$resum=FALSE;
+	$security="";
+	$security_resum="\n\n...fichero resumido... \n\n\n";
+	if (file_exists("app/config/security.yml")){
+		$fichero = @fopen('app//config/security.yml', 'rb', true );
+		if(!$fichero){
+		   $result.= 'No se puede abrir el fichero.';
+		}
+		$num=1;
+		while (!feof($fichero)){
+
+			$linea = fgets ($fichero) ;
+			
+			if ($linea=="    providers:\r\n"){$resum=TRUE;}
+			if ($linea=="    firewalls:\r\n"){$resum=FALSE;}
+
+			if ($linea=="                users:\r\n"){
+			$security.=$linea;
+			$security_resum.=$linea;
+				$linea = fgets ($fichero);
+				if (isset($_POST['admin'])){
+					$admin=$_POST['admin'];
+					$pieces = explode(":", $linea, 2);
+					$linea="                    ".trim($admin).":".$pieces[1];
+				}else{
+					$pieces = explode(":", $linea);
+					$admin=trim($pieces[0]);
+				}
+				
+				if (isset($_POST['password'])){
+					$password=trim($_POST['password']);
+					$pieces = explode(":", $linea, 4);
+					$pieces2 = explode(",", $pieces[2], 2);
+					$linea=$pieces[0].":".$pieces[1].": ".$password.",".$pieces2[1].":".$pieces[3];
+					//$linea=$pieces[0].":"$pieces[1].":".$pieces[2];
+				}else{
+					$pieces = explode(":", $linea, 4);
+					$pieces2 = explode(",", $pieces[2], 2);
+					$password=trim($pieces2[0]);
+				}
+				
+			}
+			
+			if ($resum==TRUE){$security_resum.=$linea;}
+			$security.=$linea;
+			$num++;
+		}
+	}
+
+	if(isset($_POST["admin"]) || isset($_POST["password"])){
+		file_put_contents("app/config/security.yml", $security);
+	}
+	
+	
+	echo "<textarea cols='100' rows='15'>".$security_resum."</textarea>";
+	
+	echo "<br><form name='security' action='' method='post'><table><tr><td>Usuario: </td><td> <input type='text' name='admin' value='";if(isset($admin)){echo $admin;} echo "'> </td></tr>";
+	echo "<br><tr><td>Password</td><td> <input type='text' name='password' value='";if(isset($password)){echo $password;} echo "'> </td></tr></table>";
+	echo "<br><input type='submit' value='Guardar'> </form>";
+	if(isset($_POST["admin"]) || isset($_POST['password'])){ echo "Datos guardados.<br>";}
+	
+	echo "<br><input type='button' value='Siguiente' onclick=\"location.search='?paso=2'\">";
 }
 
 //Segundo paso
 
 if ($_GET['paso']==2){
 	echo "<h3>Segundo paso: Cumplir los requisitos</h3>";
-	/*
-	$salida = shell_exec('php check.php');
-	echo "<pre>$salida</pre>";
-	*/
-	include "check.php";
-	
+	include "check.php";	
 	echo "<br><br><input type='button' value='Siguiente' onclick=\"location.search='?paso=3'\">";
 }
-
 
 //Tercer paso
 if ($_GET['paso']==3){
@@ -107,8 +201,15 @@ if ($_GET['paso']==3){
 		$salida = shell_exec('php installer');
 		echo "<pre>$salida</pre>";
 		if (file_exists("composer.phar")) {
-			$salida = shell_exec('php composer.phar install');
-			echo "<pre>$salida</pre>";
+			if (PHP_OS=="Linux") {
+				//echo exec('php composer.phar install 2>&1',$retorno,$a);
+				$salida=shell_exec("COMPOSER_HOME=bin/comp_tmp php composer.phar install;");
+				echo "<pre>$salida</pre>";
+				exec("rm -f -R bin/comp_tmp");
+			}else{
+				$salida = shell_exec('php composer.phar install');
+				echo "<pre>$salida</pre>";
+			}
 		} else {
 			echo "No se encuentra el archivo composer.phar";
 		}
@@ -116,10 +217,6 @@ if ($_GET['paso']==3){
 		// an error happened
 		echo "Error al descargar el instalador de composer.";
 	}
-			
-	
-	
-	//echo "curl -s https://getcomposer.org/installer | php php composer.phar install";
 
 	echo "<h3>Y ejecutar php app/check.php, para ver si el servidor cumple los requisitos del framework Symfony2.</h3>";
 	//Entre ellos mirar si cache y logs tienen permisos de escritura.
@@ -132,9 +229,23 @@ if ($_GET['paso']==3){
 //Cuarto paso
 if ($_GET['paso']==4){
 	echo "<h3>Cuarto paso: Crear bases de datos, y copiar imagenes y ficheros css y js</h3>";
-	echo "php app/console doctrine:schema:create <br>";
-	echo "php app/console assets:install web <br>";
-	echo "php app/console assetic:dump --env=prod –no-debug";
+		echo "php app/console doctrine:database:create [Crea la base de datos]<br>";
+		$salida = shell_exec('php app/console doctrine:database:create');
+		echo "<pre>$salida</pre><br>";
+		
+		echo "php app/console doctrine:schema:create [Crea el schema, es decir, las tablas.]<br>";
+		$salida = shell_exec('php app/console doctrine:schema:create');
+		echo "<pre>$salida</pre><br>";
+		$salida = shell_exec('php app/console doctrine:schema:update');
+		echo "<pre>$salida</pre><br>";
+		
+		echo "php app/console assets:install web [Instala imagenes y datos en el directorio web]<br>";
+		$salida = shell_exec('php app/console assets:install web');
+		echo "<pre>$salida</pre><br>";
+		
+		echo "php app/console assetic:dump --env=prod [Instala los archivos css y js en el directorio web.]";
+		$salida = shell_exec('php app/console assetic:dump --env=prod');
+		echo "<pre>$salida</pre><br>";
 	echo "<br><input type='button' value='Siguiente' onclick=\"location.search='?paso=5'\">";
 }
 
