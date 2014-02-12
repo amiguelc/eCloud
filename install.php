@@ -29,6 +29,7 @@ if ($_GET['paso']==1){
 
 	echo "<h3>Primer paso: Configurar ficheros</h3>";
 	echo "<b>Nota</b>: Estos ficheros de configuracion estan creados con el formato YAML, modificar un simple espacio destrozaria la configuracion. <br>Por eso se recomienda tan solo modificar lo necesario y respetar la estructura.<br>";
+	if (PHP_OS=="Linux"){echo "Ten en cuenta que en Linux el servidor Apache necesita permisos de escritura sobre estos ficheros para el usuario www-data.<br>";}
 	
 	if(isset($_POST["recup"])){
 		if (!copy("app/config/parameters.yml.dist", "app/config/parameters.yml")) {
@@ -39,31 +40,33 @@ if ($_GET['paso']==1){
 	}
 	//hash('sha1', uniqid(mt_rand()));
 	if(isset($_POST["q"])){
-		file_put_contents("app/config/parameters.yml", $_POST['q']);
+		if (is_writable("app/config/parameters.yml")){$asd=file_put_contents("app/config/parameters.yml", $_POST['q']);}else{ echo "El fichero no tiene permisos de escritura para el usuario de apache<br>";$asd=FALSE;}
 	}
 	
-	if (!file_exists("app/config/parameters.yml")) {	
+	if (!file_exists("app/config/parameters.yml")) {
 		if (!copy("app/config/parameters.yml.dist", "app/config/parameters.yml")) {
 			echo "<br>Error al copiar del fichero app/config/parameters.yml.dist...<br>";
 		}else{
 			echo "<br>Copiado fichero de app/config/parameters.yml-dist a app/config/parameters.yml.";
 		}
 	}
-	//parameters.yml
+	///////////////////////////////parameters.yml////////////////////////////////////////////////////////////////////////////////////////////////
 	echo "<h4> Fichero app/config/parameters.yml para configurar la base de datos y el secret token.</h4>";
+	if (!is_writable("app/config/parameters.yml")){echo "<span style='color:red;'>El fichero no tiene permisos de escritura para el usuario de apache.</span><br>";}
 	$parameters=file_get_contents("app/config/parameters.yml");
 	echo "<form name='parameters' action='' method='post' ><textarea name='q' cols='100' rows='15'>".$parameters."</textarea>";
 	echo "<br><input type='submit' value='Guardar' ></form>";
 	echo "<form name='recuperar_parameters' action='' method='post' ><input name='recup' type='submit' value='Recuperar original'></form>";
 	
-	if(isset($_POST["q"])){ echo "Datos guardados.";}
+	if(isset($_POST["q"]) && $asd!=FALSE){ echo "Datos guardados.";}
 	
 	
 	/////////////////////////////////config.yml/////////////////////////////////////////////////////////////////////////////////////////////////
-	echo "<h4> Fichero app/config/config.yml para configurar las variables var_archivos y default_limite</h4>"; //Crear la carpeta var_archivos
-	
+	echo "<h4> Fichero app/config/config.yml para configurar las variables var_archivos y default_limite</h4>"; //FALTA: Crear la carpeta var_archivos o comprobar su creacion y permisos.
+	$writ1=TRUE;;
+	if (!is_writable("app/config/config.yml")){echo "<span style='color:red;'>El fichero no tiene permisos de escritura para el usuario de apache.</span><br>";$writ1=FALSE;}
 	$config="";
-	$config_resum="\n\n...fichero resumido... \n\n";
+	$config_resum="\r\n\r\n...fichero resumido... \r\n\r\n";
 	if (file_exists("app/config/config.yml")){
 		$fichero = @fopen('app//config/config.yml', 'rb', true );
 		if(!$fichero){
@@ -73,10 +76,8 @@ if ($_GET['paso']==1){
 		while (!feof($fichero)){
 
 			 $linea = fgets ($fichero) ;
-			 //$pieces = explode(":", $linea);
-			 //if ($pieces[0]=="parameters:"){}
 			if ($num==73){
-				if (isset($_POST['var_archivos'])){
+				if (isset($_POST['var_archivos']) && $writ1==TRUE){
 					$var_archivos=$_POST['var_archivos'];
 					if($var_archivos[strlen($var_archivos)-1]!="\\"){
 						if($var_archivos[strlen($var_archivos)-1]!="/"){
@@ -90,7 +91,7 @@ if ($_GET['paso']==1){
 				}
 			}
 			if ($num==74){
-				if (isset($_POST['default_limite'])){
+				if (isset($_POST['default_limite']) && $writ1==TRUE){
 					$default_limite=$_POST['default_limite'];
 					$pieces = explode(":", $linea);
 					$linea=$pieces[0].": ".trim($default_limite)."\r\n";
@@ -106,21 +107,25 @@ if ($_GET['paso']==1){
 	}
 
 	if(isset($_POST["var_archivos"]) || isset($_POST["default_limite"])){
-		file_put_contents("app/config/config.yml", $config);
+		if (is_writable("app/config/config.yml")){$asd2=file_put_contents("app/config/config.yml", $config);}else{$asd2=FALSE;}
 	}
 	
 	echo "<textarea cols='100' rows='15'>".$config_resum."</textarea>";
 	echo "<br><form name='config' action='' method='post'><table><tr><td>var_archivos</td><td> <input type='text' name='var_archivos' value='";if(isset($var_archivos)){echo $var_archivos;} echo "'> </td><td> Carpeta raiz desde donde colgaran todos los ficheros de eCloud.</td></tr>";
 	echo "<br><tr><td>default_limite</td><td> <input type='text' name='default_limite' value='";if(isset($default_limite)){echo $default_limite;} echo "'> </td><td> El limite de bytes por defecto por cada cuenta.</td></tr></table>";
 	echo "<br><input type='submit' value='Guardar'> </form>";
-	if(isset($_POST["var_archivos"]) || isset($_POST['default_limite'])){ echo "Datos guardados.";}
+	if(isset($_POST["var_archivos"]) || isset($_POST['default_limite'])){ if($asd2!=FALSE){echo "Datos guardados.";}}
+	
+	//Comprobacion de var archivos.
+	if (!file_exists($var_archivos) || !is_writable($var_archivos)){echo "<br><span style='color:red;'> No existe o no se tiene permisos sobre la carpeta ".$var_archivos.".</span>";}
 	
 	//////////////////////////////////////////////////////////////security////////////////////////////////////////////////////
 	echo "<h4> Fichero app/config/security.yml para configurar la contraseña de administrador por defecto admin:admin1</h4>";
-	
+	$writ2=TRUE;
+	if (!is_writable("app/config/security.yml")){echo "<span style='color:red;'>El fichero no tiene permisos de escritura para el usuario de apache.</span><br>";$writ2=FALSE;}
 	$resum=FALSE;
 	$security="";
-	$security_resum="\n\n...fichero resumido... \n\n\n";
+	$security_resum="\r\n\r\n...fichero resumido... \r\n\r\n\n";
 	if (file_exists("app/config/security.yml")){
 		$fichero = @fopen('app//config/security.yml', 'rb', true );
 		if(!$fichero){
@@ -131,14 +136,14 @@ if ($_GET['paso']==1){
 
 			$linea = fgets ($fichero) ;
 			
-			if ($linea=="    providers:\r\n"){$resum=TRUE;}
-			if ($linea=="    firewalls:\r\n"){$resum=FALSE;}
+			if (preg_match("/^    providers:/", $linea)){$resum=TRUE;}
+			if (preg_match("/^    firewalls:/", $linea)){$resum=FALSE;}
 
-			if ($linea=="                users:\r\n"){
+			if (preg_match("/^                users:/", $linea)){
 			$security.=$linea;
 			$security_resum.=$linea;
 				$linea = fgets ($fichero);
-				if (isset($_POST['admin'])){
+				if (isset($_POST['admin']) && $writ2==TRUE){
 					$admin=$_POST['admin'];
 					$pieces = explode(":", $linea, 2);
 					$linea="                    ".trim($admin).":".$pieces[1];
@@ -147,7 +152,7 @@ if ($_GET['paso']==1){
 					$admin=trim($pieces[0]);
 				}
 				
-				if (isset($_POST['password'])){
+				if (isset($_POST['password']) && $writ2==TRUE){
 					$password=trim($_POST['password']);
 					$pieces = explode(":", $linea, 4);
 					$pieces2 = explode(",", $pieces[2], 2);
@@ -168,7 +173,7 @@ if ($_GET['paso']==1){
 	}
 
 	if(isset($_POST["admin"]) || isset($_POST["password"])){
-		file_put_contents("app/config/security.yml", $security);
+		if (is_writable("app/config/security.yml")){$asd3=file_put_contents("app/config/security.yml", $security);}else{ $asd3=FALSE;}
 	}
 	
 	
@@ -177,7 +182,7 @@ if ($_GET['paso']==1){
 	echo "<br><form name='security' action='' method='post'><table><tr><td>Usuario: </td><td> <input type='text' name='admin' value='";if(isset($admin)){echo $admin;} echo "'> </td></tr>";
 	echo "<br><tr><td>Password</td><td> <input type='text' name='password' value='";if(isset($password)){echo $password;} echo "'> </td></tr></table>";
 	echo "<br><input type='submit' value='Guardar'> </form>";
-	if(isset($_POST["admin"]) || isset($_POST['password'])){ echo "Datos guardados.<br>";}
+	if(isset($_POST["admin"]) || isset($_POST['password'])){ if($asd3!=FALSE){echo "Datos guardados.<br>";}}
 	
 	echo "<br><input type='button' value='Siguiente' onclick=\"location.search='?paso=2'\">";
 }
@@ -187,7 +192,7 @@ if ($_GET['paso']==1){
 if ($_GET['paso']==2){
 	echo "<h3>Segundo paso: Cumplir los requisitos</h3>";
 	include "check.php";	
-	echo "<br><br><input type='button' value='Siguiente' onclick=\"location.search='?paso=3'\">";
+	echo "<br><br><input type='button' value='Siguiente' onclick=\"location.search='?paso=3'\">  Nota: El siguiente paso se toma su tiempo en descargar datos, se paciente.";
 }
 
 //Tercer paso
@@ -268,6 +273,8 @@ if ($_GET['paso']==5){
 		&#60;/VirtualHost&#62;
 		
 	-Y por ultimo descomentar \"Include conf/extra/httpd-vhosts.conf\" en el fichero apache/conf/httpd.conf, para permitir el uso de virtualhosts.
-</pre>";
+</pre>
+
+<br><br>Finalizado.";
 }
 ?>
