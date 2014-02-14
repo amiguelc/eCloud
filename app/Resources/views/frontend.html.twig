@@ -1,7 +1,7 @@
 {% extends '::base.html.twig' %}
 {% block stylesheets %}
 	
-	{% stylesheets 'bundles/usuario/css/*' %}
+	{% stylesheets 'bundles/usuario/css/*' filter='cssrewrite' output='css/all.css'%}
 		<link rel="stylesheet" href="{{ asset_url }}" />
 	{% endstylesheets %}
 	{% stylesheets 'bundles/usuario/css/smoothness/*' filter='cssrewrite' output='css/smoothness/jqueryui.css' %}
@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block javascripts %}
-	{% javascripts 'bundles/usuario/js/*' %}
+	{% javascripts 'bundles/usuario/js/*'  output='js/all.js' %}
     <script type="text/javascript" src="{{ asset_url }}"></script>
 	{% endjavascripts %}
 {% endblock %}
@@ -21,7 +21,7 @@
 	<header>
 		<a href="{{ path('home') }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>
 		
-		{% if is_granted('ROLE_USER') %}
+		{% if app.user and is_granted('ROLE_USER') %}
 		{% set currentPath = path(app.request.attributes.get('_route')) %}
 		<nav>
 			<ul> 

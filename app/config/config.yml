@@ -72,3 +72,8 @@ swiftmailer:
 parameters:
     var_archivos: C:\ecloud\
     default_limite: 524288000
+#Servicios
+services:
+    eCloud.SoInfo:
+        class: eCloud\AdminBundle\SoInfo\SoInfo
+

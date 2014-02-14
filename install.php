@@ -249,7 +249,7 @@ if ($_GET['paso']==4){
 		echo "<pre>$salida</pre><br>";
 		
 		echo "php app/console assetic:dump --env=prod [Instala los archivos css y js en el directorio web.]";
-		$salida = shell_exec('php app/console assetic:dump --env=prod');
+		$salida = shell_exec('php app/console assetic:dump');
 		echo "<pre>$salida</pre><br>";
 	echo "<br><input type='button' value='Siguiente' onclick=\"location.search='?paso=5'\">";
 }
