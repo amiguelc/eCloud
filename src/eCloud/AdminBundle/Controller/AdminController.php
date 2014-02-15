@@ -86,7 +86,6 @@ class AdminController extends Controller
 		}
 		////////////////////////////////////////////////////////////////////////LINUX////////////////////////////////////////////////////////////////////////////////
 		else{
-			//include("functions.LINUX.php");
 			
 			//Distrobucion
 			$asd=$this->get('eCloud.SoInfo')->getDistro();
@@ -94,9 +93,21 @@ class AdminController extends Controller
 			
 			//CPU
 			$asd2=$this->get('eCloud.SoInfo')->getCPU();
-			foreach ($asd2 as $valor){
-				$datos['cpu'].=$valor;
+			foreach ($asd2[0] as $key => $valor){
+				$datos['cpu'].=$valor." ";
 			}
+			
+			
+			$mem=$this->get('eCloud.SoInfo')->getRAM();
+			$datos['memoria']=round($mem['total']/1024/1024, 2);
+			$datos['memoria_libre']=round($mem['free']/1024/1024, 2);
+			
+			$datos['uptime']=$this->get('eCloud.SoInfo')->getUpTime();
+			
+			$asd3=$this->get('eCloud.SoInfo')->getLoad();
+			$datos['load']=$asd3['now']." %";
+			
+			
 		}
 		
 			
@@ -226,9 +237,14 @@ class AdminController extends Controller
 			$query=$em->createQuery('SELECT COUNT(e.idEnlace) FROM UsuarioBundle:Enlaces e');
 			$datos['links'] = $query->getSingleScalarResult();
 			
-			$datos['size']=round(disk_total_space("C:")/1024/1024/1024,2);
-			$datos['free_space']=round(disk_free_space("C:")/1024/1024/1024,2);
-						
+			if (PHP_OS=="WINNT"){
+				$datos['size']=round(disk_total_space("C:")/1024/1024/1024,2);
+				$datos['free_space']=round(disk_free_space("C:")/1024/1024/1024,2);
+			}else{
+				$datos['size']=round(disk_total_space("/")/1024/1024/1024,2);
+				$datos['free_space']=round(disk_free_space("/")/1024/1024/1024,2);
+			}
+			
 			return $this->render('AdminBundle:Admin:stats.html.twig', array('usuarios'=>$usuarios,'datos'=>$datos));
 		}
 		else{		
