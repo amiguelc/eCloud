@@ -1,5 +1,5 @@
 <?php
-///////////Codigo copiado de linfo 1.9/////////////
+///////////Codigo copiado del script php linfo 1.9/////////////
 
 namespace eCloud\AdminBundle\SoInfo;
 

@@ -147,6 +147,19 @@ class Usuarios implements UserInterface {
      */
     private $ultimoAcceso;
 
+	 /**
+     * @var string
+     *
+     * @ORM\Column(name="locale", type="string", length=255)
+     */
+    private $idioma
+	
+	/**
+     * @var string
+     *
+     * @ORM\Column(name="zone", type="string", length=255)
+     */
+    private $zone
 
     /**
      * Get idUser

@@ -35,8 +35,8 @@ class RegistroController extends Controller{
 			$passwordCodificado = $encoder->encodePassword($usuario->getPassword(),$usuario->getSalt());
 			$usuario->setIpRegistro($_SERVER['REMOTE_ADDR']);
 			//$sp=new DateTimeZone("Europe\London");
-			$usuario->setFechaRegistro(new \DateTime());
-			$usuario->setultimoAcceso(new \DateTime());
+			$usuario->setFechaRegistro(new \Datetime(null,new \DateTimeZone("UTC")));
+			$usuario->setultimoAcceso(new \Datetime(null,new \DateTimeZone("UTC")));
 			$usuario->setLimite($this->container->getParameter('default_limite'));
 			$usuario->setOcupado("0");
 			$usuario->setLoginsftp("0");
@@ -54,7 +54,7 @@ class RegistroController extends Controller{
 			$eventos->setIdUser($usuario->getidUser());
 			$eventos->setaccion("&iexcl;Te has registrado!");
 			$eventos->setTipo("0");
-			$eventos->setFecha(new \Datetime());
+			$eventos->setFecha(new \Datetime(null,new \DateTimeZone("UTC")));
 			$eventos->setRuta("-");
 			
 			$em->persist($eventos);

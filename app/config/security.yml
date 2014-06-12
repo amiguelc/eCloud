@@ -41,6 +41,7 @@ security:
                 check_path: /login_check
                 default_target_path: /home
                 always_use_default_target_path: true
+                require_previous_session: false
             logout:
                 path:   /logout
                 target: /

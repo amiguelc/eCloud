@@ -50,12 +50,16 @@ _ficheros2:
 fichero:
     path: /fichero/{id}
     defaults: { _controller: UsuarioBundle:Cuenta:fichero, id: 0 }
+    requirements:
+        id:  \d+
 subir:
     path: /subir
     defaults: { _controller: UsuarioBundle:Cuenta:subir }
 modificar:
     path: /modificar/{fichero}
     defaults: { _controller: UsuarioBundle:Cuenta:modificar, fichero: 0 }
+    requirements:
+        fichero:  \d+
 borrar:
     path: /borrar/{fichero}
     defaults: { _controller: UsuarioBundle:Cuenta:borrar }
@@ -89,6 +93,11 @@ api_ficheros2:
     defaults: { _controller: UsuarioBundle:Cuenta:ficherosjson, ruta: / }
     requirements:
         ruta: ".+"
+api_modificar:
+    path: /api/modificar/{fichero}
+    defaults: { _controller: UsuarioBundle:Cuenta:modificarjson, fichero: 0 }
+    requirements:
+        fichero:  \d+
 api_fichero:
     path: /api/fichero/{id}
     defaults: { _controller: UsuarioBundle:Cuenta:ficherojson, id: 0 }

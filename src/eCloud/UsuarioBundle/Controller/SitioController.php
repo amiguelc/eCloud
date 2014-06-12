@@ -10,12 +10,10 @@ class SitioController extends Controller{
 	public function HomeAction(){
 		
 		if ($this->get('security.context')->isGranted('ROLE_USER')) {
-		// el usuario tiene el role 'ROLE_USUARIO'
-		return $this->redirect($this->generateUrl('ficheros'), 303);
+			return $this->redirect($this->generateUrl('ficheros'), 303);
 		}
 		else{
-		// el usuario anonymous
-		return $this->render('UsuarioBundle:Paginas:home.html.twig');
+			return $this->render('UsuarioBundle:Paginas:home.html.twig');
 		}
     }
 	
