@@ -150,16 +150,16 @@ class Usuarios implements UserInterface {
 	 /**
      * @var string
      *
-     * @ORM\Column(name="locale", type="string", length=255)
+     * @ORM\Column(name="idioma", type="string", length=255)
      */
-    private $idioma
+    private $idioma;
 	
 	/**
      * @var string
      *
      * @ORM\Column(name="zone", type="string", length=255)
      */
-    private $zone
+    private $zone;
 
     /**
      * Get idUser
@@ -398,6 +398,7 @@ class Usuarios implements UserInterface {
      */
     public function getFechaRegistro()
     {
+		//return $this->fechaRegistro->setTimeZone(new \DateTimeZone($this->getZone()));
         return $this->fechaRegistro;
     }
 
@@ -514,5 +515,51 @@ class Usuarios implements UserInterface {
     public function getUltimoAcceso()
     {
         return $this->ultimoAcceso;
+    }
+
+    /**
+     * Set idioma
+     *
+     * @param string $idioma
+     * @return Usuarios
+     */
+    public function setIdioma($idioma)
+    {
+        $this->idioma = $idioma;
+
+        return $this;
+    }
+
+    /**
+     * Get idioma
+     *
+     * @return string 
+     */
+    public function getIdioma()
+    {
+        return $this->idioma;
+    }
+
+    /**
+     * Set zone
+     *
+     * @param string $zone
+     * @return Usuarios
+     */
+    public function setZone($zone)
+    {
+        $this->zone = $zone;
+
+        return $this;
+    }
+
+    /**
+     * Get zone
+     *
+     * @return string 
+     */
+    public function getZone()
+    {
+        return $this->zone;
     }
 }

@@ -39,10 +39,18 @@
 				<td>{{ form_label(formulario.pais) }}</td>
 				<td>{{ form_widget(formulario.pais) }}</td>
 			</tr>
+			<tr>
+				<td> Idioma</td>
+				<td>{{ form_widget(formulario.idioma) }}</td>
+			</tr>
+			<tr>
+				<td> Zona horaria</td>
+				<td>{{ form_widget(formulario.zone) }}</td>
+			</tr>
 			{{ form_rest(formulario) }}
 			<tr>
 				<td> Fecha de Registro</td>
-				<td>{{ usuario.fechaRegistro|date('d/m/Y H:i') }}</td>
+				<td>{{ usuario.fechaRegistro|date('d/m/Y H:i', usuario.zone ) }}</td>
 			</tr>
 			<tr>
 				<td> Espacio ocupado</td>

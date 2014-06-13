@@ -216,7 +216,8 @@
 							idFichero="";
 						}
 						else if(attrName=="fecha"){
-							var date = new Date(attrValue['timestamp']*1000);
+							var f1=attrValue['timestamp']*1000;
+							var date = new Date(f1+attrValue['offset']*1000);
 							var _mes=date.getMonth()+1; //getMonth devuelve el mes empezando por 0
 							var _dia=date.getDate(); //getDate devuelve el dia del mes
 							var _anyo=date.getFullYear();

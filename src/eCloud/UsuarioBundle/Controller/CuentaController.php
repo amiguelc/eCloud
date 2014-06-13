@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use eCloud\UsuarioBundle\Clases\Fechas;
 
 
 
@@ -22,15 +23,17 @@ class CuentaController extends Controller{
     public function perfilAction(){
         // Obtener los datos del usuario logueado y utilizarlos para rellenar un formulario de registro.
 		//
-		// Si la petición es GET, mostrar el formulario
-		// Si la petición es POST, actualizar la información del usuario con los nuevos datos obtenidos del formulario
+		// Si la peticiÃ³n es GET, mostrar el formulario
+		// Si la peticiÃ³n es POST, actualizar la informaciÃ³n del usuario con los nuevos datos obtenidos del formulario
 
 		 if ($this->get('security.context')->isGranted('ROLE_USER')){
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 			$em = $this->getDoctrine()->getManager();
 			$entity_usuarios=new Usuarios();
 			$usuario=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
-			$formulario=$this->createFormBuilder($entity_usuarios)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')->getForm();
+			$formulario=$this->createFormBuilder($entity_usuarios)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')
+			->add('idioma', 'choice', array('choices' => array('es' => 'EspaÃ±ol', 'en' => 'English'),'required'  => true))
+			->add('zone','timezone')->getForm();
 
 			if ($this->getRequest()->isMethod('POST')) {
 				$formulario->bind($this->getRequest());
@@ -45,6 +48,8 @@ class CuentaController extends Controller{
 					$usuario->setDireccion($formulario["direccion"]->getData());
 					$usuario->setCiudad($formulario["ciudad"]->getData());
 					$usuario->setPais($formulario["pais"]->getData());
+					$usuario->setIdioma($formulario["idioma"]->getData());
+					$usuario->setZone($formulario["zone"]->getData());
 					
 					//$formulario_recibido=setIpRegistro($this->getIpRegistro());
 					//$formulario_recibido=setLimite('5555555');
@@ -66,7 +71,14 @@ class CuentaController extends Controller{
 				$usuario->setOcupado($usuario->getOcupado().""); //MB
 				$libre=($usuario->getLimite()-$usuario->getOcupado())." MB (".round((($usuario->getOcupado()/$usuario->getLimite())*100),2)."%)";
 				$libre_porcentaje=round((($usuario->getOcupado()/$usuario->getLimite())*100),2);
-				$formulario=$this->createFormBuilder($usuario)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')->getForm();
+				
+				//Sumar offset
+				$a=new Fechas();
+				$b=$a->convertFecha($usuario->getfechaRegistro(), $usuario->getZone());
+				$usuario->setfechaRegistro($b);
+				
+				$formulario=$this->createFormBuilder($usuario)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')
+				->add('idioma', 'choice', array('choices' => array('es' => 'EspaÃ±ol', 'en' => 'English'),'required'  => true))->add('zone','timezone')->getForm();
 				return $this->render('UsuarioBundle:Cuenta:perfil.html.twig', array('usuario'=>$usuario,'formulario' => $formulario->createView(), 'libre'=> $libre, 'libre_porcentaje'=> $libre_porcentaje));
 			}
 		}
@@ -114,7 +126,7 @@ class CuentaController extends Controller{
 						$jsonContent="{\"limite\":\"".$usuario->getLimite()."\",\"ocupado\":\"".$usuario->getOcupado()."\", \"libre\":\"".$libre."\"}";
 						break;
 					default:
-						//Envia todo... hasta contraseña..
+						//Envia todo... hasta contraseÃ±a..
 						$usuario->setPassword("");
 						$encoders = array(new XmlEncoder(), new JsonEncoder());
 						$normalizers = array(new GetSetMethodNormalizer());
@@ -186,7 +198,7 @@ class CuentaController extends Controller{
 			//Aqui saca los ficheros de esa carpeta
 			$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'ruta' => "/".$ruta));
 			
-			//For each $ficheros cuando sea carpeta hacer una SQL para sacar el tamaño de subficheros. Esto consumirá mucho SQL. Ademas no se deberia poner aqui, sino en ficheros JSON y guardarse el valor para la app.
+			//For each $ficheros cuando sea carpeta hacer una SQL para sacar el tamaÃ±o de subficheros. Esto consumirÃ¡ mucho SQL. Ademas no se deberia poner aqui, sino en ficheros JSON y guardarse el valor para la app.
 			$filesize_total=0;
 
 			foreach ($ficheros as $clave => $valor){
@@ -342,7 +354,7 @@ class CuentaController extends Controller{
 						}
 					}
 					else{
-					//Comprobaciones a fichero. Falta añadir if is sets.	
+					//Comprobaciones a fichero. Falta aÃ±adir if is sets.	
 						if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['ruta'])==1){ return  $response = new Response("Error en la ruta del fichero");}
 						if(preg_match("/\.\.\//",$_POST['form']['ruta'])==1){ return  $response = new Response("No se permite rutas con ../");}
 						if(preg_match("/(\/|\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_FILES['form']['name']['file'])==1){ return  $response = new Response("Error en el nombre del fichero");}
@@ -1048,25 +1060,25 @@ class CuentaController extends Controller{
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 			$em=$this->getDoctrine()->getManager();
 			
-			//Falta mejorar la creacion del objeto datetime para utilizar timezone Europe/Madrid u otro según el país del usuario.
+			//Falta mejorar la creacion del objeto datetime para utilizar timezone Europe/Madrid u otro segÃºn el paÃ­s del usuario.
 			//return new Response ($desde." ".$hasta);
 			if ($desde==1){
-				$desde=date_create();
+				$desde=new \Datetime(null,new \DateTimeZone("UTC"));
 				$desde->modify("-3 month");
 				//$desde=$desde->format("d/m/Y");
 			}else{
 				//Recoger datos y validarlos.
-				$a=date_create();
+				$a=new \Datetime(null,new \DateTimeZone("UTC"));
 				$desde=$a->createFromFormat("d-m-Y H:i:s", $desde." 00:00:01");
 				//$desde=$desde->format("d/m/Y");
 			}
 			
 			if ($hasta==1){
-				$hasta=date_create();
+				$hasta=new \Datetime(null,new \DateTimeZone("UTC"));
 				$hasta=$hasta->format("d/m/Y");
 			}else{
 				//Recoger datos y validarlos.
-				$a=date_create();
+				$a=new \Datetime(null,new \DateTimeZone("UTC"));
 				$hasta=$a->createFromFormat("d-m-Y H:i:s", $hasta." 23:59:59");
 				//$hasta=$hasta->format("d/m/Y");
 			}
@@ -1085,7 +1097,19 @@ class CuentaController extends Controller{
 			//$query->setParameter(5, $cantidad);
 			$query->setFirstResult($start);
 			$query->setMaxResults($cantidad);
+			//$min=new Eventos();
 			$min=$query->getResult();
+			
+			
+			//Coger Timezone del usuario
+			$timezone = $em->createQuery('SELECT u.zone FROM UsuarioBundle:Usuarios u WHERE u.idUser='.$userid)->getResult();
+			//return new Response(var_dump($timezone));
+			
+			foreach ($min as $key => $valor) {
+				$min[$key]['fecha']=$min[$key]['fecha']->setTimezone(new \DateTimeZone($timezone[0]['zone']));
+				//return new Response($min[$key]['fecha']->getOffset());
+			}
+			
 			$encoders = array(new XmlEncoder(), new JsonEncoder());
 			$normalizers = array(new GetSetMethodNormalizer());
 			$serializer = new Serializer($normalizers, $encoders);
@@ -1199,7 +1223,7 @@ class CuentaController extends Controller{
 		}
 		else{
 		
-			//FALTA MOSTRAR FICHERO Y ESPERA PARA DETERMINADA IP. ¿Hacer una tabla para la cola de espera?
+			//FALTA MOSTRAR FICHERO Y ESPERA PARA DETERMINADA IP. Â¿Hacer una tabla para la cola de espera?
 			$em=$this->getDoctrine()->getManager();
 			$enlace=$em->getRepository('UsuarioBundle:Enlaces')->findOneBy(array('idEnlace'=>$descarga));
 			if (!$enlace) {throw $this->createNotFoundException('No existe ese fichero');}

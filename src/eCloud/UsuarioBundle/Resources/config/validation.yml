@@ -1,0 +1,5 @@
+﻿eCloud\UsuarioBundle\Entity\Usuario:
+    properties:
+        zone:
+            - NotBlank: ~
+            - Type: \DateTimeZone
