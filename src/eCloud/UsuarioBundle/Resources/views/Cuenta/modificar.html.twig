@@ -101,6 +101,14 @@
 					<td>{{ ficheros.totaldescargas }} <br></td>
 				</tr>
 				<tr>
+					<td>Fecha subida: </td>
+					<td>{{ ficheros.fechasubida|date('d/m/Y H:i', false) }} <br></td>
+				</tr>
+				<tr>
+					<td>Última modificación: </td>
+					<td>{{ ficheros.modificacion|date('d/m/Y H:i', false) }} <br></td>
+				</tr>
+				<tr>
 					<td> Nuevo Nombre Fichero </td>
 					<td><div>{{ form_errors(formulario.nombrefichero) }}{{ form_widget(formulario.nombrefichero, {'attr': {'onkeyup': 'comprobarFichero(this)'}}) }} </div></td>
 				</tr>

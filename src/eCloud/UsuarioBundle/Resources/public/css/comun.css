@@ -1,34 +1,32 @@
 body {
     background-color:rgb(238, 238, 238);
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-	
 }
 
-.center
-{
-margin:auto;
-width:40%;
+.center{
+	margin:auto;
+	width:40%;
 }
 
 /* --------------- BOTONES --------------- */
 
-.button, .button:visited { /* botones genéricos */
-background: #222 url(http://sites.google.com/site/zavaletaster/Home/overlay.png) repeat-x;
-display: inline-block;
-padding: 5px 10px 6px;
-color: #FFF;
-text-decoration: none;
--moz-border-radius: 6px;
--webkit-border-radius: 6px;
--moz-box-shadow: 0 1px 3px rgba(0,0,0,0.6);
--webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.6);
-text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
-border-top: 0px;
-border-left: 0px;
-border-right: 0px;
-border-bottom: 1px solid rgba(0,0,0,0.25);
-position: relative;
-cursor:pointer;
+.button, .button:visited { /* botones genÃ©ricos */
+	background: #222 url(http://sites.google.com/site/zavaletaster/Home/overlay.png) repeat-x;
+	display: inline-block;
+	padding: 5px 10px 6px;
+	color: #FFF;
+	text-decoration: none;
+	-moz-border-radius: 6px;
+	-webkit-border-radius: 6px;
+	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+	text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+	border-top: 0px;
+	border-left: 0px;
+	border-right: 0px;
+	border-bottom: 1px solid rgba(0,0,0,0.25);
+	position: relative;
+	cursor:pointer;
 }
 
 button::-moz-focus-inner,
@@ -36,41 +34,41 @@ input[type="reset"]::-moz-focus-inner,
 input[type="button"]::-moz-focus-inner,
 input[type="submit"]::-moz-focus-inner,
 input[type="file"] > input[type="button"]::-moz-focus-inner {
-border: none;
+	border: none;
 }
 
 .button:hover { /* el efecto hover */
-background-color: #111
-color: #FFF;
+	background-color: #111
+	color: #FFF;
 }
 
 .button:active{ /* el efecto click */
-top: 1px;
+	top: 1px;
 }
 
-/* botones pequeños */
+/* botones pequeÃ±os */
 .small.button, .small.button:visited {
-font-size: 11px ;
+	font-size: 11px ;
 }
 
 /* botones medianos */
 .button, .button:visited,.medium.button, .medium.button:visited {
-font-size: 13px;
-font-weight: bold;
-line-height: 1;
-text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
+	font-size: 13px;
+	font-weight: bold;
+	line-height: 1;
+	text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
 }
 
 /* botones grandes */
 .large.button, .large.button:visited {
-font-size:14px;
-padding: 8px 14px 9px;
+	font-size:14px;
+	padding: 8px 14px 9px;
 }
 
 /* botones extra grandes */
 .super.button, .super.button:visited {
-font-size: 34px;
-padding: 8px 14px 9px;
+	font-size: 34px;
+	padding: 8px 14px 9px;
 }
 
 .pink.button { background-color: #E22092; }
@@ -103,10 +101,9 @@ padding: 8px 14px 9px;
 /*        */
 		/* Tabla en css de http://icant.co.uk/csstablegallery/tables/37.php */ 
 
-.tabla table { width:80%;border-collapse: collapse;border: 2px solid #AAA;font: normal 80%/140% arial, helvetica, sans-serif;color: #555;background: rgb(245, 245, 245);
-}
+.tabla table { width:80%;border-collapse: collapse;border: 1px solid #AAA;font: normal 80%/140% arial, helvetica, sans-serif;color: #555;background: rgb(245, 245, 245); }
 
-.tabla td, .tabla th {border: 1px dotted #bbb;padding: .5em;}
+.tabla td, .tabla th {border: 1px dotted #bbb;padding: .5em;} 
 
 .tabla caption {padding: 0 0 .5em 0;text-align: left;font-size: 1.4em;font-weight: bold;text-transform: uppercase;color: #333;background: transparent;}
 
@@ -124,9 +121,10 @@ padding: 8px 14px 9px;
 /* =head =foot
 ----------------------------------------------- */
 
-.tabla thead th, .tabla tfoot th {border: 2px solid #999;text-align: left;font-size: 1.2em;font-weight: bold;color: #666;background: transparent;}
+.tabla thead th, .tabla tfoot th {border: 1px solid #999;text-align: left;font-size: 1.2em;font-weight: bold;color: #666;background: transparent;}
+.tabla thead th {background:#DFDFDF;}
 
-.tabla tfoot td {border: 2px solid #999;}
+.tabla tfoot td {border: 1px solid #999;}
 
 /* =body
 ----------------------------------------------- */

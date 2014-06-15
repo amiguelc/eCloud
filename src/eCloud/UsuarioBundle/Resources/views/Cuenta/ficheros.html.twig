@@ -534,7 +534,7 @@
 			success: function(data,textStatus,jqXHR){
 				if (data[0].tipo=="fichero"){
 					//Procesar fecha
-					var date = new Date(data[0].fechaSubida['timestamp']*1000);
+					var date = new Date((data[0].fechaSubida['timestamp']*1000));
 					var _mes=date.getMonth()+1; //getMonth devuelve el mes empezando por 0
 					var _dia=date.getDate(); //getDate devuelve el dia del mes
 					var _anyo=date.getFullYear();
@@ -694,7 +694,7 @@
 			</div>
 			</th>
 			<th style='text-align:right;'> {{ficheros.filesize}} Mb</th>
-			<th>{{ ficheros.fechasubida|date('d-m-Y') }}</th>
+			<th>{{ ficheros.modificacion|date('d/m/Y H:i', false) }}</th>
 			<th> 
 				<a href="{{ path('modificar', { 'fichero': ficheros.idfichero }) }}"><img  alt="Editar" src="{{ asset('bundles/usuario/images/edit.png') }}"></a>
 				<!-- <a href="{{ path('borrar', { 'fichero': ficheros.idfichero }) }}">  <img alt="Eliminar" src="{{ asset('bundles/usuario/images/delete.png') }}"></a> -->
@@ -706,7 +706,7 @@
 		{% endfor %}
 		{% if var1 == 0 %}<tr><th><a href="{{ app.request.getRequestURI() }}/../"/>../</a></th><th></th><th></th><th></th></tr>{% endif %}
 	</tbody>
-	<tfoot><tr><th>Total</th><td colspan="4" id="td_total_archivos"><span id='total_archivos'>{{var1}}</span> archivos</td></tr></tfoot>
+	<tfoot><tr><td style='font-size: 1.2em;font-weight: bold;color: #666;'>Total</td><td colspan="4" id="td_total_archivos"><span id='total_archivos'>{{var1}}</span> archivos</td></tr></tfoot>
 	</table>
 	</div>	
 

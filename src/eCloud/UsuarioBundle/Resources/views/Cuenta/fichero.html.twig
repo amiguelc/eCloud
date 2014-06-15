@@ -29,7 +29,11 @@
 				</tr>
 				<tr>
 					<td>Fecha subida: </td>
-					<td>{{ fichero.0.fechasubida|date('d-m-Y') }} </td>
+					<td>{{ fichero.0.fechasubida|date('d/m/Y H:i', app.user.zone) }} </td>
+				</tr>
+				<tr>
+					<td>Fecha última modificación: </td>
+					<td>{{ fichero.0.modificacion|date('d/m/Y H:i', app.user.zone) }} </td>
 				</tr>
 				<tr>
 					<td>Total Descargas: </td>

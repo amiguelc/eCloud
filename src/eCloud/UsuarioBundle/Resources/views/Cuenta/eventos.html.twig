@@ -108,7 +108,7 @@
   
 		var tabla;		
 		var caption = "<caption>{{ app.user.nombreusuario }} <div style='float:right;font-weight:normal;font-size: 0.8em' id='opcionesTabla'> <input id='cantidadAnterior' type='hidden' value='20'><input id='start' type='hidden' value='0'> Mostrar <input id='cantidad' type='text' onchange='createCookie(\"mostrar\",this.value,14);recargarContenido();resetStart();' value='20' size='2' maxlength='3'> Desde: <input type='text' id='desde' onchange='recargarContenido();resetStart();' maxlength='10' size='10' > Hasta: <input type='text'  onchange='recargarContenido();resetStart();' id='hasta' maxlength='10' size='10' > </caption>";
-		var cab="<tr><th style='width:87%;'>Acci&oacuten</th><th> </th></tr>";
+		var cab="";//var cab="<tr><th style='width:87%;'>Acci&oacuten</th><th> </th></tr>";
 		var cuerpo = "<tbody id='cuerpo'></tbody>";
 		tabla = "<table id='tabla1'>"+ caption + cab + cuerpo + "</table>";
 		tabla += "<br><div id='mostrarMas' > <div id='mostrarMas1' style='margin-left:auto;margin-right:auto;width:7em;'>";
@@ -212,12 +212,13 @@
 							else if(attrValue=="0"){texto="Te has registrado!";color="#95FF95";}
 							else {color="";}
 							
-							cuerpo = cuerpo + "<td style='background-color:"+color+";' > "+texto+"</td>";
+							cuerpo = cuerpo + "<td style='width:87%;background-color:"+color+";' > "+texto+"</td>";
 							idFichero="";
 						}
 						else if(attrName=="fecha"){
 							var f1=attrValue['timestamp']*1000;
 							var date = new Date(f1+attrValue['offset']*1000);
+							var date = new Date(f1);
 							var _mes=date.getMonth()+1; //getMonth devuelve el mes empezando por 0
 							var _dia=date.getDate(); //getDate devuelve el dia del mes
 							var _anyo=date.getFullYear();

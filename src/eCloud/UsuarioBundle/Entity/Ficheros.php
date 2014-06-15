@@ -80,6 +80,13 @@ class Ficheros
     private $fechaSubida;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="modificacion", type="datetime")
+     */
+    private $modificacion;
+	
+    /**
      * @var integer
      *
      * @ORM\Column(name="totalDescargas", type="bigint")
@@ -294,6 +301,39 @@ class Ficheros
         return $this->fechaSubida;
     }
 
+
+    /**
+     * Set modificacion
+     *
+     * @param \DateTime $modificacion
+     * @return Ficheros
+     */
+    public function setModificacion($modificacion)
+    {
+        $this->modificacion = $modificacion;
+    
+        return $this;
+    }
+
+    /**
+     * Get modificacion
+     *
+     * @return \DateTime 
+     */
+    public function getModificacion()
+    {
+        return $this->modificacion;
+    }
+	public function setFechasCorrectas($zone){
+		if ($zone==null){$zone="UTC";}
+		$this->fechaSubida->setTimeZone(new \DateTimeZone($zone));
+		$this->modificacion->setTimeZone(new \DateTimeZone($zone));
+		//$this->modificacion=\DateTime::createFromFormat("d/m/Y H:i" , $this->modificacion->format("d/m/Y H:i") , new \DateTimeZone($zone));
+		//$this->fechaSubida=\DateTime::createFromFormat("d/m/Y H:i" , $this->fechaSubida->format("d/m/Y H:i"), new \DateTimeZone($zone));
+		//$this->fechaSubida=new \DateTime
+		return 1;
+	}
+	
     /**
      * Set totalDescargas
      *

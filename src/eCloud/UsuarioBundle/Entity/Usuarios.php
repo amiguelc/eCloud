@@ -398,8 +398,8 @@ class Usuarios implements UserInterface {
      */
     public function getFechaRegistro()
     {
-		//return $this->fechaRegistro->setTimeZone(new \DateTimeZone($this->getZone()));
-        return $this->fechaRegistro;
+		return $this->fechaRegistro->setTimeZone(new \DateTimeZone($this->getZone()));
+        //return $this->fechaRegistro;
     }
 
     /**

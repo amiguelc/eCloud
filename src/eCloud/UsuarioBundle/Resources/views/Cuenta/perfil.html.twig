@@ -50,7 +50,7 @@
 			{{ form_rest(formulario) }}
 			<tr>
 				<td> Fecha de Registro</td>
-				<td>{{ usuario.fechaRegistro|date('d/m/Y H:i', usuario.zone ) }}</td>
+				<td>{{ usuario.fechaRegistro|date('d/m/Y H:i', false ) }}</td>
 			</tr>
 			<tr>
 				<td> Espacio ocupado</td>

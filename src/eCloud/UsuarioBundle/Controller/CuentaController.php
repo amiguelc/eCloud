@@ -73,9 +73,9 @@ class CuentaController extends Controller{
 				$libre_porcentaje=round((($usuario->getOcupado()/$usuario->getLimite())*100),2);
 				
 				//Sumar offset
-				$a=new Fechas();
-				$b=$a->convertFecha($usuario->getfechaRegistro(), $usuario->getZone());
-				$usuario->setfechaRegistro($b);
+				//$a=new Fechas();
+				//$b=$a->convertFecha($usuario->getfechaRegistro(), $usuario->getZone());
+				//$usuario->setfechaRegistro($b);
 				
 				$formulario=$this->createFormBuilder($usuario)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')
 				->add('idioma', 'choice', array('choices' => array('es' => 'Español', 'en' => 'English'),'required'  => true))->add('zone','timezone')->getForm();
@@ -157,6 +157,7 @@ class CuentaController extends Controller{
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
 		
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+			
 					
 			//Procesa ruta/carpeta. (coger ficheros de ese usuario y pasarlos a la plantilla twig, primero saber que ruta pide).
 			$entity_ficheros = new Ficheros();
@@ -174,6 +175,7 @@ class CuentaController extends Controller{
 			$formulario_carpeta  = $this->createFormBuilder($entity_ficheros)->add('nombrefichero','text',array('label'=>'Carpeta'))->add('ruta','hidden',array('data' => "/".$ruta))->getForm();
 			
 			$em=$this->getDoctrine()->getManager();
+			$usuarios=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser'=>$userid));
 			//Comprobacion de existencia de tal carpeta, falta devolver error, de momento redirecciona a ficheros.
 			if ($ruta!=""){
 				$comp_carpeta=explode("/",$ruta);
@@ -228,7 +230,12 @@ class CuentaController extends Controller{
 			//PASAR BYTES A MB				
 			foreach ($ficheros as $clave => $valor){
 				$ficheros[$clave]->setFilesize(round(($ficheros[$clave]->getFilesize()/1024/1024),2));
-			}				
+			}
+			
+			//Arreglar Fecha de modificacion
+			foreach ($ficheros as $clave => $valor){
+				$ficheros[$clave]->setFechasCorrectas($usuarios->getZone());
+			}
 		
 		return $this->render('UsuarioBundle:Cuenta:ficheros.html.twig',array('ficheros' => $ficheros,'ruta' => $ruta, 'formulario' => $formulario->createView(), 'formulario_carpeta' => $formulario_carpeta->createView()));
 		}
@@ -383,6 +390,7 @@ class CuentaController extends Controller{
 					$ruta=$formulario["ruta"]->getData();
 					$ficheros->setRuta($ruta);
 					$ficheros->setfechaSubida(new \Datetime(null,new \DateTimeZone("UTC")));
+					$ficheros->setModificacion(new \Datetime(null,new \DateTimeZone("UTC")));
 					$ficheros->settotalDescargas("0");
 					$ficheros->setPermiso("si");
 
@@ -464,10 +472,11 @@ class CuentaController extends Controller{
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 			
+			
 			$document = new Ficheros();
 			$formulario = $this->createFormBuilder($document)->add('nombrefichero','text')->add('ruta','text')->getForm();
 			$em = $this->getDoctrine()->getManager();
-			
+			$usuarios=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser'=>$userid));			
 			
 			if ($this->getRequest()->isMethod('POST')) {
 				//guardar datos modificados
@@ -500,6 +509,7 @@ class CuentaController extends Controller{
 					$ficheros->setRuta($ruta_nueva);
 					$ficheros->setNombreFichero($nombre_nuevo);
 					$ficheros->setNombreRealFisico($nombre_nuevo);
+					$ficheros->setModificacion(new \Datetime(null,new \DateTimeZone("UTC")));
 										
 					//Eventos//
 					$eventos=new Eventos();
@@ -658,6 +668,9 @@ class CuentaController extends Controller{
 				$ficheros2=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
 				
 				if($ficheros2==null){return new Response("El fichero no existe o t&uacute; no eres el propietario.");}
+				//Arreglar Fechas
+				$ficheros2->setFechasCorrectas($usuarios->getZone());
+				//return new Response(ini_get('date.timezone'));
 				
 				//id_fichero,propietario,nombre_fichero,nombre_real_fisico,ruta,filesize,checksum,fecha_subida,total_descargas,permiso,tipo 
 								
@@ -690,6 +703,8 @@ class CuentaController extends Controller{
 				$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
 				if ($ficheros==null){ return  $response = new Response("E_6X4.1");} //Ese fichero no existe o no es tuyo
 				$fichero_movido=$ficheros->getNombreFichero();
+				
+				$ficheros->setModificacion(new \Datetime(null,new \DateTimeZone("UTC")));
 				
 				//Validar datos.
 				if(isset($_POST['ruta'])){
