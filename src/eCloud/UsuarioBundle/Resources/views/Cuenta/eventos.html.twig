@@ -50,7 +50,10 @@
 		//La opcion cutre para sacar las fechas en el formato correcto
 		desde = document.getElementById('desde').value.replace("/","-"); desde = desde.replace("/","-"); 
 		hasta = document.getElementById('hasta').value.replace("/","-"); hasta = hasta.replace("/","-"); 
-		
+		//Comprobar cantidad
+		if (isNaN(document.getElementById('cantidad').value)){
+			document.getElementById('cantidad').value=20;
+		}
 		//Cargar contenido
 		cargarContenido('GET','api/eventos/desde='+desde+'&hasta='+hasta+'&start=0&cantidad='+document.getElementById('cantidad').value+'&nocache='+Math.random(), agregarEventos);
 	
@@ -116,8 +119,13 @@
 		tabla += "</div><br><br></div>";
 		div.innerHTML = tabla;
 		
-		//Falta: Comprobar primero si tal cookie existe.
-		document.getElementById('cantidad').value=readCookie('mostrar');
+		//Falta arreglar esto: Comprobar primero si tal cookie existe.
+		if (isNaN(readCookie('mostrar'))){
+			createCookie("mostrar",20,14);
+			document.getElementById('cantidad').value=20;
+		}else{
+			document.getElementById('cantidad').value=readCookie('mostrar');
+		};
 		//document.getElementById('start').value=readCookie('mostrar');
 		$( "#desde" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", "-3m");;		
 		$( "#hasta" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", new Date());

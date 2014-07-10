@@ -77,7 +77,7 @@ Siguiendo el instalador install.php o manualmente:
 <br>
 <h3>Limitaciones</h3>
 
-En windows, el sistema de archivos no es case-sensitive, es decir "carpeta" es igual que "Carpeta", aunque conserve su nombre. Por eso es mas que recomendable utilizar como servidor un Linux.
+En windows, el sistema de archivos no es case-sensitive, es decir "carpeta" es igual que "Carpeta", aunque conserve su nombre. Por eso, por compatibilidad, eCloud no es case-sensitive pero guarda el nombre.
 
 <br>
 

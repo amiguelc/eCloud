@@ -157,7 +157,6 @@ class CuentaController extends Controller{
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
 		
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
-			
 					
 			//Procesa ruta/carpeta. (coger ficheros de ese usuario y pasarlos a la plantilla twig, primero saber que ruta pide).
 			$entity_ficheros = new Ficheros();
@@ -182,8 +181,7 @@ class CuentaController extends Controller{
 				if (is_array($comp_carpeta)){
 					$total=count($comp_carpeta);
 					$nombref=$comp_carpeta[$total-1];
-					if ($total>2){
-						
+					if ($total>=2){						
 						$ruta_carpeta="";
 						for ($i=0;$i<$total-1;$i++){
 							$ruta_carpeta.="/".$comp_carpeta[$i];
@@ -194,7 +192,10 @@ class CuentaController extends Controller{
 					}
 					
 					$comprobacion=$em->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'ruta' => "/".$ruta_carpeta, 'nombreFichero' => $nombref));
-					if ($comprobacion==null) {return $this->redirect($this->generateUrl('ficheros'), 303);}
+					if ($comprobacion==null) {
+							//return $this->redirect($this->generateUrl('ficheros'), 303);
+							return new Response("No existe esa carpeta");
+						}
 				}
 			}
 			//Aqui saca los ficheros de esa carpeta
@@ -283,6 +284,9 @@ class CuentaController extends Controller{
 			//Validar idfichero.			
 			$fichero=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'idFichero' => $id));
 			if ($fichero==NULL){return new Response ("Fichero no encontrado");}
+			$usuario=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
+			
+			$fichero[0]->setFechasCorrectas($usuario->getZone());
 				
 			return $this->render('UsuarioBundle:Cuenta:fichero.html.twig',array('fichero'=>$fichero));
 		}
@@ -324,7 +328,8 @@ class CuentaController extends Controller{
 			
 			$carpeta=FALSE;
 			if(isset($_POST['form']['nombrefichero'])){
-				$carpeta=TRUE;$formulario  = $this->createFormBuilder($ficheros)->add('nombrefichero','text')->add('ruta','hidden', array('constraints' => new NotBlank()))->getForm();
+				$carpeta=TRUE;
+				$formulario  = $this->createFormBuilder($ficheros)->add('nombrefichero','text')->add('ruta','hidden', array('constraints' => new NotBlank()))->getForm();
 			}
 			else{
 				$formulario = $this->createFormBuilder($ficheros)->add('file','file')->add('ruta','hidden', array('constraints' => new NotBlank()))->getForm();
@@ -345,6 +350,7 @@ class CuentaController extends Controller{
 						if(preg_match("/(\/|\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['nombrefichero'])==1){ return  $response = new Response("Error en el nombre de la carpeta");}
 						if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['ruta'])==1){ return  $response = new Response("Error en la ruta de la carpeta");}
 						if(preg_match("/\.\.\//",$_POST['form']['ruta'])==1){ return  $response = new Response("No se permite rutas con ../");}
+						if($_POST['form']['ruta'][0]!="/"){$_POST['form']['ruta']="/".$_POST['form']['ruta'];}
 						
 						$query=$em->createQuery("SELECT f.tipo FROM UsuarioBundle:Ficheros f WHERE f.propietario=?1 and f.ruta like ?2 and f.nombreFichero like ?3");
 						$query->setParameter(1, $userid);
@@ -359,12 +365,14 @@ class CuentaController extends Controller{
 								return  $response = new Response("En esa carpeta existe un fichero con el mismo nombre");
 							}
 						}
+						//$namefile=$_POST['form']['nombrefichero'];
 					}
 					else{
 					//Comprobaciones a fichero. Falta añadir if is sets.	
 						if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['ruta'])==1){ return  $response = new Response("Error en la ruta del fichero");}
 						if(preg_match("/\.\.\//",$_POST['form']['ruta'])==1){ return  $response = new Response("No se permite rutas con ../");}
 						if(preg_match("/(\/|\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_FILES['form']['name']['file'])==1){ return  $response = new Response("Error en el nombre del fichero");}
+						if($_POST['form']['ruta'][0]!="/"){$_POST['form']['ruta']="/".$_POST['form']['ruta'];}
 						
 						$query=$em->createQuery("SELECT f.tipo FROM UsuarioBundle:Ficheros f WHERE f.propietario=?1 and f.ruta like ?2 and f.nombreFichero like ?3");
 						$query->setParameter(1, $userid);
@@ -380,14 +388,42 @@ class CuentaController extends Controller{
 								return  $response = new Response("En esa carpeta existe un fichero con el mismo nombre");
 							}
 						}
+						//$namefile=$_FILES['form']['name']['file'];
 					}
 					
+					//Comprobacion de si existe la carpeta en la cual se va a crear/subir fichero/carpeta
+					$ruta=$_POST['form']['ruta'];
+					if ($ruta!="/"){
+						if ($ruta!=""){
+							$comp_carpeta=explode("/",$ruta);
+							if (is_array($comp_carpeta)){
+								$total=count($comp_carpeta);
+								$nombref=$comp_carpeta[$total-1];
+								if ($total>=2){
+									$ruta_carpeta="";
+									for ($i=0;$i<$total-1;$i++){
+										$ruta_carpeta.="/".$comp_carpeta[$i];
+									}
+									if($ruta_carpeta[0]=="/"){$ruta_carpeta=substr($ruta_carpeta,1);}
+									if($ruta_carpeta[0]=="/"){$ruta_carpeta=substr($ruta_carpeta,1);}
+								}else{
+									$ruta_carpeta="";
+								}
+								
+								$comprobacion=$em->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'ruta' => "/".$ruta_carpeta, 'nombreFichero' => $nombref));
+								if ($comprobacion==null) {
+										//return $this->redirect($this->generateUrl('ficheros'), 303);
+										return new Response("Ese carpeta no existe");
+									}
+							}
+						}
+					}
 					//Ficheros normales///
 					//propietario, nombre_fichero, nombre_real_fisico, tipo, ruta, filesize, checksum, fecha_subida, total_descargas, permiso
 					$ficheros->setPropietario($userid);
 					
 					//$ficheros->setRuta("/");
-					$ruta=$formulario["ruta"]->getData();
+					//$ruta=$formulario["ruta"]->getData();
 					$ficheros->setRuta($ruta);
 					$ficheros->setfechaSubida(new \Datetime(null,new \DateTimeZone("UTC")));
 					$ficheros->setModificacion(new \Datetime(null,new \DateTimeZone("UTC")));
@@ -485,6 +521,7 @@ class CuentaController extends Controller{
 									
 					//Validar datos.
 					if($_POST['form']['ruta']=="" || $_POST['form']['nombrefichero']==""){ return  $response = new Response("Faltan datos");}
+					if($_POST['form']['ruta'][0]!="/"){$_POST['form']['ruta']="/".$_POST['form']['ruta'];}
 					if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['ruta'])==1){ return  $response = new Response("Error en la ruta del fichero");}
 					if(preg_match("/\.\.\//",$_POST['form']['ruta'])==1){ return  $response = new Response("No se permite rutas con ../");}
 					if(preg_match("/(\/|\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['form']['nombrefichero'])==1){ return  $response = new Response("Error en el nombre del fichero");}
@@ -499,8 +536,8 @@ class CuentaController extends Controller{
 					else{ return $response=new Response("Error");}
 					
 					$nombre_antiguo=$ficheros->getNombreFichero();
-					$nombre_nuevo=$formulario["nombrefichero"]->getData();
-					$ruta_nueva=$formulario["ruta"]->getData();	
+					$nombre_nuevo=$_POST['form']['nombrefichero'];	//$nombre_nuevo=$formulario["nombrefichero"]->getData();
+					$ruta_nueva=$_POST['form']['ruta'];				//$ruta_nueva=$formulario["ruta"]->getData();	
 					if (strlen($ruta_nueva)>1 && $ruta_nueva[strlen($ruta_nueva)-1]=="/"){$ruta_nueva=substr($ruta_nueva, 0, -1);}//Para quitar el ultimo / de la ruta si lo tuviera. Cuidao con la raiz
 					$ruta_antigua=$ficheros->getRuta();
 					$ruta_absoluta_antigua=$this->container->getParameter('var_archivos').$userid.$ficheros->getRuta()."/".$nombre_antiguo;
@@ -611,14 +648,14 @@ class CuentaController extends Controller{
 					//Cambia ruta subficheros.
 					$query = $em->createQuery('UPDATE UsuarioBundle:Ficheros f SET f.ruta = ?1 WHERE f.ruta LIKE ?2 and f.propietario=?3');
 					if($ruta_nueva=="/"){$query->setParameter(1, "/".$nombre_nuevo);}else{$query->setParameter(1, $ruta_nueva."/".$nombre_nuevo);}
-					if ($ruta_antigua=="/"){$query->setParameter(2, $ruta_antigua.$nombre_antiguo);}else{$query->setParameter(2, $ruta_antigua."/".$nombre_antiguo);}
+					if ($ruta_antigua=="/"){$query->setParameter(2, "/".$nombre_antiguo);}else{$query->setParameter(2, $ruta_antigua."/".$nombre_antiguo);}
 					$query->setParameter(3, $userid);
 					$query->getResult();
 					
 					
 					//Saca las rutas de los sub-subficheros a cambiar
 					$query = $em->createQuery('SELECT f.ruta FROM UsuarioBundle:Ficheros f WHERE f.ruta LIKE ?1');
-					if ($ruta_antigua=="/"){$query->setParameter(1, $ruta_antigua.$nombre_antiguo.'/%');}else{$query->setParameter(1, $ruta_antigua."/".$nombre_antiguo.'/%');}
+					if ($ruta_antigua=="/"){$query->setParameter(1, "/".$nombre_antiguo.'/%');}else{$query->setParameter(1, $ruta_antigua."/".$nombre_antiguo.'/%');}
 					//Saca rutas a cambiar de sub-subficheros.
 					$archivos=$query->getResult();
 					
@@ -712,7 +749,8 @@ class CuentaController extends Controller{
 					$accion="mover";					
 					if(preg_match("/(\\\\|:|\?|<|>|\'|\"|~|\*|\|)/",$_POST['ruta'])==1){ return  $response = new Response("E_6X4.2");} //Error en la ruta del fichero
 					if(preg_match("/\.\.\//",$_POST['ruta'])==1){ return  $response = new Response("E_6X4.3");}	//No se permite rutas con ../
-															
+					if($_POST['ruta'][0]!="/"){$_POST['ruta']="/".$_POST['ruta'];}
+					
 					$ruta_nueva=$_POST['ruta'];
 					
 					if (strlen($ruta_nueva)>1 && $ruta_nueva[strlen($ruta_nueva)-1]=="/"){$ruta_nueva=substr($ruta_nueva, 0, -1);}//Para quitar el ultimo / de la ruta si lo tuviera. Cuidao con la raiz
@@ -883,7 +921,7 @@ class CuentaController extends Controller{
 					$ruta_absoluta_antigua=str_replace("//", "/", $ruta_absoluta_antigua);
 					$ruta_absoluta_nueva=str_replace("//", "/", $ruta_absoluta_nueva);
 					
-					//rename($ruta_absoluta_antigua,$ruta_absoluta_nueva)
+					rename($ruta_absoluta_antigua,$ruta_absoluta_nueva);
 					//return new Response(var_dump($ruta_absoluta_antigua)." - ".var_dump($ruta_absoluta_nueva));
 				
 					return new Response($codigo);
@@ -896,7 +934,8 @@ class CuentaController extends Controller{
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 			$em=$this->getDoctrine()->getManager();
-			//Falta antes de hacer la SQL validar la variable fichero.
+			//Peligroso: Es un borrado con get, sin validar nada, se le pasa el idfichero y elimina. Se puede utilizar en AJAX.
+			//Falta antes de hacer la SQL validar la variable fichero. 
 			
 			$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
 			if ($ficheros==null){ return  $response = new Response("Ese fichero no es tuyo o no existe");}
@@ -904,8 +943,10 @@ class CuentaController extends Controller{
 			//$ruta_local=str_replace("/", "\\", $ruta_local);
 			$ruta_local=str_replace("//", "/", $ruta_local);
 			
+			$codigo="M_5X1";
 			//Si es fichero
 			if ($ficheros->getTipo()=="fichero"){
+				$codigo="M_501";
 				//Eventos//
 				$eventos=new Eventos();
 				//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
@@ -933,6 +974,7 @@ class CuentaController extends Controller{
 				}
 			}else{
 				//Si es carpeta
+				$codigo="M_511";
 				//$sub_ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findByRuta(array('idFichero'=>$fichero,'propietario' => $userid));
 				$filesize_total_restar=0;
 				$ruta_carpeta=str_replace('//','/',$ficheros->getRuta()."/".$ficheros->getNombreFichero());
@@ -1020,9 +1062,7 @@ class CuentaController extends Controller{
 				//return $response = New Response(var_dump($usuarios));
 			}			
 			
-			//Con el borrado por ajax devuelve 1 en casa de borrado bien y 0 en caso de que no
-
-			return $response = New Response('1');
+			return $response = New Response($codigo);
 
 		}
 		else{

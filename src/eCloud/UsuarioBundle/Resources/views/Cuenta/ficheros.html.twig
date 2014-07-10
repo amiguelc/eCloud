@@ -528,7 +528,7 @@
 		//alert("e");
 		var idfichero=$('#propiedades_tr').attr("idfichero");
 		$.ajax({
-			url: "api/fichero/"+idfichero,
+			url: location.href.substr(0,location.href.indexOf("/ficheros"))+"/api/fichero/"+idfichero,
 			type: 'GET',
 			data: {},
 			success: function(data,textStatus,jqXHR){
@@ -540,8 +540,8 @@
 					var _anyo=date.getFullYear();
 					var fechaSubida=_dia+"-"+_mes+"-"+_anyo+" "+addZeroo(date.getHours())+":"+addZeroo(date.getMinutes());
 					//Falta procesar tamaño
-					var tamanyo=data[0].filesize;
-					var contenido="Nombre: "+data[0].nombreFichero+"<br>Ruta: "+data[0].ruta+"<br>Tama&ntilde;o: "+tamanyo+"<br> Fecha Subida: "+fechaSubida+"<br>Checksum: "+data[0].checksum;
+					var tamanyo=parseFloat(data[0].filesize/1024/1024).toFixed(2);
+					var contenido="Nombre: "+data[0].nombreFichero+"<br>Ruta: "+data[0].ruta+"<br>Tama&ntilde;o: "+tamanyo+" MB<br> Fecha Subida: "+fechaSubida+"<br>Checksum: "+data[0].checksum;
 				}else if(data[0].tipo=="carpeta"){
 					//Procesar fecha
 					var date = new Date(data[0].fechaSubida['timestamp']*1000);
@@ -550,7 +550,7 @@
 					var _anyo=date.getFullYear();
 					var fechaSubida=_dia+"-"+_mes+"-"+_anyo+" "+addZeroo(date.getHours())+":"+addZeroo(date.getMinutes());
 					//Falta procesar tamaño
-					var tamanyo=data[0].filesize;
+					var tamanyo=data[0].filesize/1024/1024;
 					
 					var contenido="Carpeta: "+data[0].nombreFichero+"<br> Ruta: "+data[0].ruta+"<br>Fecha subida: "+fechaSubida;
 				}
