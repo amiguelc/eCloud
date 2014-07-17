@@ -120,12 +120,16 @@
 		div.innerHTML = tabla;
 		
 		//Falta arreglar esto: Comprobar primero si tal cookie existe.
-		if (isNaN(readCookie('mostrar'))){
+		if (readCookie('mostrar')===null){
 			createCookie("mostrar",20,14);
-			document.getElementById('cantidad').value=20;
 		}else{
-			document.getElementById('cantidad').value=readCookie('mostrar');
-		};
+			if (isNaN(readCookie('mostrar'))){
+				createCookie('mostrar',20,14);
+				document.getElementById('cantidad').value=20;
+			}else{
+				document.getElementById('cantidad').value=readCookie('mostrar');
+			};
+		}
 		//document.getElementById('start').value=readCookie('mostrar');
 		$( "#desde" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", "-3m");;		
 		$( "#hasta" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", new Date());

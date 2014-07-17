@@ -45,6 +45,7 @@ class RegistroController extends Controller{
 					$usuario->setLoginsftp("0");
 					$usuario->setLoginweb("0");
 					$usuario->setPassword($passwordCodificado);
+					$usuario->setStatus("0");
 					//$usuario->setIdioma();
 					$em = $this->getDoctrine()->getManager();
 					

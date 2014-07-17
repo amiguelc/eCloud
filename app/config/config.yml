@@ -76,4 +76,3 @@ parameters:
 services:
     eCloud.SoInfo:
         class: eCloud\AdminBundle\SoInfo\SoInfo
-

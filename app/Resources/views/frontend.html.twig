@@ -17,13 +17,18 @@
 	{% endjavascripts %}
 {% endblock %}
 {% block body %}
-<section id="contenedor">
-	<header>
+<div id="container">
+{% set currentPath = path(app.request.attributes.get('_route')) %}
+
+{% if app.user and is_granted('ROLE_USER') %}
+	<header class="header_in">
 		<a href="{{ path('home') }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>
-		
-		{% if app.user and is_granted('ROLE_USER') %}
-		{% set currentPath = path(app.request.attributes.get('_route')) %}
-		<nav>
+		<div class='login_box'>
+			<span style='position:relative;right:15px;color:white;font-size:20px;'>Hola, <i>{{ app.user.nombreusuario }} </i></span> 
+			<button class='mid green button' onclick="window.location='{{ path('logout') }}'">Salir</button>
+		</div>
+	</header>
+	<nav>
 			<ul> 
 				<li>
 					<a href="{{ path('perfil') }}"> 
@@ -63,8 +68,24 @@
 				</li> 
 			</ul>
 		</nav>
-			<div class='login_box'><span style='position:relative;right:15px;color:white;font-size:20px;'>Hola, <i>{{ app.user.nombreusuario }} </i></span> <button class='mid green button' onclick="window.location='{{ path('logout') }}'">Salir</button></div>
-		{% else %}
+	<article class="article_in">
+		<img class='bgbox' src="{{ asset('bundles/usuario/images/imagen_portada.png') }}">
+		
+			{% block article %}{% endblock %}
+	</article>
+	<footer class="footer_in">
+		&copy; {{ 'now' | date('Y') }} - eCloud
+		<a class='footer_links' href="{{ path('ayuda') }}">Ayuda</a>
+		<a class='footer_links' href="{{ path('contacto') }}">Contacto</a>
+		<a class='footer_links' href="{{ path('privacidad') }}">Privacidad</a>
+		<a class='footer_links' href="{{ path('sobre-nosotros') }}">Sobre nosotros</a>
+	</footer>	
+		
+{% else %}
+	<header class="header_out">
+		<a href="{{ path('home') }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>		
+		
+		{% if currentPath|split('/')|last != 'login' %}
 			<div class='login_box'>
 				<form action="{{ path('login_check') }}" method="post">
 					<label for="username">Email:</label>
@@ -79,22 +100,17 @@
 			</div>
 		{% endif %}
 	</header>
-		
-	<article>
-	<img class='bgbox' src="{{ asset('bundles/usuario/images/imagen_portada.png') }}">
-		{% block article %}{% endblock %}
+	<article class="article_out">
+		<img class='bgbox' src="{{ asset('bundles/usuario/images/imagen_portada.png') }}">		
+			{{ block('article') }}
 	</article>
-	
-</section>
-	<!--
-	<aside>
-	</aside>
-	-->
-	<footer>
+	<footer class="footer_out">
 		&copy; {{ 'now' | date('Y') }} - eCloud
 		<a class='footer_links' href="{{ path('ayuda') }}">Ayuda</a>
 		<a class='footer_links' href="{{ path('contacto') }}">Contacto</a>
 		<a class='footer_links' href="{{ path('privacidad') }}">Privacidad</a>
 		<a class='footer_links' href="{{ path('sobre-nosotros') }}">Sobre nosotros</a>
-	</footer>
+	</footer>	
+{% endif %}
+	</div>
 {% endblock %}

@@ -53,6 +53,14 @@
 				<td>{{ usuario.fechaRegistro|date('d/m/Y H:i', false ) }}</td>
 			</tr>
 			<tr>
+				<td> Último Acceso</td>
+				<td>{{ usuario.ultimoAcceso|date('d/m/Y H:i', false ) }}</td>
+			</tr>
+			<tr>
+				<td> Logins via web</td>
+				<td>{{ usuario.loginWeb }}</td>
+			</tr>
+			<tr>
 				<td> Espacio ocupado</td>
 				<td> {{ usuario.ocupado }} de {{ usuario.limite }} MB</td>
 			</tr>

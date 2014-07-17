@@ -5,12 +5,12 @@ namespace eCloud\UsuarioBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Logins_error
+ * LoginsError
  *
  * @ORM\Table()
  * @ORM\Entity
  */
-class Logins_error
+class LoginsError
 {
     /**
      * @var integer
@@ -21,12 +21,6 @@ class Logins_error
      */
     private $idLoginErroneo;
 	
-	 /**
-     * @var string
-     *
-     * @ORM\Column(name="idUser", type="integer")
-     */
-    private $idUser;
 
     /**
      * @var \DateTime
@@ -59,9 +53,9 @@ class Logins_error
     /**
      * @var string
      *
-     * @ORM\Column(name="metodo", type="string", length=255)
+     * @ORM\Column(name="cliente", type="string", length=255)
      */
-    private $metodo;
+    private $cliente;
 
 
     /**
@@ -74,28 +68,6 @@ class Logins_error
         return $this->id;
     }
 
-    /**
-     * Set idUser
-     *
-     * @param integer $idUser
-     * @return Logins_error
-     */
-    public function setIdUser($idUser)
-    {
-        $this->idUser = $idUser;
-    
-        return $this;
-    }
-
-    /**
-     * Get idUser
-     *
-     * @return integer 
-     */
-    public function getIdUser()
-    {
-        return $this->idUser;
-    }
 
     /**
      * Set fecha
@@ -190,26 +162,26 @@ class Logins_error
     }
 
     /**
-     * Set metodo
+     * Set cliente
      *
-     * @param string $metodo
+     * @param string $cliente
      * @return Logins_error
      */
-    public function setMetodo($metodo)
+    public function setCliente($cliente)
     {
-        $this->metodo = $metodo;
+        $this->cliente = $cliente;
     
         return $this;
     }
 
     /**
-     * Get metodo
+     * Get cliente
      *
      * @return string 
      */
-    public function getMetodo()
+    public function getCliente()
     {
-        return $this->metodo;
+        return $this->cliente;
     }
 
     /**

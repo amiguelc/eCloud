@@ -1,7 +1,18 @@
 parameters:
 #    usuario.example.class: ecloud\UsuarioBundle\Example
+    security.user_checker.class: eCloud\UsuarioBundle\Security\MyUserChecker
 
 services:
-#    usuario.example:
-#        class: %usuario.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+#    security.user_checker:
+#        class: %security.user_checker.class%
+#        arguments: [@doctrine]
+    ecloud.authenticationlistener.authentication_failure_event_listener:
+        class: eCloud\UsuarioBundle\Listener\AuthenticationListener
+        arguments: [@doctrine]
+        tags:
+            - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure  }
+    ecloud.authenticationlistener.interactive_login_listener:
+        class: eCloud\UsuarioBundle\Listener\AuthenticationListener
+        arguments: [@doctrine]
+        tags:
+            - { name: kernel.event_listener, event: security.interactive_login, method: onAuthenticationSuccess }

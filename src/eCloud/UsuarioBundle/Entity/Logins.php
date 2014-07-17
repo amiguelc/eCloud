@@ -45,9 +45,9 @@ class Logins
     /**
      * @var string
      *
-     * @ORM\Column(name="metodo", type="string", length=3)
+     * @ORM\Column(name="cliente", type="string", length=255)
      */
-    private $metodo;
+    private $cliente;
 
 
     /**
@@ -130,26 +130,26 @@ class Logins
     }
 
     /**
-     * Set metodo
+     * Set cliente
      *
-     * @param string $metodo
+     * @param string $cliente
      * @return Logins
      */
-    public function setMetodo($metodo)
+    public function setCliente($cliente)
     {
-        $this->metodo = $metodo;
+        $this->cliente = $cliente;
     
         return $this;
     }
 
     /**
-     * Get metodo
+     * Get cliente
      *
      * @return string 
      */
-    public function getMetodo()
+    public function getCliente()
     {
-        return $this->metodo;
+        return $this->cliente;
     }
 
     /**

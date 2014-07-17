@@ -30,8 +30,44 @@ class Usuarios implements UserInterface {
 	}
 	
 	public function getSalt() {
-    return ''; // Could also be 'mysalt'
+		return ''; // Could also be 'mysalt'
 	}
+	
+	/*	AdvancedUserInterface, not used...
+	public function isAccountNonExpired(){
+		if ($this->status=="1"){
+			return false;
+		}
+		
+		return true;
+	}
+
+    public function isAccountNonLocked(){
+		if ($this->status=="2"){
+			return false;
+		}
+		
+		return true;
+	}
+
+    public function isCredentialsNonExpired(){
+		if ($this->status=="3"){
+			return false;
+		}
+		
+		return true;
+	}
+
+
+    
+    public function isEnabled(){
+		if ($this->status=="4"){
+			return false;
+		}
+		
+		return true;
+	}
+	 */
 
     /**
      * @var integer
@@ -160,6 +196,13 @@ class Usuarios implements UserInterface {
      * @ORM\Column(name="zone", type="string", length=255)
      */
     private $zone;
+
+	/**
+     * @var string
+     *
+     * @ORM\Column(name="status", type="string", length=255)
+     */
+    private $status;
 
     /**
      * Get idUser
@@ -514,7 +557,8 @@ class Usuarios implements UserInterface {
      */
     public function getUltimoAcceso()
     {
-        return $this->ultimoAcceso;
+		return $this->ultimoAcceso->setTimeZone(new \DateTimeZone($this->getZone()));
+        //return $this->ultimoAcceso;
     }
 
     /**
@@ -561,5 +605,28 @@ class Usuarios implements UserInterface {
     public function getZone()
     {
         return $this->zone;
+    }
+	
+    /**
+     * Set status
+     *
+     * @param string $status
+     * @return Usuarios
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * Get status
+     *
+     * @return string 
+     */
+    public function getStatus()
+    {
+        return $this->status;
     }
 }
