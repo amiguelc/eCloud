@@ -21,28 +21,28 @@ class MyUserChecker extends UserChecker{
      */
 	
     public function checkPreAuth(UserInterface $user){
-        // check anything
-		//$em=$this->doctrine->getManager();
-		/*
-		$em=$this->get('doctrine.orm.entity_manager');
-		*/
+		//echo var_dump($user);die();
 		
-		if ($user->getStatus()=="2"){
-			$ex = new AuthenticationException('User account is locked!');
-			throw $ex;
+		$role=$user->getRoles();		
+		if($role[0]=="ROLE_ADMIN"){
+			
+		
+		}elseif ($role[0]=="ROLE_USER"){
+			if ($user->getStatus()=="locked"){
+				$ex = new AuthenticationException('User account is locked!');
+				throw $ex;
+			}
+			
+			if ($user->getStatus()=="disabled"){
+				$ex = new AuthenticationException('User account is disabled!');
+				throw $ex;
+			}
 		}
-		
-		if ($user->getStatus()=="4"){
-			$ex = new AuthenticationException('User account is disabled!');
-			throw $ex;
-		}
-		
         parent::checkPreAuth($user);
     }
 	
     public function checkPostAuth(UserInterface $user){
-        // check anything
-
+		//echo var_dump($user);die();
         parent::checkPostAuth($user);
     }
 	

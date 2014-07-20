@@ -113,9 +113,9 @@
 		var caption = "<caption>{{ app.user.nombreusuario }} <div style='float:right;font-weight:normal;font-size: 0.8em' id='opcionesTabla'> <input id='cantidadAnterior' type='hidden' value='20'><input id='start' type='hidden' value='0'> Mostrar <input id='cantidad' type='text' onchange='createCookie(\"mostrar\",this.value,14);recargarContenido();resetStart();' value='20' size='2' maxlength='3'> Desde: <input type='text' id='desde' onchange='recargarContenido();resetStart();' maxlength='10' size='10' > Hasta: <input type='text'  onchange='recargarContenido();resetStart();' id='hasta' maxlength='10' size='10' > </caption>";
 		var cab="";//var cab="<tr><th style='width:87%;'>Acci&oacuten</th><th> </th></tr>";
 		var cuerpo = "<tbody id='cuerpo'></tbody>";
-		tabla = "<table id='tabla1'>"+ caption + cab + cuerpo + "</table>";
+		tabla = "<table id='tabla1' style='width:100%;'>"+ caption + cab + cuerpo + "</table>";
 		tabla += "<br><div id='mostrarMas' > <div id='mostrarMas1' style='margin-left:auto;margin-right:auto;width:7em;'>";
-		tabla += "<a href='#' onclick=\"cargarEventos(document.getElementById('desde').value,document.getElementById('hasta').value,document.getElementById('start').value,document.getElementById('cantidad').value)\"> Mostrar mas</a>";
+		tabla += "<span class='mid grey button' onclick=\"cargarEventos(document.getElementById('desde').value,document.getElementById('hasta').value,document.getElementById('start').value,document.getElementById('cantidad').value)\"> Mostrar mas</span>";
 		tabla += "</div><br><br></div>";
 		div.innerHTML = tabla;
 		

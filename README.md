@@ -6,7 +6,7 @@
 
 
 Un servidor de descargas programado con el framework de php Symfony2.<br>
-Lo utilizo como método de aprendizaje de php, javascript, ajax, jquery, symfony2 y github.com. <br>
+Lo utilizo como método de aprendizaje de php, javascript, ajax, jquery, css, symfony2 y github.com. <br>
 Ademas pretendo agregarle un cliente en java y android, todo para aprender programación.<br>
 
 <br>
@@ -73,6 +73,10 @@ Siguiendo el instalador install.php o manualmente:
 	
 	De todas maneras, aqui explican mejor como configurarlo y mejorar el rendimiento: <a href='http://symfony.es/documentacion/como-configurar-bien-apache-para-las-aplicaciones-symfony2/'>symfony.es</a>
 </pre>
+
+<br>
+<h3>¿Cómo funciona?</h3>
+
 
 <br>
 <h3>Limitaciones</h3>

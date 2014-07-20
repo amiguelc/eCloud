@@ -84,8 +84,8 @@
 {% else %}
 	<header class="header_out">
 		<a href="{{ path('home') }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>		
-		
-		{% if currentPath|split('/')|last != 'login' %}
+		{% set pages = ['login','recovery'] %}
+		{% if currentPath|split('/')|last not in pages %}
 			<div class='login_box'>
 				<form action="{{ path('login_check') }}" method="post">
 					<label for="username">Email:</label>
@@ -101,7 +101,6 @@
 		{% endif %}
 	</header>
 	<article class="article_out">
-		<img class='bgbox' src="{{ asset('bundles/usuario/images/imagen_portada.png') }}">		
 			{{ block('article') }}
 	</article>
 	<footer class="footer_out">

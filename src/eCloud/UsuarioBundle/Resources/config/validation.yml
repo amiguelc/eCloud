@@ -1,5 +1,25 @@
-﻿eCloud\UsuarioBundle\Entity\Usuario:
+﻿eCloud\UsuarioBundle\Entity\Usuarios:
     properties:
+        email:
+            - NotBlank: ~
+        nombreUsuario:
+            - NotBlank: ~
+        password:
+            - NotBlank: ~
+        nombre:
+            - NotBlank: ~
+            - Length:
+                max: 2
+        apellidos:
+            - NotBlank: ~
+        direccion:
+            - NotBlank: ~
+        ciudad:
+            - NotBlank: ~
+        pais:
+            - NotBlank: ~
+        idioma:
+            - NotBlank: ~
         zone:
             - NotBlank: ~
             - Type: \DateTimeZone

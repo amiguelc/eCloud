@@ -1,29 +1,44 @@
 {% extends '::frontend.html.twig' %}
+
+{# import "_self" as the form theme #}
+{% form_theme formulario _self %}
+
+{# make the form fragment customization #}
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+             {% for error in errors %}
+                <span style="color:red;">{{ error.message }}</span><br>
+            {% endfor %}
+
+        {% endif %}
+    {% endspaceless %}
+	
+{% endblock form_errors %}
+
 {% block id 'usuario' %}
 {% block title %}Registrate gratis como usuario{% endblock %}
 {% block article %}
-<div class="center">
+<div class="registro">
 <h1>{{ block('title') }}</h1>
 
-
-<form action="{{ path('registro') }}" method="post" {{form_enctype(formulario) }}>
-
-<div class="errors">
+{{ form_start(formulario) }}
+	<div class="errors">
 		{{ form_errors(formulario) }}
-		</div>
-		<table class='form'>
+	</div>
+	<table class='form'>
 		<tbody>
 			<tr>
 				<td>Email</td>
-				<td>{{ form_widget(formulario.email) }}</td>
+				<td>{{ form_widget(formulario.email) }} {{ form_errors(formulario.email) }}</td>
 			</tr>
 			<tr>
 				<td>Nombre Usuario</td>
-				<td>{{ form_widget(formulario.nombre_usuario) }}</td>
+				<td>{{ form_widget(formulario.nombre_usuario) }} {{ form_errors(formulario.nombre_usuario) }}</td>
 			</tr>
 			<tr>
 				<td>Password</td>
-				<td>{{ form_widget(formulario.password) }}</td>
+				<td>{{ form_widget(formulario.password) }} {{ form_errors(formulario.password) }}</td>
 			</tr>
 			<tr>
 				<td>Nombre</td>
@@ -34,7 +49,7 @@
 			</tr>
 			<tr>
 				<td>Direccion</td>
-				<td>{{ form_widget(formulario.direccion) }}</td>
+				<td>{{ form_widget(formulario.direccion) }} {{ form_errors(formulario.direccion) }}</td>
 			</tr>
 			<tr>
 				<td>Ciudad</td>
@@ -46,22 +61,23 @@
 			</tr>
 			<tr>
 				<td>Idioma</td>
-				<td>{{ form_widget(formulario.idioma) }}</td>
+				<td>{{ form_widget(formulario.idioma) }} {{ form_errors(formulario.idioma) }}</td>
 			</tr>
 			<tr>
 				<td>Zona horaria</td>
-				<td>{{ form_widget(formulario.zone) }}</td>
+				<td>{{ form_widget(formulario.zone) }} {{ form_errors(formulario.zone) }}</td>
 			</tr>
-			{{ form_rest(formulario) }}
+			
 			<tr>
+				<td>Captcha</td>
 				
 			</tr>
 		</div>
 		</tbody>
-		</table><br>
+	</table><br>
 <input class="boton" type="submit" value="Registrarme" />
-</form>
-
+{{ form_end(formulario) }}
+{# </form> #}
 
 
 </div>

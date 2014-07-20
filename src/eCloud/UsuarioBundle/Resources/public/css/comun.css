@@ -11,7 +11,8 @@ body {
 /* --------------- BOTONES --------------- */
 
 .button, .button:visited { /* botones genéricos */
-	background: #222 url(http://sites.google.com/site/zavaletaster/Home/overlay.png) repeat-x;
+	/* background: #222 url(http://sites.google.com/site/zavaletaster/Home/overlay.png) repeat-x; */
+	background: #222 url() repeat-x;
 	display: inline-block;
 	padding: 5px 10px 6px;
 	color: #FFF;
@@ -101,7 +102,7 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 /*        */
 		/* Tabla en css de http://icant.co.uk/csstablegallery/tables/37.php */ 
 
-.tabla table { width:80%;border-collapse: collapse;border: 1px solid #AAA;font: normal 80%/140% arial, helvetica, sans-serif;color: #555;background: rgb(245, 245, 245); }
+.tabla table { border-collapse: collapse;border: 1px solid #AAA;font: normal 80%/140% arial, helvetica, sans-serif;color: #555;background: rgb(245, 245, 245); }
 
 .tabla td, .tabla th {border: 1px dotted #bbb;padding: .5em;} 
 
@@ -122,7 +123,7 @@ input[type="file"] > input[type="button"]::-moz-focus-inner {
 ----------------------------------------------- */
 
 .tabla thead th, .tabla tfoot th {border: 1px solid #999;text-align: left;font-size: 1.2em;font-weight: bold;color: #666;background: transparent;}
-.tabla thead th {background:#DFDFDF;}
+.tabla thead th {background:linear-gradient(rgba(220, 220, 220,0.8), rgba(240, 240, 240,0.9));}
 
 .tabla tfoot td {border: 1px solid #999;}
 

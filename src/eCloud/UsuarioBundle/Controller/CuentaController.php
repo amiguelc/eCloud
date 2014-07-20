@@ -29,22 +29,28 @@ class CuentaController extends Controller{
 		 if ($this->get('security.context')->isGranted('ROLE_USER')){
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 			$em = $this->getDoctrine()->getManager();
-			$entity_usuarios=new Usuarios();
+			
 			$usuario=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
-			$formulario=$this->createFormBuilder($entity_usuarios)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')
-			->add('idioma', 'choice', array('choices' => array('es' => 'Español', 'en' => 'English'),'required'  => true))
-			->add('zone','timezone')->getForm();
-
+			$formulario_builder=$this->createFormBuilder(new Usuarios(),array('validation_groups' => array('perfil')))
+				//->add('email','text',array('required' => false, 'attr' => array ('disabled' => true)))
+				//->add('nombre_usuario','text',array('required' => false, 'attr' => array ('disabled' => true)))
+				->add('nombre','text',array('required' => false))
+				->add('apellidos','text',array('required' => false))				
+				->add('direccion','text',array('required' => false))
+				->add('ciudad','text',array('required' => false))
+				->add('pais','text',array('required' => false))
+				->add('idioma', 'choice', array('choices' => array('es' => 'Español', 'en' => 'English')))
+				->add('zone','timezone',array('required' => false));
+			
 			if ($this->getRequest()->isMethod('POST')) {
-				$formulario->bind($this->getRequest());
+				$formulario=$formulario_builder->getForm();
+				$formulario->handleRequest($this->getRequest());
 				if ($formulario->isValid()) {
 					// actualizar el perfil del usuario
-					$usuario=new Usuarios();
-					$usuario=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
 					$usuario->setNombre($formulario["nombre"]->getData());
 					$usuario->setApellidos($formulario["apellidos"]->getData());
-					$usuario->setEmail($formulario["email"]->getData());
-					$usuario->setNombreUsuario($formulario["nombre_usuario"]->getData());
+					//$usuario->setEmail($formulario["email"]->getData());
+					//$usuario->setNombreUsuario($formulario["nombre_usuario"]->getData());
 					$usuario->setDireccion($formulario["direccion"]->getData());
 					$usuario->setCiudad($formulario["ciudad"]->getData());
 					$usuario->setPais($formulario["pais"]->getData());
@@ -58,29 +64,24 @@ class CuentaController extends Controller{
 					$em->persist($usuario);
 					$em->flush();
 					
-					return $this->redirect($this->generateUrl('perfil'), 303);
+					//return $this->redirect($this->generateUrl('ficheros'), 303);
 				}
-				else {
-					return $this->redirect($this->generateUrl('perfil'), 303);
-				}
+			}else{
+				$formulario=$formulario_builder->setData($usuario)->getForm();
 			}
-			else{
-				//$formulario = $this->createFormBuilder($usuario)->add('nombrefichero','text', array('data'=> $ficheros2->getNombreFichero()))->add('ruta','text',array ('data'=> $ficheros2->getRuta()))->getForm();
-				$usuario->setLimite(round(($usuario->getLimite()/1024/1024),2).""); //MB
-				$usuario->setOcupado(round(($usuario->getOcupado()/1024/1024),2));
-				$usuario->setOcupado($usuario->getOcupado().""); //MB
-				$libre=($usuario->getLimite()-$usuario->getOcupado())." MB (".round((($usuario->getOcupado()/$usuario->getLimite())*100),2)."%)";
-				$libre_porcentaje=round((($usuario->getOcupado()/$usuario->getLimite())*100),2);
-				
-				//Sumar offset
-				//$a=new Fechas();
-				//$b=$a->convertFecha($usuario->getfechaRegistro(), $usuario->getZone());
-				//$usuario->setfechaRegistro($b);
-				
-				$formulario=$this->createFormBuilder($usuario)->add('nombre','text')->add('apellidos','text')->add('email','text')->add('nombre_usuario','text')->add('direccion','text')->add('ciudad','text')->add('pais','text')
-				->add('idioma', 'choice', array('choices' => array('es' => 'Español', 'en' => 'English'),'required'  => true))->add('zone','timezone')->getForm();
-				return $this->render('UsuarioBundle:Cuenta:perfil.html.twig', array('usuario'=>$usuario,'formulario' => $formulario->createView(), 'libre'=> $libre, 'libre_porcentaje'=> $libre_porcentaje));
-			}
+			//$formulario = $this->createFormBuilder($usuario)->add('nombrefichero','text', array('data'=> $ficheros2->getNombreFichero()))->add('ruta','text',array ('data'=> $ficheros2->getRuta()))->getForm();
+			$usuario->setLimite(round(($usuario->getLimite()/1024/1024),2).""); //MB
+			$usuario->setOcupado(round(($usuario->getOcupado()/1024/1024),2));
+			$usuario->setOcupado($usuario->getOcupado().""); //MB
+			$libre=($usuario->getLimite()-$usuario->getOcupado())." MB (".round((($usuario->getOcupado()/$usuario->getLimite())*100),2)."%)";
+			$libre_porcentaje=round((($usuario->getOcupado()/$usuario->getLimite())*100),2);
+			
+			//Sumar offset
+			//$a=new Fechas();
+			//$b=$a->convertFecha($usuario->getfechaRegistro(), $usuario->getZone());
+			//$usuario->setfechaRegistro($b);
+			
+			return $this->render('UsuarioBundle:Cuenta:perfil.html.twig', array('usuario'=>$usuario,'formulario' => $formulario->createView(), 'libre'=> $libre, 'libre_porcentaje'=> $libre_porcentaje));
 		}
 		else{
 			return $this->redirect($this->generateUrl('login'), 301);

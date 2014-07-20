@@ -13,18 +13,19 @@ class SecurityController extends Controller{
 		$peticion = $this->getRequest();
 		$sesion = $peticion->getSession();
 		$error = $peticion->attributes->get(SecurityContext::AUTHENTICATION_ERROR,$sesion->get(SecurityContext::AUTHENTICATION_ERROR));
-		
-		/*
-		//Sumar LOGIN_WEB.
-			$em = $this->getDoctrine()->getManager();
-		$usuario = $em->getRepository('UsuarioBundle:Usuarios')->find($id);
-		//$usuario->setLoginWeb($usuario->getLoginWeb()+1);
-		$usuario->setLoginWeb(1);
-		$em->persist($usuario);
-		$em->flush();
-		*/
-		
+				
 		return $this->render('UsuarioBundle:Security:login.html.twig', array('last_username' => $sesion->get(SecurityContext::LAST_USERNAME),'error' => $error));
 
+	}
+	
+	public function recoveryAction(){
+		if ($this->getRequest()->isMethod('POST')){
+			return $this->render('UsuarioBundle:Security:recovery.html.twig', array('username' => $this->get('request')->request->get('_username')));
+		}
+		else{
+			$peticion = $this->getRequest();
+			$sesion = $peticion->getSession();
+			return $this->render('UsuarioBundle:Security:recovery.html.twig', array('last_username' => $sesion->get(SecurityContext::LAST_USERNAME)));
+		}
 	}
 }

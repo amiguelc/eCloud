@@ -1,29 +1,32 @@
 {% extends '::frontend.html.twig' %}
-{% block title %}home {% endblock %}
+{% block title %} entrar {% endblock %}
 {% block article %}
 <section>
-<div>
-{% if error %}
-	{{ error.message }}
-</div>
-{% endif %}
-	<br>
-	<br>
-
-	
-	<form action="{{ path('login_check') }}" method="post">
-		<table>
-			<tr>
-				<td><label for="username">Email</label></td><td><input type="text" id="username" name="_username" value="{{ last_username }}" /></td>
-				<td><label for="password">Password:</label></td><td><input type="password" id="password" name="_password" /></td>
-			</tr>		
-			
-			{#	If you want to control the URL the user is redirected to on success <input type="hidden" name="_target_path" value="/account" /> #}
-			<tr><td><input type="checkbox" id="no_cerrar" name="_remember_me" checked /><label for="no_cerrar">Recordarme</label></td></td></tr>
-		
-			<tr><td></td></tr>
-		</table>
-		<br><button class="mid button green" type="submit">Entrar</button>
-	</form>
+	<div id="login_page">
+	<h1>Entrar en eCloud</h1>
+		{% if error %}
+			<div id="error_login">
+			{{ error.message }}
+			</div>
+		{% endif %}
+		<div id='login_form'>
+			<form action="{{ path('login_check') }}" method="post">
+				<table>
+					<tr>
+						<td><label for="username">Email</label></td><td><input type="text" id="username" name="_username" value="{{ last_username }}" size="30" /></td></tr>
+						<tr><td><label for="password">Password:</label></td><td><input type="password" id="password" name="_password" size="30" /></td></tr>
+							
+					
+					{#	If you want to control the URL the user is redirected to on success <input type="hidden" name="_target_path" value="/account" /> #}
+					<tr><td><input type="checkbox" id="no_cerrar" name="_remember_me" checked /><label for="no_cerrar">Recordarme</label></td><td></td></tr>
+				
+					<tr><td></td></tr>
+				</table>
+				<br><button class="mid button green" type="submit">Entrar</button> <a href="{{ path('registro') }}">o Registrarse</a>
+			</form>
+			<br><a href="{{ path('recovery') }}">¿No puedes iniciar sesión??</a>
+		</div>
+	</div>
 </section>
+
 {% endblock %}

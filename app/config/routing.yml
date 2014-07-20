@@ -25,7 +25,10 @@ logout:
     path: /logout
 registro:
     path: /registro
-    defaults: { _controller: UsuarioBundle:Registro:Registro}
+    defaults: { _controller: UsuarioBundle:Registro:registro}
+recovery:
+    path: /recovery
+    defaults: { _controller: UsuarioBundle:Security:recovery}
 
 #PERFILES, PROTEGIDO BAJO FIREWALL
 perfil:

@@ -1,53 +1,67 @@
 {% extends '::frontend.html.twig' %}
+
+{# import "_self" as the form theme #}
+{% form_theme formulario _self %}
+
+{# make the form fragment customization #}
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+             {% for error in errors %}
+                <span style="color:red;">{{ error.message }}</span><br>
+            {% endfor %}
+
+        {% endif %}
+    {% endspaceless %}	
+{% endblock form_errors %}
+
 {% block title %}Mi perfil {% endblock %}
 
 {% block article %}
 <section>
 	<h1>{{ block('title') }}</h1>
-	<form action="{{ path('perfil') }}" method="post" {{ form_enctype(formulario) }}>
 		<div class="errors">
 		{{ form_errors(formulario) }}
 		</div>
 		<table class='form'>
 		<tbody>
 			<tr>
+				<td><label for="form_email">Email</label></td>
+				<td><input type="text" id="form_email" name="form[email]" disabled="disabled" value="{{ usuario.email }}" /> </td>
+			</tr>
+			<tr>
+				<td><label for="form_nombre_usuario">Nombre usuario</label></td>
+				<td><input type="text" id="form_nombre_usuario" name="form[nombre_usuario]" disabled="disabled" value="{{ usuario.nombreusuario }}" /> </td>
+			</tr>
+			{{ form_start(formulario) }}
+			<tr>
 				<td style='width:150px'>{{ form_label(formulario.nombre) }}</td>
-				<td>{{ form_widget(formulario.nombre) }}</td>
+				<td>{{ form_widget(formulario.nombre) }} {{ form_errors(formulario.nombre) }}</td>
 			</tr>
 			<tr>
 				<td>{{ form_label(formulario.apellidos) }}</td>
-				<td>{{ form_widget(formulario.apellidos) }}</td>
+				<td>{{ form_widget(formulario.apellidos) }} {{ form_errors(formulario.apellidos) }}</td>
 			</tr>
-			<tr>
-				<td>{{ form_label(formulario.email) }}</td>
-				<td>{{ form_widget(formulario.email) }}</td>
-			</tr>
-						<tr>
-				<td>{{ form_label(formulario.nombre_usuario) }}</td>
-				<td>{{ form_widget(formulario.nombre_usuario) }}</td>
-			</tr>
-
 			<tr>
 				<td>{{ form_label(formulario.direccion) }}</td>
-				<td>{{ form_widget(formulario.direccion) }}</td>
+				<td>{{ form_widget(formulario.direccion)}} {{ form_errors(formulario.direccion) }}</td>
 			</tr>
 			<tr>
 				<td>{{ form_label(formulario.ciudad) }}</td>
-				<td>{{ form_widget(formulario.ciudad) }}</td>
+				<td>{{ form_widget(formulario.ciudad) }} {{ form_errors(formulario.ciudad) }}</td>
 			</tr>
 			<tr>
 				<td>{{ form_label(formulario.pais) }}</td>
-				<td>{{ form_widget(formulario.pais) }}</td>
+				<td>{{ form_widget(formulario.pais)}} {{ form_errors(formulario.pais) }}</td>
 			</tr>
 			<tr>
 				<td> Idioma</td>
-				<td>{{ form_widget(formulario.idioma) }}</td>
+				<td>{{ form_widget(formulario.idioma) }} {{ form_errors(formulario.idioma) }}</td>
 			</tr>
 			<tr>
 				<td> Zona horaria</td>
-				<td>{{ form_widget(formulario.zone) }}</td>
+				<td>{{ form_widget(formulario.zone) }} {{ form_errors(formulario.zone) }}</td>
 			</tr>
-			{{ form_rest(formulario) }}
 			<tr>
 				<td> Fecha de Registro</td>
 				<td>{{ usuario.fechaRegistro|date('d/m/Y H:i', false ) }}</td>
@@ -66,22 +80,29 @@
 			</tr>
 			<tr>
 				<td> Libre</td>
-				<td>{{ libre }}</td>
-						
+				<td>{{ libre }}</td>						
 			</tr>
 			<tr>
-				<td colspan="2"><div>
-					<progress value="{{ libre_porcentaje }}" max="100"></progress>
-					<!-- <span style='position:relative;left:-105px;z-index:1;font-size:12pt'>{{ libre_porcentaje }}%  </span> -->
-				</div></td>		
+				<td colspan="2">
+					<div>
+						<progress value="{{ libre_porcentaje }}" max="100"></progress>
+					</div>
+				</td>		
+			</tr>
+			<tr>
+				<td> Status</td>
+				<td>{{ usuario.status }}</td>						
+			</tr>
+			<tr>
+				<td> Tipo de Cuenta</td>
+				<td>{{ usuario.tipo }}</td>						
 			</tr>
 		</div>
 		</tbody>
 		</table><br>
-		<td><input class="boton" type="submit" value="Guardar cambios" /></td>
+		<td><input class="grey mid button" type="submit" value="Guardar cambios" /></td>
 		<br>
-		
-	</form>
+	{{ form_end(formulario) }}
 	
 
 </section>

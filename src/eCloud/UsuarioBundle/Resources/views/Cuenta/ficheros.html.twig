@@ -670,7 +670,7 @@
 	<table>
 	<caption>{{ app.user.nombreusuario }}<a href="{{ path('ficheros') }}">/{{ ruta }}</a> <div style='float:right'><button class='small grey button' id='button_dialogo_subir'>Subir</button> <button class='small grey button' id='button_crear_carpeta'>Crear carpeta</button> <button id='button_subir'>Subir archivo</button> <button id='button_carpeta'style="display:none;">Crear carpeta</button></div></caption>
 
-	<thead><tr><th style='width:80%;'>Nombre</th><th>Tama&ntilde;o</th><th>Modificado</th><th></th></tr></thead>
+	<thead><tr><th style='width:100%;'>Nombre</th><th>Tama&ntilde;o</th><th>Modificado</th><th></th></tr></thead>
 	<tbody id="tbody">
 		{% set var1 = 0 %}
 		{% for ficheros in ficheros %}

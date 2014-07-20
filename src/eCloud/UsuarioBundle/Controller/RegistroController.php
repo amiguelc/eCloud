@@ -19,9 +19,9 @@ class RegistroController extends Controller{
 			$usuario = new Usuarios();
 			//id_user,email,nombre_usuario,password,nombre,apellidos,direccion,ciudad,pais,ip_registro,fecha_registro,limite,logins_ftp,login_web,ocupado,ultimo_acceso,idioma,zone
 
-			$formulario=$this->createFormBuilder($usuario)->add('email','text')->add('nombre_usuario','text')->add('password','password')->add('nombre','text')
-			->add('apellidos','text')->add('direccion','text')->add('ciudad','text')
-			->add('pais','text')->add('idioma', 'choice', array('choices' => array('es' => 'Español', 'en' => 'English'),'required'  => true))
+			$formulario=$this->createFormBuilder($usuario, array('validation_groups' => array('registro')))->add('email','text')->add('nombre_usuario','text')->add('password','password')->add('nombre','text',array('required' => false))
+			->add('apellidos','text',array('required' => false))->add('direccion','text',array('required' => false))->add('ciudad','text',array('required' => false))
+			->add('pais','text',array('required' => false))->add('idioma', 'choice', array('choices' => array('es' => 'Español', 'en' => 'English')))
 			->add('zone','timezone')->getForm();
 			
 			if ($peticion->getMethod() == 'POST') {
@@ -30,14 +30,13 @@ class RegistroController extends Controller{
 				$formulario->handleRequest($peticion);
 				
 				if ($formulario->isValid()) {
-				// guardar la información en la base de datos
+					// guardar la información en la base de datos
 					$encoder = $this->get('security.encoder_factory')->getEncoder($usuario);
 					
 					//Usuario
 					//$usuario->setSalt(md5(time()));
 					$passwordCodificado = $encoder->encodePassword($usuario->getPassword(),$usuario->getSalt());
 					$usuario->setIpRegistro($_SERVER['REMOTE_ADDR']);
-					//$sp=new DateTimeZone("Europe\London");
 					$usuario->setFechaRegistro(new \Datetime(null,new \DateTimeZone("UTC")));
 					$usuario->setultimoAcceso(new \Datetime(null,new \DateTimeZone("UTC")));
 					$usuario->setLimite($this->container->getParameter('default_limite'));
@@ -45,7 +44,8 @@ class RegistroController extends Controller{
 					$usuario->setLoginsftp("0");
 					$usuario->setLoginweb("0");
 					$usuario->setPassword($passwordCodificado);
-					$usuario->setStatus("0");
+					$usuario->setStatus("unverified");
+					$usuario->setTipo("free");
 					//$usuario->setIdioma();
 					$em = $this->getDoctrine()->getManager();
 					

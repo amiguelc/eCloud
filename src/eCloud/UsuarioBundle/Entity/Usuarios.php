@@ -5,12 +5,24 @@ namespace eCloud\UsuarioBundle\Entity;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * Usuarios
  *
  * @ORM\Table()
  * @ORM\Entity
+ * @UniqueEntity(
+ *     fields={"email"},
+ *     message="Ese correo ya existe.",
+ *     groups={"registro"}
+ * )
+ * @UniqueEntity(
+ *     fields={"nombreUsuario"},
+ *     message="Ese usuario ya existe.",
+ *     groups={"registro"}
+ * )
  */
 class Usuarios implements UserInterface {
 
@@ -35,7 +47,7 @@ class Usuarios implements UserInterface {
 	
 	/*	AdvancedUserInterface, not used...
 	public function isAccountNonExpired(){
-		if ($this->status=="1"){
+		if ($this->status=="expired"){
 			return false;
 		}
 		
@@ -43,7 +55,7 @@ class Usuarios implements UserInterface {
 	}
 
     public function isAccountNonLocked(){
-		if ($this->status=="2"){
+		if ($this->status=="locked"){
 			return false;
 		}
 		
@@ -51,7 +63,7 @@ class Usuarios implements UserInterface {
 	}
 
     public function isCredentialsNonExpired(){
-		if ($this->status=="3"){
+		if ($this->status=="credentialsExpired"){
 			return false;
 		}
 		
@@ -61,7 +73,7 @@ class Usuarios implements UserInterface {
 
     
     public function isEnabled(){
-		if ($this->status=="4"){
+		if ($this->status=="disabled"){
 			return false;
 		}
 		
@@ -81,6 +93,11 @@ class Usuarios implements UserInterface {
     /**
      * @var string
      * @ORM\Column(name="email", type="string", length=255, unique=true)
+	 * @Assert\NotBlank()
+	 * @Assert\Email(
+     *     message = "El email '{{ value }}' es inválido.",
+     *     checkMX = true,
+	 *     groups={"registro"})
      */
     private $email;
 
@@ -88,6 +105,7 @@ class Usuarios implements UserInterface {
      * @var string
      *
      * @ORM\Column(name="nombreUsuario", type="string", length=255, unique=true)
+	 * @Assert\NotBlank(groups={"registro"})
      */
     private $nombreUsuario;
 
@@ -95,41 +113,50 @@ class Usuarios implements UserInterface {
      * @var string
      *
      * @ORM\Column(name="password", type="string", length=255)
+	 * @Assert\NotBlank()
+	 * @Assert\Length(
+     *      min = "6",
+     *      max = "20",
+     *      minMessage = "La contraseña debe tener al menos {{ limit }} carácteres",
+     *      maxMessage = "La contraseña no puede tener más de {{ limit }} caracteres",
+	 *		groups={"registro"}
+     * )
      */
     private $password;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre", type="string", length=255)
+     * @ORM\Column(name="nombre", type="string", length=255, nullable=true)
+	 * @Assert\Type(type="string", message="No se permite números", groups={"perfil"});
      */
     private $nombre;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="apellidos", type="string", length=255)
+     * @ORM\Column(name="apellidos", type="string", length=255, nullable=true)
      */
     private $apellidos;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="direccion", type="text")
+     * @ORM\Column(name="direccion", type="text", nullable=true)
      */
     private $direccion;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="ciudad", type="string", length=255)
+     * @ORM\Column(name="ciudad", type="string", length=255, nullable=true)
      */
     private $ciudad;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="pais", type="string", length=255)
+     * @ORM\Column(name="pais", type="string", length=255, nullable=true)
      */
     private $pais;
 
@@ -187,6 +214,7 @@ class Usuarios implements UserInterface {
      * @var string
      *
      * @ORM\Column(name="idioma", type="string", length=255)
+	 * @Assert\Choice(choices = {"es", "en"}, message = "Choose ES or EN language.", groups={"registro","perfil"})
      */
     private $idioma;
 	
@@ -203,6 +231,14 @@ class Usuarios implements UserInterface {
      * @ORM\Column(name="status", type="string", length=255)
      */
     private $status;
+
+	/**
+     * @var string
+     *
+     * @ORM\Column(name="tipo", type="string", length=255)
+	 * @Assert\Choice(choices = {"free", "premium"}, message = "Invalid account")
+     */
+    private $tipo;
 
     /**
      * Get idUser
@@ -628,5 +664,28 @@ class Usuarios implements UserInterface {
     public function getStatus()
     {
         return $this->status;
+    }
+	
+	/**
+     * Set tipo
+     *
+     * @param string $tipo
+     * @return Usuarios
+     */
+    public function setTipo($tipo)
+    {
+        $this->tipo = $tipo;
+
+        return $this;
+    }
+
+    /**
+     * Get tipo
+     *
+     * @return string 
+     */
+    public function getTipo()
+    {
+        return $this->tipo;
     }
 }
