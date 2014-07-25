@@ -15,13 +15,12 @@
 					<tr>
 						<td><label for="username">Email</label></td><td><input type="text" id="username" name="_username" value="{{ last_username }}" size="30" /></td></tr>
 						<tr><td><label for="password">Password:</label></td><td><input type="password" id="password" name="_password" size="30" /></td></tr>
-							
-					
-					{#	If you want to control the URL the user is redirected to on success <input type="hidden" name="_target_path" value="/account" /> #}
+						{#	If you want to control the URL the user is redirected to on success <input type="hidden" name="_target_path" value="/account" /> #}
 					<tr><td><input type="checkbox" id="no_cerrar" name="_remember_me" checked /><label for="no_cerrar">Recordarme</label></td><td></td></tr>
 				
 					<tr><td></td></tr>
 				</table>
+				<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 				<br><button class="mid button green" type="submit">Entrar</button> <a href="{{ path('registro') }}">o Registrarse</a>
 			</form>
 			<br><a href="{{ path('recovery') }}">¿No puedes iniciar sesión??</a>

@@ -1,46 +1,23 @@
-function jsonToTable() {
-
-    if(peticion.readyState == 4) {
-	 
-      if(peticion.status == 200) {
-	 
-		// Borrar datos anteriores
-		//limpia(contenedor);
-	  
-        div = document.getElementById('tabla');
-        		
-		//JSON
-		var arr = eval ("(" + peticion.responseText+ ")"); 
+	$(document).ready(function(){
+		var pagina=location.pathname;
+		pagina=pagina.replace(/^\/app_dev\.php/,"");
+		pagina=pagina.replace(/^\/app\.php/,"/");
 		
-		
-		// Formatear JSON en una tabla
-		var tabla;
-		var cab = "<tr>";
-		var cuerpo = "";
-	
-		for(var i=0;i<arr.length;i++){
-			var obj = arr[i];
-			cuerpo = cuerpo + "<tr>";
-			for(var key in obj){
-				//Para saltar campos
-				//alert(key);
-				if(key=="accion" || key=="nombreFicheroNuevo" || key=="fecha"){
-				
-					var attrName = key;
-					var attrValue = obj[key];
-					cuerpo = cuerpo + "<td>" + attrValue + "</td>";
-					if (i==0){
-					//Guarda cabeceras de la tabla
-					cab = cab + "<th>" + attrName + "</th>";
-					}
-				}
-			}
-			cuerpo = cuerpo + "</tr>";
+		//Ver el menu y resaltar la parte en la que nos encontramos
+		if (pagina.match(/^\/perfil/)!==null){
+			$("#nav").css("visibility","visible");
+			$("#menu_perfil").css("font-weight","bold");
+		}else if(pagina.match(/^\/ficheros/)!==null){
+			$("#nav").css("visibility","visible");
+			$("#menu_ficheros").css("font-weight","bold");
+		}else if(pagina.match(/^\/eventos/)!==null){
+			$("#nav").css("visibility","visible");
+			$("#menu_eventos").css("font-weight","bold");
+		}else if(pagina.match(/^\/links/)!==null){
+			$("#nav").css("visibility","visible");
+			$("#menu_links").css("font-weight","bold");
+		}else if(pagina.match(/^\/modificar/)!==null){
+			$("#nav").css("visibility","visible");
+			$("#menu_ficheros").css("font-weight","bold");
 		}
-		tabla = "<table>" + cab + "</tr>" + cuerpo + "</table>";
-		div.innerHTML = tabla;
-		
-		
-      }
-    }
-  }
+	})

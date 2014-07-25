@@ -3,31 +3,38 @@
 namespace eCloud\UsuarioBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use eCloud\UsuarioBundle\Entity\Usuarios;
 use eCloud\UsuarioBundle\Entity\Eventos;
 
 class RegistroController extends Controller{
 
-		public function registroAction(){
+	public function registroAction(Request $request){
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
 			return $this->redirect($this->generateUrl('home'), 301);
 		}
 		else{
 			 
-			$peticion = $this->getRequest();
 			$usuario = new Usuarios();
-			//id_user,email,nombre_usuario,password,nombre,apellidos,direccion,ciudad,pais,ip_registro,fecha_registro,limite,logins_ftp,login_web,ocupado,ultimo_acceso,idioma,zone
 
-			$formulario=$this->createFormBuilder($usuario, array('validation_groups' => array('registro')))->add('email','text')->add('nombre_usuario','text')->add('password','password')->add('nombre','text',array('required' => false))
-			->add('apellidos','text',array('required' => false))->add('direccion','text',array('required' => false))->add('ciudad','text',array('required' => false))
-			->add('pais','text',array('required' => false))->add('idioma', 'choice', array('choices' => array('es' => 'Español', 'en' => 'English')))
-			->add('zone','timezone')->getForm();
+			$formulario=$this->createFormBuilder($usuario, array('validation_groups' => array('registro')))
+				->add('email','text')
+				->add('nombre_usuario','text')
+				->add('password','password')
+				->add('nombre','text',array('required' => false))
+				->add('apellidos','text',array('required' => false))
+				->add('direccion','text',array('required' => false))
+				->add('ciudad','text',array('required' => false))
+				->add('pais','text',array('required' => false))
+				->add('idioma', 'choice', array('choices' => array('es' => 'Español', 'en' => 'English')))
+				->add('zone','timezone')
+			->getForm();
 			
-			if ($peticion->getMethod() == 'POST') {
+			if ($request->getMethod() == 'POST') {
 				// Validar los datos enviados y guardarlos en la base de datos
 				
-				$formulario->handleRequest($peticion);
+				$formulario->handleRequest($request);
 				
 				if ($formulario->isValid()) {
 					// guardar la información en la base de datos
@@ -55,7 +62,7 @@ class RegistroController extends Controller{
 					
 					//Crear evento de cuenta creada
 					$eventos=new Eventos();
-					//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
+
 					$eventos->setIdUser($usuario->getidUser());
 					$eventos->setaccion("&iexcl;Te has registrado!");
 					$eventos->setTipo("0");
@@ -68,13 +75,13 @@ class RegistroController extends Controller{
 					//$token = new UsernamePasswordToken($usuario,$usuario->getPassword(),'usuarios',$usuario->getRoles());
 					//$this->container->get('security.context')->setToken($token);
 					
-					//crear la carpeta del usuario en el disco duro
+					//Crear la carpeta del usuario en el disco duro, Falta: capturar la excepcion.
 					$var_archivos = $this->container->getParameter('var_archivos');
 					mkdir($var_archivos.$usuario->getIdUser());
 					
 					
 					//falta enviar email de registro completo
-					return $this->redirect($this->generateUrl('login'));	
+					return $this->redirect($this->generateUrl('login'));
 					
 				}
 			}

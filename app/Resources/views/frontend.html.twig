@@ -28,46 +28,16 @@
 			<button class='mid green button' onclick="window.location='{{ path('logout') }}'">Salir</button>
 		</div>
 	</header>
-	<nav>
-			<ul> 
-				<li>
-					<a href="{{ path('perfil') }}"> 
-						{% if currentPath|split('/')|last == 'perfil' %}
-							<b>Mi Perfil</b> 
-						{% else %}
-							Mi perfil 
-						{% endif %} 
-					</a>
-				</li> 
-				<li>
-					<a href="{{ path('ficheros') }}"> 
-						{% if currentPath|split('/')|last == 'ficheros' %}
-							<b>Ficheros</b> 
-						{% else %}
-							Ficheros 
-						{% endif %} 
-					</a>
-				</li>
-				<li>
-					<a href="{{ path('eventos') }}"> 
-						{% if currentPath|split('/')|last == 'eventos' %}
-							<b>Eventos</b> 
-						{% else %}
-							Eventos 
-						{% endif %} 
-					</a>
-				</li>
-				<li>
-					<a href="{{ path('links') }}"> 
-						{% if currentPath|split('/')|last == 'links' %}
-							<b>Links</b> 
-						{% else %}
-							Links 
-						{% endif %} 
-					</a>
-				</li> 
+	<div id="nav" style="visibility:hidden;">
+		<nav>
+			<ul>
+				<li id='menu_perfil'><a href='perfil'>Mi perfil</a></li>
+				<li id='menu_ficheros'><a href='ficheros'>Ficheros </a></li>
+				<li id='menu_eventos'><a href='eventos'>Eventos </a></li>
+				<li id='menu_links'><a href='links'>Links</a></li>
 			</ul>
-		</nav>
+		</nav>		
+	</div>
 	<article class="article_in">
 		<img class='bgbox' src="{{ asset('bundles/usuario/images/imagen_portada.png') }}">
 		
@@ -95,6 +65,7 @@
 					<input type="password" id="password" name="_password" />
 					
 					<input type="hidden" name="_target_path" value="/home" />
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 					<button class="mid button green" type="submit">Entrar</button>
 				</form>
 			</div>

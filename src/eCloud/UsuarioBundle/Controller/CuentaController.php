@@ -1,5 +1,4 @@
 <?php
-
 namespace eCloud\UsuarioBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -17,11 +16,9 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use eCloud\UsuarioBundle\Clases\Fechas;
 
-
-
 class CuentaController extends Controller{
-    public function perfilAction(){
-        // Obtener los datos del usuario logueado y utilizarlos para rellenar un formulario de registro.
+    public function perfilAction(Request $request){
+        // Obtener los datos del usuario logueado y utilizarlos para rellenar un formulario de modificacion de perfil.
 		//
 		// Si la petición es GET, mostrar el formulario
 		// Si la petición es POST, actualizar la información del usuario con los nuevos datos obtenidos del formulario
@@ -42,9 +39,9 @@ class CuentaController extends Controller{
 				->add('idioma', 'choice', array('choices' => array('es' => 'Español', 'en' => 'English')))
 				->add('zone','timezone',array('required' => false));
 			
-			if ($this->getRequest()->isMethod('POST')) {
+			if ($request->isMethod('POST')) {
 				$formulario=$formulario_builder->getForm();
-				$formulario->handleRequest($this->getRequest());
+				$formulario->handleRequest($request);
 				if ($formulario->isValid()) {
 					// actualizar el perfil del usuario
 					$usuario->setNombre($formulario["nombre"]->getData());
@@ -69,17 +66,11 @@ class CuentaController extends Controller{
 			}else{
 				$formulario=$formulario_builder->setData($usuario)->getForm();
 			}
-			//$formulario = $this->createFormBuilder($usuario)->add('nombrefichero','text', array('data'=> $ficheros2->getNombreFichero()))->add('ruta','text',array ('data'=> $ficheros2->getRuta()))->getForm();
 			$usuario->setLimite(round(($usuario->getLimite()/1024/1024),2).""); //MB
 			$usuario->setOcupado(round(($usuario->getOcupado()/1024/1024),2));
 			$usuario->setOcupado($usuario->getOcupado().""); //MB
 			$libre=($usuario->getLimite()-$usuario->getOcupado())." MB (".round((($usuario->getOcupado()/$usuario->getLimite())*100),2)."%)";
 			$libre_porcentaje=round((($usuario->getOcupado()/$usuario->getLimite())*100),2);
-			
-			//Sumar offset
-			//$a=new Fechas();
-			//$b=$a->convertFecha($usuario->getfechaRegistro(), $usuario->getZone());
-			//$usuario->setfechaRegistro($b);
 			
 			return $this->render('UsuarioBundle:Cuenta:perfil.html.twig', array('usuario'=>$usuario,'formulario' => $formulario->createView(), 'libre'=> $libre, 'libre_porcentaje'=> $libre_porcentaje));
 		}
@@ -91,12 +82,7 @@ class CuentaController extends Controller{
 	public function perfiljsonAction($info){
  
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
-			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
-		
-			$em=$this->getDoctrine()->getManager();
-			$usuario=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
-			
-			//if isset nombre dar solo esa info-> jsonificar
+			$usuario=$this->get('security.context')->getToken()->getUser();
 			
 			if ($info!="all"){
 				//Enviar solo lo pedido [email,nombreusuario,limite,ocupado] sin JSON
@@ -105,7 +91,7 @@ class CuentaController extends Controller{
 						$jsonContent=$usuario->getEmail();
 						break;
 					case "perfil":
-						$jsonContent="{\"email\":\"".$usuario->getemail()."\", \"nombreUsuario\":\"".$usuario->getNombreUsuario()."\", \"nombre\":\"".$usuario->getNombre()."\", \"apellidos\":\"".$usuario->getApellidos()."\", \"direccion\":\"".$usuario->getdireccion()."\", \"ciudad\":\"".$usuario->getciudad()."\", \"pais\":\"".$usuario->getpais()."\", \"fechaRegistro\":\"".$usuario->getfechaRegistro()->format('d/m/Y H:i:s')."\", \"limite\":\"".$usuario->getlimite()."\", \"ocupado\":\"".$usuario->getocupado()."\"}";
+						$jsonContent="{\"email\":\"".$usuario->getemail()."\", \"nombreUsuario\":\"".$usuario->getNombreUsuario()."\", \"nombre\":\"".$usuario->getNombre()."\", \"apellidos\":\"".$usuario->getApellidos()."\", \"direccion\":\"".$usuario->getdireccion()."\", \"ciudad\":\"".$usuario->getciudad()."\", \"pais\":\"".$usuario->getpais()."\", \"fechaRegistro\":\"".$usuario->getfechaRegistro()->format('d/m/Y H:i:s')."\", \"limite\":\"".$usuario->getlimite()."\", \"ocupado\":\"".$usuario->getocupado()."\", \"status\":\"".$usuario->getStatus()."\", \"tipo\":\"".$usuario->getTipo()."\"}";
 						break;
 					case "min":
 						$jsonContent="{\"idUser\":\"".$usuario->getidUser()."\",\"email\":\"".$usuario->getemail()."\", \"nombreUsuario\":\"".$usuario->getNombreUsuario()."\"}";
@@ -126,8 +112,14 @@ class CuentaController extends Controller{
 						$libre=$usuario->getLimite()-$usuario->getOcupado();
 						$jsonContent="{\"limite\":\"".$usuario->getLimite()."\",\"ocupado\":\"".$usuario->getOcupado()."\", \"libre\":\"".$libre."\"}";
 						break;
+					case "status":
+						$jsonContent=$usuario->getStatus();
+						break;
+					case "tipo":
+						$jsonContent=$usuario->getTipo();
+						break;
 					default:
-						//Envia todo... hasta contraseña..
+						//Envia todo...
 						$usuario->setPassword("");
 						$encoders = array(new XmlEncoder(), new JsonEncoder());
 						$normalizers = array(new GetSetMethodNormalizer());
@@ -226,7 +218,7 @@ class CuentaController extends Controller{
 						
 					$ficheros[$clave]->setFilesize($filesize_total);
 					$filesize_total=0;
-				}					
+				}
 			}
 			
 			//PASAR BYTES A MB				
@@ -281,11 +273,13 @@ class CuentaController extends Controller{
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
 		
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+			$em=$this->getDoctrine()->getManager();
 			
 			//Validar idfichero.			
-			$fichero=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'idFichero' => $id));
+			$fichero=$em()->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid, 'idFichero' => $id));
 			if ($fichero==NULL){return new Response ("Fichero no encontrado");}
-			$usuario=$this->getDoctrine()->getManager()->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
+			
+			$usuario=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser' => $userid));
 			
 			$fichero[0]->setFechasCorrectas($usuario->getZone());
 				
@@ -320,7 +314,7 @@ class CuentaController extends Controller{
 		}	
 	}
 	
-	public function subirAction(){
+	public function subirAction(Request $request){
 	
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
 			$ficheros = new Ficheros();
@@ -336,9 +330,9 @@ class CuentaController extends Controller{
 				$formulario = $this->createFormBuilder($ficheros)->add('file','file')->add('ruta','hidden', array('constraints' => new NotBlank()))->getForm();
 			}
 			
-			if ($this->getRequest()->isMethod('POST')) {
+			if ($request->isMethod('POST')) {
 			
-				$formulario->handleRequest($this->getRequest());
+				$formulario->handleRequest($request);
 				if ($formulario->isValid()) {
 					$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
 					
@@ -504,20 +498,19 @@ class CuentaController extends Controller{
 		}
 	}
 
-	public function modificarAction($fichero){
+	public function modificarAction(Request $request,$fichero){
    
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
-			
 			
 			$document = new Ficheros();
 			$formulario = $this->createFormBuilder($document)->add('nombrefichero','text')->add('ruta','text')->getForm();
 			$em = $this->getDoctrine()->getManager();
 			$usuarios=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser'=>$userid));			
 			
-			if ($this->getRequest()->isMethod('POST')) {
+			if ($request->isMethod('POST')) {
 				//guardar datos modificados
-				$formulario->bind($this->getRequest());
+				$formulario->bind($request);
 				if ($formulario->isValid()) {
 									
 					//Validar datos.
@@ -727,7 +720,7 @@ class CuentaController extends Controller{
 		}
 	}
 	
-	public function modificarjsonAction($fichero){
+	public function modificarjsonAction(Request $request,$fichero){
 	//Modificar o mover fichero segun si se recibe nuevo nombre o nueva ruta. Codigo copiado de modificarAction. SIN TERMINAR.
    
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
@@ -735,7 +728,7 @@ class CuentaController extends Controller{
 			
 			$em = $this->getDoctrine()->getManager();
 			
-			if ($this->getRequest()->isMethod('POST')) {
+			if ($request->isMethod('POST')) {
 				$codigo="00";
 			
 				$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
@@ -930,141 +923,144 @@ class CuentaController extends Controller{
 		}
 	}
 	
-	public function borrarAction($fichero){
+	public function borrarAction(Request $request,$fichero){
    
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
-			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
-			$em=$this->getDoctrine()->getManager();
-			//Peligroso: Es un borrado con get, sin validar nada, se le pasa el idfichero y elimina. Se puede utilizar en AJAX.
-			//Falta antes de hacer la SQL validar la variable fichero. 
-			
-			$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
-			if ($ficheros==null){ return  $response = new Response("Ese fichero no es tuyo o no existe");}
-			$ruta_local=$this->container->getParameter('var_archivos').$userid.print_r($ficheros->getRuta(), true)."/".print_r($ficheros->getNombreFichero(), true);
-			//$ruta_local=str_replace("/", "\\", $ruta_local);
-			$ruta_local=str_replace("//", "/", $ruta_local);
-			
-			$codigo="M_5X1";
-			//Si es fichero
-			if ($ficheros->getTipo()=="fichero"){
-				$codigo="M_501";
-				//Eventos//
-				$eventos=new Eventos();
-				//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
-				$eventos->setIdUser($userid);
-				$eventos->setaccion("Has borrado el fichero ".$ficheros->getnombreFichero());
-				$eventos->setTipo("50");
-				$eventos->setIdFichero($fichero);
-				$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
-				$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
-				$eventos->setFecha(new \Datetime(null,new \DateTimeZone("UTC")));
-				$eventos->setRuta($ficheros->getRuta());
-				
-				//Restar espacio ocupado a la cuenta del userid.
-				$usuarios=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser'=>$userid));
-				$usuarios->setOcupado($usuarios->getOcupado()-$ficheros->getFilesize());
-				
-				//ejecutar sentencias
-				$em->persist($eventos);
-				$em->persist($usuarios);
-				$em->remove($ficheros);			
-				$em->flush();
-				//borrar fichero
-				if (file_exists($ruta_local)){
-					unlink($ruta_local);
-				}
-			}else{
-				//Si es carpeta
-				$codigo="M_511";
-				//$sub_ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findByRuta(array('idFichero'=>$fichero,'propietario' => $userid));
-				$filesize_total_restar=0;
-				$ruta_carpeta=str_replace('//','/',$ficheros->getRuta()."/".$ficheros->getNombreFichero());
-				$query=$em->createQuery('SELECT f FROM UsuarioBundle:Ficheros f WHERE f.propietario=?1 and f.ruta like ?2 ORDER BY f.tipo DESC');
-				$query->setParameter(1, $userid);
-				$query->setParameter(2, $ruta_carpeta."%");
-				$sub_ficheros = $query->getResult();
-				//return $response = New Response(var_dump($sub_ficheros));
-				
-				
-				//BUCLE QUE RECORRE FICHERO A FICHERO DENTRO DE LA BD PARA BORRAR SUBFICHEROS
-				foreach ($sub_ficheros as $clave => $valor){
-				
-				//Falta analizar el sentido de esta SQL. Creo que hay que eliminarla.
-				$filesize_query=$em->createQuery('SELECT f from UsuarioBundle:Ficheros f WHERE f.propietario=?1 and id_fichero=?2');
-				$filesize_query->setParameter(1, $userid);
-				$filesize_query->setParameter(2, $sub_ficheros[$clave]->getidFichero());
-				$filesize_query = $query->getResult();
+			if($request->isMethod("POST")){
+				$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+				if ($request->request->get('_token')!==$request->getSession()->get("_csrf/form",null)){return new Response("Invalidad Token");};
 
-				//$filesize_f=$filesize_query[$clave]->getFilesize();
-				$filesize_total_restar+=$sub_ficheros[$clave]->getFilesize();
+				$em=$this->getDoctrine()->getManager();
+				//Falta antes de hacer la SQL validar la variable fichero, aunque en teoria se hace en el router.
 				
-				//EVENTOS (fichero o carpeta)
-				$eventos=new Eventos();
-				//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
-				$eventos->setIdUser($userid);
-				//$eventos->setIdFichero($document->getIdFichero());
-				$eventos->setIdFichero($sub_ficheros[$clave]->getidFichero());
-				$eventos->setNombreFicheroAntiguo($sub_ficheros[$clave]->getnombreFichero());
-				$eventos->setNombreFicheroNuevo($sub_ficheros[$clave]->getnombreFichero());
-				$eventos->setFecha(new \Datetime(null,new \DateTimeZone("UTC")));
-				$eventos->setRuta($sub_ficheros[$clave]->getRuta());
-				if($sub_ficheros[$clave]->getTipo()=='fichero'){
-				$eventos->setaccion("Has borrado el fichero ".$sub_ficheros[$clave]->getnombreFichero());
-				$eventos->setTipo("50");
-				}else{
-				$eventos->setaccion("Has borrado la carpeta ".$sub_ficheros[$clave]->getnombreFichero());
-				$eventos->setTipo("51");
-				}
+				$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findOneBy(array('idFichero'=>$fichero,'propietario' => $userid));
+				if ($ficheros==null){ return  $response = new Response("Ese fichero no es tuyo o no existe");}
+				$ruta_local=$this->container->getParameter('var_archivos').$userid.print_r($ficheros->getRuta(), true)."/".print_r($ficheros->getNombreFichero(), true);
+				//$ruta_local=str_replace("/", "\\", $ruta_local);
+				$ruta_local=str_replace("//", "/", $ruta_local);
 				
-				$em->remove($sub_ficheros[$clave]);
-				$em->persist($eventos);
-				$em->flush();
-				
-				
-				//return $response = New Response(var_dump($filesize_query));
-				}//cierra foreach
-				
-				//Eliminar de la BD la carpeta principal y crear evento de borrado de esa carpeta.
-				$eventos=new Eventos();
-				//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
-				$eventos->setIdUser($userid);
-				$eventos->setaccion("Has borrado la carpeta ".$ficheros->getnombreFichero());
-				$eventos->setTipo("51");
-				$eventos->setIdFichero($ficheros->getidFichero());
-				$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
-				$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
-				$eventos->setFecha(new \Datetime(null,new \DateTimeZone("UTC")));
-				$eventos->setRuta($ficheros->getRuta());
-				
-				$em->remove($ficheros);
-				$em->persist($eventos);
-				
-				//Restar espacio ocupado a la cuenta del userid.
-				$usuarios=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser'=>$userid));
-				$usuarios->setOcupado($usuarios->getOcupado()-$filesize_total_restar);
-				$em->flush();
-				
-				//BORRAR DIRECTORIO
-				function deleteDirectory($dir) {
-				if (!file_exists($dir)) return true;
-				if (!is_dir($dir) || is_link($dir)) return unlink($dir);
-					foreach (scandir($dir) as $item) {
-						if ($item == '.' || $item == '..') continue;
-						if (!deleteDirectory($dir . "/" . $item)) {
-							chmod($dir . "/" . $item, 0777);
-							if (!deleteDirectory($dir . "/" . $item)) return false;
-						};
+				$codigo="M_5X1";
+				//Si es fichero
+				if ($ficheros->getTipo()=="fichero"){
+					$codigo="M_501";
+					//Eventos//
+					$eventos=new Eventos();
+					//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
+					$eventos->setIdUser($userid);
+					$eventos->setaccion("Has borrado el fichero ".$ficheros->getnombreFichero());
+					$eventos->setTipo("50");
+					$eventos->setIdFichero($fichero);
+					$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
+					$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
+					$eventos->setFecha(new \Datetime(null,new \DateTimeZone("UTC")));
+					$eventos->setRuta($ficheros->getRuta());
+					
+					//Restar espacio ocupado a la cuenta del userid.
+					$usuarios=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser'=>$userid));
+					$usuarios->setOcupado($usuarios->getOcupado()-$ficheros->getFilesize());
+					
+					//ejecutar sentencias
+					$em->persist($eventos);
+					$em->persist($usuarios);
+					$em->remove($ficheros);			
+					$em->flush();
+					//borrar fichero
+					if (file_exists($ruta_local)){
+						unlink($ruta_local);
 					}
-					return rmdir($dir);
-				}
-				deleteDirectory($ruta_local);
-				
-				//$sub_ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid,'ruta'=>$ruta_carpeta));
-				//return $response = New Response(var_dump($usuarios));
-			}			
-			
-			return $response = New Response($codigo);
+				}else{
+					//Si es carpeta
+					$codigo="M_511";
+					//$sub_ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findByRuta(array('idFichero'=>$fichero,'propietario' => $userid));
+					$filesize_total_restar=0;
+					$ruta_carpeta=str_replace('//','/',$ficheros->getRuta()."/".$ficheros->getNombreFichero());
+					$query=$em->createQuery('SELECT f FROM UsuarioBundle:Ficheros f WHERE f.propietario=?1 and f.ruta like ?2 ORDER BY f.tipo DESC');
+					$query->setParameter(1, $userid);
+					$query->setParameter(2, $ruta_carpeta."%");
+					$sub_ficheros = $query->getResult();
+					//return $response = New Response(var_dump($sub_ficheros));
+					
+					
+					//BUCLE QUE RECORRE FICHERO A FICHERO DENTRO DE LA BD PARA BORRAR SUBFICHEROS
+					foreach ($sub_ficheros as $clave => $valor){
+					
+					//Falta analizar el sentido de esta SQL. Creo que hay que eliminarla.
+					$filesize_query=$em->createQuery('SELECT f from UsuarioBundle:Ficheros f WHERE f.propietario=?1 and id_fichero=?2');
+					$filesize_query->setParameter(1, $userid);
+					$filesize_query->setParameter(2, $sub_ficheros[$clave]->getidFichero());
+					$filesize_query = $query->getResult();
 
+					//$filesize_f=$filesize_query[$clave]->getFilesize();
+					$filesize_total_restar+=$sub_ficheros[$clave]->getFilesize();
+					
+					//EVENTOS (fichero o carpeta)
+					$eventos=new Eventos();
+					//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
+					$eventos->setIdUser($userid);
+					//$eventos->setIdFichero($document->getIdFichero());
+					$eventos->setIdFichero($sub_ficheros[$clave]->getidFichero());
+					$eventos->setNombreFicheroAntiguo($sub_ficheros[$clave]->getnombreFichero());
+					$eventos->setNombreFicheroNuevo($sub_ficheros[$clave]->getnombreFichero());
+					$eventos->setFecha(new \Datetime(null,new \DateTimeZone("UTC")));
+					$eventos->setRuta($sub_ficheros[$clave]->getRuta());
+					if($sub_ficheros[$clave]->getTipo()=='fichero'){
+					$eventos->setaccion("Has borrado el fichero ".$sub_ficheros[$clave]->getnombreFichero());
+					$eventos->setTipo("50");
+					}else{
+					$eventos->setaccion("Has borrado la carpeta ".$sub_ficheros[$clave]->getnombreFichero());
+					$eventos->setTipo("51");
+					}
+					
+					$em->remove($sub_ficheros[$clave]);
+					$em->persist($eventos);
+					$em->flush();
+					
+					
+					//return $response = New Response(var_dump($filesize_query));
+					}//cierra foreach
+					
+					//Eliminar de la BD la carpeta principal y crear evento de borrado de esa carpeta.
+					$eventos=new Eventos();
+					//id_evento,id_user,accion,id_fichero,nombre_fichero_antiguo,nombre_fichero_nuevo,fecha 
+					$eventos->setIdUser($userid);
+					$eventos->setaccion("Has borrado la carpeta ".$ficheros->getnombreFichero());
+					$eventos->setTipo("51");
+					$eventos->setIdFichero($ficheros->getidFichero());
+					$eventos->setNombreFicheroAntiguo($ficheros->getnombreFichero());
+					$eventos->setNombreFicheroNuevo($ficheros->getnombreFichero());
+					$eventos->setFecha(new \Datetime(null,new \DateTimeZone("UTC")));
+					$eventos->setRuta($ficheros->getRuta());
+					
+					$em->remove($ficheros);
+					$em->persist($eventos);
+					
+					//Restar espacio ocupado a la cuenta del userid.
+					$usuarios=$em->getRepository('UsuarioBundle:Usuarios')->findOneBy(array('idUser'=>$userid));
+					$usuarios->setOcupado($usuarios->getOcupado()-$filesize_total_restar);
+					$em->flush();
+					
+					//BORRAR DIRECTORIO
+					function deleteDirectory($dir) {
+					if (!file_exists($dir)) return true;
+					if (!is_dir($dir) || is_link($dir)) return unlink($dir);
+						foreach (scandir($dir) as $item) {
+							if ($item == '.' || $item == '..') continue;
+							if (!deleteDirectory($dir . "/" . $item)) {
+								chmod($dir . "/" . $item, 0777);
+								if (!deleteDirectory($dir . "/" . $item)) return false;
+							};
+						}
+						return rmdir($dir);
+					}
+					deleteDirectory($ruta_local);
+					
+					//$sub_ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findBy(array('propietario' => $userid,'ruta'=>$ruta_carpeta));
+					//return $response = New Response(var_dump($usuarios));
+				}			
+				
+				return $response = New Response($codigo);
+			}
+			return new Response("Metodo GET no permitido");
 		}
 		else{
 			return $this->redirect($this->generateUrl('login'), 301);
@@ -1113,7 +1109,8 @@ class CuentaController extends Controller{
 	public function eventosJSONAction($desde, $hasta, $start, $cantidad){
    
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
-			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
+			$usuario=$this->get('security.context')->getToken()->getUser();
+			$userid=$usuario->getidUser();
 			$em=$this->getDoctrine()->getManager();
 			
 			//Falta mejorar la creacion del objeto datetime para utilizar timezone Europe/Madrid u otro según el país del usuario.
@@ -1139,7 +1136,7 @@ class CuentaController extends Controller{
 				//$hasta=$hasta->format("d/m/Y");
 			}
 			
-			//Falta: Comprobar que desde es anterior a la otra.			
+			//Falta: Comprobar que desde es anterior a la otra.
 			
 			//return new Response ($start." ".$cantidad);
 			
@@ -1156,14 +1153,11 @@ class CuentaController extends Controller{
 			//$min=new Eventos();
 			$min=$query->getResult();
 			
-			
 			//Coger Timezone del usuario
-			$timezone = $em->createQuery('SELECT u.zone FROM UsuarioBundle:Usuarios u WHERE u.idUser='.$userid)->getResult();
-			//return new Response(var_dump($timezone));
+			$timezone = $usuario->getZone();
 			
 			foreach ($min as $key => $valor) {
-				$min[$key]['fecha']=$min[$key]['fecha']->setTimezone(new \DateTimeZone($timezone[0]['zone']));
-				//return new Response($min[$key]['fecha']->getOffset());
+				$min[$key]['fecha']=$min[$key]['fecha']->setTimezone(new \DateTimeZone($timezone));
 			}
 			
 			$encoders = array(new XmlEncoder(), new JsonEncoder());
@@ -1171,23 +1165,14 @@ class CuentaController extends Controller{
 			$serializer = new Serializer($normalizers, $encoders);
 			$jsonContent = $serializer->serialize($min, 'json');
 			return new Response ($jsonContent);
-					
-			/*
-			//Envia todo...
-			$eventos=$em->getRepository('UsuarioBundle:Eventos')->findBy(array('idUser' => $userid),array('fecha' => 'DESC'));
-			$encoders = array(new XmlEncoder(), new JsonEncoder());
-			$normalizers = array(new GetSetMethodNormalizer());
-			$serializer = new Serializer($normalizers, $encoders);
-			$jsonContent = $serializer->serialize($eventos, 'json');
-			return new Response ($jsonContent);
-			*/
+			
 		}
 		else{
 			return $this->redirect($this->generateUrl('login'), 301);
 		}
 	}
 	
-	public function linksAction($id){
+	public function linksAction(Request $request,$id){
 	
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
 			$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
@@ -1199,9 +1184,9 @@ class CuentaController extends Controller{
 			$formulario_link = $this->createFormBuilder($entity_enlace)->add('url','text')->add('idFichero','hidden')->add('propietario','hidden')->add('fechaInicio','date')->add('fechaExpiracion','date')->add('usuarios','choice', array('choices' => array('todos' => 'Todos', 'registrados' => 'Solo registrados')))->getForm();
 			//si GET, ver lista de LINKS, si link especificado, mostrar formulario para ver y modificarlo.
 
-			if ($this->getRequest()->isMethod('POST')){
+			if ($request->isMethod('POST')){
 				//Guardar datos
-				$formulario_link->bind($this->getRequest());
+				$formulario_link->bind($request);
 				if ($formulario_link->isValid()) {
 				$enlace = $formulario_link->getData();
 				$em->persist($enlace);
@@ -1214,15 +1199,15 @@ class CuentaController extends Controller{
 			else{
 				//GET a secas-> Ver lista de links, GET con idFichero y formulario para editar.
 				if($id==0){
-				//Ver Lista de links.
-				$enlaces=$em->getRepository('UsuarioBundle:Enlaces')->findBy(array('propietario'=>$userid));
-				
-				return $this->render('UsuarioBundle:Cuenta:links.html.twig', array('enlaces'=>$enlaces));
+					//Ver Lista de links.
+					$enlaces=$em->getRepository('UsuarioBundle:Enlaces')->findBy(array('propietario'=>$userid));
+					
+					return $this->render('UsuarioBundle:Cuenta:links.html.twig', array('enlaces'=>$enlaces));
 				}else{
-				//Ver LINK especifico
-				
-				return $this->redirect($this->generateUrl('ficheros'), 303);
-				//return $this->render('UsuarioBundle:Cuenta:links.html.twig');
+						//Ver LINK especifico
+						
+						return $this->redirect($this->generateUrl('ficheros'), 303);
+						//return $this->render('UsuarioBundle:Cuenta:links.html.twig');
 				}
 			}
 
@@ -1252,7 +1237,7 @@ class CuentaController extends Controller{
 	}
 	
 	//Descarga EXTERNA ecloud/!idlink
-	public function downloadAction($descarga){
+	public function downloadAction(Request $request,$descarga){
    
 		if ($this->get('security.context')->isGranted('ROLE_USER')){
 			//$userid=$this->get('security.context')->getToken()->getUser()->getidUser();
@@ -1279,7 +1264,7 @@ class CuentaController extends Controller{
 		}
 		else{
 		
-			//FALTA MOSTRAR FICHERO Y ESPERA PARA DETERMINADA IP. ¿Hacer una tabla para la cola de espera?
+			//FALTA MOSTRAR FICHERO Y ESPERA PARA DETERMINADA IP. ¿Hacer una tabla para la cola de espera? Mejor una session con timer.
 			$em=$this->getDoctrine()->getManager();
 			$enlace=$em->getRepository('UsuarioBundle:Enlaces')->findOneBy(array('idEnlace'=>$descarga));
 			if (!$enlace) {throw $this->createNotFoundException('No existe ese fichero');}
@@ -1289,7 +1274,7 @@ class CuentaController extends Controller{
 			if($enlace->getUsuarios()=='todos'){
 				//procesar enlace y servir al usuario.
 				
-				if ($this->getRequest()->isMethod('POST')){
+				if ($request->isMethod('POST')){
 					//procesar ruta y descargar el archivo, sumar una descarga a la BD.
 					$ruta_local=$this->container->getParameter('var_archivos').$ficheros->getPropietario().print_r($ficheros->getRuta(), true)."/".print_r($ficheros->getNombreFichero(), true);
 					$ruta_local=str_replace("//", "/", $ruta_local);
@@ -1324,7 +1309,7 @@ class CuentaController extends Controller{
 			return new Response("true");
 		}else{
 			return new Response("false");
-		}			
+		}
 	}
 		
 }

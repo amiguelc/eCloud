@@ -118,12 +118,12 @@ class AdminController extends Controller
 		}
     }
 	
-    public function usuariosAction($id){
+    public function usuariosAction(Request $request,$id){
 		if ($this->get('security.context')->isGranted('ROLE_ADMIN')){
 			$em=$this->getDoctrine()->getManager();
 			$usuarios=$em->getRepository('UsuarioBundle:Usuarios')->findAll();
 			
-			if ($this->getRequest()->isMethod('POST')) {
+			if ($request->isMethod('POST')) {
 			
 			
 			
@@ -168,12 +168,12 @@ class AdminController extends Controller
 		}
     }
 	
-	public function borrarusuariosAction($id){
+	public function borrarusuariosAction(Request $request,$id){
 		if ($this->get('security.context')->isGranted('ROLE_ADMIN')){
 			$em=$this->getDoctrine()->getManager();
 			$usuarios=$em->getRepository('UsuarioBundle:Usuarios')->findOneByIdUser($id);
 			$ficheros=$em->getRepository('UsuarioBundle:Ficheros')->findByPropietario($id);
-			if ($this->getRequest()->isMethod('GET')) {
+			if ($request->isMethod('GET')) {
 			//BORRAR USUARIO Y SUS CORRESPONDIENTES FICHEROS.
 			
 			//return $response = New Response(var_dump($ficheros));

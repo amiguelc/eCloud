@@ -10,18 +10,19 @@
 	
 		
 	<script type="text/javascript">
-		//Esto mas tarde estará en un fichero Javascript General que detecte la URL y ejecute funciones en base a ello.
-  String.prototype.transformaCaracteresEspeciales = function() {
-    return unescape(escape(this).
-                      replace(/%0A/g, '<br/>').
-                      replace(/%3C/g, '&lt;').
-                      replace(/%3E/g, '&gt;'));
-  }
+	//Esto mas tarde estará en un fichero Javascript General que detecte la URL y ejecute funciones en base a ello.
+	String.prototype.transformaCaracteresEspeciales = function() {
+		return unescape(escape(this).
+						  replace(/%0A/g, '<br/>').
+						  replace(/%3C/g, '&lt;').
+						  replace(/%3E/g, '&gt;')
+						);
+	};
   
 	//AL cargar la página
 	$( document ).ready(function() {
 		dibujarTabla();
-		if (location.pathname.match(/eventos$/)!=null){
+		if (location.pathname.match(/eventos$/)!==null){
 			
 			//Convertir "/" a "-".
 			/* Utilizando el objeto date de jquery.
@@ -61,8 +62,7 @@
 	
 	function vaciarTabla(){
 		mydiv = document.getElementById('cuerpo');
-		while ( mydiv.firstChild ) mydiv.removeChild( mydiv.firstChild );
-	
+		while ( mydiv.firstChild ) mydiv.removeChild( mydiv.firstChild );	
 	}
 	
 	
@@ -79,18 +79,13 @@
 		//document.getElementById('start').value=parseInt(start)+parseInt(cantidad);
 		document.getElementById('cantidadAnterior').value=cantidad;
 	}
-	
-	
-	
-	
   
 	function cargarContenido(metodo,url,funcion) {
   
 		// Instanciar objeto XMLHttpRequest
 		if(window.XMLHttpRequest) {
 		  peticion = new XMLHttpRequest();
-		}
-		else {
+		}else {
 		  peticion = new ActiveXObject("Microsoft.XMLHTTP");
 		}
 		
@@ -100,7 +95,7 @@
 		// Realizar petición
 		peticion.open(metodo, url, true);
 		peticion.send(null);
-  }
+	}
 	
 	function resetStart(){
 		document.getElementById('start').value='0';
@@ -128,128 +123,126 @@
 				document.getElementById('cantidad').value=20;
 			}else{
 				document.getElementById('cantidad').value=readCookie('mostrar');
-			};
+			}
 		}
 		//document.getElementById('start').value=readCookie('mostrar');
-		$( "#desde" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", "-3m");;		
+		$( "#desde" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", "-3m");
 		$( "#hasta" ).datepicker({ dateFormat: "dd/mm/yy" }).datepicker("setDate", new Date());
 		$( "#mostrarMas").css("width", $( "#tabla1").width()-$("#mostrarMas1").width()); 
 		
-		//tooltipear();
-		
+		//tooltipear();		
     }
 	
 
 	function agregarEventos(){
 		
-		if(peticion.readyState == 4) {
+		if(peticion.readyState == 4) {		 
+			if(peticion.status == 200) {
 		 
-		  if(peticion.status == 200) {
-		 
-			// Borrar datos anteriores
-			//limpia(contenedor);
-		  
-			div = document.getElementById('tabla');
-			
-			//JSON
-			var arr = eval ("(" + peticion.responseText+ ")"); 
-			
-			var cuerpo = "";
-			var color="";
-			var idfichero="";
-			for(var i=0;i<arr.length;i++){
-				var obj = arr[i];
-				cuerpo = cuerpo + "<tr>";
-				for(var key in obj){
-					//Para saltar campos
-					//alert(key);
-					if(key=="tipo" || key=="fecha"){
-					
-						var attrName = key;
-						var attrValue = obj[key];
+				// Borrar datos anteriores
+				//limpia(contenedor);
+			  
+				div = document.getElementById('tabla');
+				
+				//JSON
+				var arr = eval ("(" + peticion.responseText+ ")"); 
+				
+				var cuerpo = "";
+				var color="";
+				var idfichero="";
+				for(var i=0;i<arr.length;i++){
+					var obj = arr[i];
+					cuerpo = cuerpo + "<tr>";
+					for(var key in obj){
+						//Para saltar campos
+						//alert(key);
+						if(key=="tipo" || key=="fecha"){
 						
-						if(attrName=="tipo"){
-						var texto="";
-							if(attrValue=="10" ){
-								//Has subido fichero...
-								color="#B5FFB5";
-								texto="Has subido el fichero <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
-								
-							}
-							else if(attrValue=="11"){
-								//Has creado la carpeta...
-								color="#B5FFB5";
-								texto="Has creado la carpeta <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a> en "+obj['ruta'];
-							}
-							else if(attrValue=="20"){
-								//Has cambiado el nombre al fichero...
-								color="#FFFF00";				
-								texto="Has cambiado el nombre al fichero "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
-							}
-							else if(attrValue=="21"){
-								//Has cambiado el nombre a la carpeta...
-								color="#FFFF00";									
-								texto="Has cambiado el nombre a la carpeta "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
-							}
-							else if(attrValue=="30"){
-								//Has movido el fichero...
-								color="#FFFF00";				
-								texto="Has movido el fichero "+obj['nombreFicheroNuevo']+" a "+obj['ruta'];
-							}
-							else if(attrValue=="31"){
-								//Has movido la carpeta...
-								color="#FFFF00";									
-								texto="Has movido la carpeta "+obj['nombreFicheroNuevo']+" a "+obj['ruta'];
-							}
-							else if(attrValue=="40"){
-								//Has cambiado el fichero...y lo has movido a...
-								color="#FFFF00";				
-								texto="Has cambiado el nombre al fichero "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+"</a> y lo has movido a "+obj['ruta']+"";
-							}
-							else if(attrValue=="41"){
-								//Has cambiado el nombre a la carpeta...y lo has movido a...
-								color="#FFFF00";									
-								texto="Has cambiado el nombre a la carpeta "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+"</a> y lo has movido a "+obj['ruta']+"";
-							}
-							else if(attrValue=="50"){
-								//Has borrado fichero... 
-								color="#FFB5B5";
-								texto="Has borrado el fichero "+obj['nombreFicheroNuevo']+" de "+obj['ruta'];
-							}
-							else if(attrValue=="51"){
-								//Has borrado carpeta...
-								color="#FFB5B5";
-								texto="Has borrado la carpeta "+obj['nombreFicheroNuevo']+" de "+obj['ruta'];
-							}
-							else if(attrValue=="0"){texto="Te has registrado!";color="#95FF95";}
-							else {color="";}
+							var attrName = key;
+							var attrValue = obj[key];
 							
-							cuerpo = cuerpo + "<td style='width:87%;background-color:"+color+";' > "+texto+"</td>";
-							idFichero="";
-						}
-						else if(attrName=="fecha"){
-							var f1=attrValue['timestamp']*1000;
-							var date = new Date(f1+attrValue['offset']*1000);
-							var date = new Date(f1);
-							var _mes=date.getMonth()+1; //getMonth devuelve el mes empezando por 0
-							var _dia=date.getDate(); //getDate devuelve el dia del mes
-							var _anyo=date.getFullYear();
-							cuerpo = cuerpo + "<td style='text-align:right;background-color:"+color+";'>" + _dia+"/"+addZeroo(_mes)+"/"+_anyo + " "+addZeroo(date.getHours())+":"+addZeroo(date.getMinutes())+"</td>";
-						}
-						else if(attrName==null){cuerpo = cuerpo +"<td></td>";}
-						else{cuerpo = cuerpo + "<td>" + attrValue + "</td>";
+							if(attrName=="tipo"){
+							var texto="";
+								if(attrValue=="10" ){
+									//Has subido fichero...
+									color="#B5FFB5";
+									texto="Has subido el fichero <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
+									
+								}
+								else if(attrValue=="11"){
+									//Has creado la carpeta...
+									color="#B5FFB5";
+									texto="Has creado la carpeta <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a> en "+obj['ruta'];
+								}
+								else if(attrValue=="20"){
+									//Has cambiado el nombre al fichero...
+									color="#FFFF00";				
+									texto="Has cambiado el nombre al fichero "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
+								}
+								else if(attrValue=="21"){
+									//Has cambiado el nombre a la carpeta...
+									color="#FFFF00";									
+									texto="Has cambiado el nombre a la carpeta "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+" </a>";
+								}
+								else if(attrValue=="30"){
+									//Has movido el fichero...
+									color="#FFFF00";				
+									texto="Has movido el fichero "+obj['nombreFicheroNuevo']+" a "+obj['ruta'];
+								}
+								else if(attrValue=="31"){
+									//Has movido la carpeta...
+									color="#FFFF00";									
+									texto="Has movido la carpeta "+obj['nombreFicheroNuevo']+" a "+obj['ruta'];
+								}
+								else if(attrValue=="40"){
+									//Has cambiado el fichero...y lo has movido a...
+									color="#FFFF00";				
+									texto="Has cambiado el nombre al fichero "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+"</a> y lo has movido a "+obj['ruta']+"";
+								}
+								else if(attrValue=="41"){
+									//Has cambiado el nombre a la carpeta...y lo has movido a...
+									color="#FFFF00";									
+									texto="Has cambiado el nombre a la carpeta "+obj['nombreFicheroAntiguo']+" por <a idfile='"+obj['idFichero']+"' href='fichero/"+obj['idFichero']+"'>"+obj['nombreFicheroNuevo']+"</a> y lo has movido a "+obj['ruta']+"";
+								}
+								else if(attrValue=="50"){
+									//Has borrado fichero... 
+									color="#FFB5B5";
+									texto="Has borrado el fichero "+obj['nombreFicheroNuevo']+" de "+obj['ruta'];
+								}
+								else if(attrValue=="51"){
+									//Has borrado carpeta...
+									color="#FFB5B5";
+									texto="Has borrado la carpeta "+obj['nombreFicheroNuevo']+" de "+obj['ruta'];
+								}
+								else if(attrValue=="0"){texto="Te has registrado!";color="#95FF95";}
+								else {color="";}
+								
+								cuerpo = cuerpo + "<td style='width:87%;background-color:"+color+";' > "+texto+"</td>";
+								idFichero="";
+							}
+							else if(attrName=="fecha"){
+								var f1=attrValue['timestamp']*1000;
+								//var date = new Date(f1+attrValue['offset']*1000);
+								var date = new Date(f1);
+								var _mes=date.getMonth()+1; //getMonth devuelve el mes empezando por 0
+								var _dia=date.getDate(); //getDate devuelve el dia del mes
+								var _anyo=date.getFullYear();
+								cuerpo = cuerpo + "<td style='text-align:right;background-color:"+color+";'>" + _dia+"/"+addZeroo(_mes)+"/"+_anyo + " "+addZeroo(date.getHours())+":"+addZeroo(date.getMinutes())+"</td>";
+							}
+							else if(attrName===null){cuerpo = cuerpo +"<td></td>";}
+							else{cuerpo = cuerpo + "<td>" + attrValue + "</td>";
+							}
 						}
 					}
+					cuerpo = cuerpo + "</tr>";
 				}
-				cuerpo = cuerpo + "</tr>";
-			}
-				
-			//Agregar datos a la tabla
-			//$("#tabla1:last-child").html();
-			//$("#tabla1").append(cuerpo);
-			document.getElementById("cuerpo").innerHTML+=cuerpo;
-			document.getElementById('start').value=parseInt(document.getElementById('start').value)+parseInt(document.getElementById('cantidad').value);// Falta comprobacion de si se ha respondido correctamente.
-			tooltipear();
+					
+				//Agregar datos a la tabla
+				//$("#tabla1:last-child").html();
+				//$("#tabla1").append(cuerpo);
+				document.getElementById("cuerpo").innerHTML+=cuerpo;
+				document.getElementById('start').value=parseInt(document.getElementById('start').value)+parseInt(document.getElementById('cantidad').value);// Falta comprobacion de si se ha respondido correctamente.
+				tooltipear();
 			}
 		}
 		
@@ -448,9 +441,7 @@
 	  document.getElementById(id).innerHTML = "";
 	}
 
-	
 	function tooltipear(){
-	
 		$('a[idfile]').qtip({
 			style: {
 				classes: 'qtip-tipsy qtip-shadow'
@@ -483,13 +474,10 @@
 						api.set('content.text', 'Fichero no encontrado');
 					});
 
-					return 'Cargando...' // Set some initial loading text
+					return 'Cargando...'; // Set some initial loading text
 				}
 			}
-		});
-		
-		
-		
+		});		
 	}
 
 	/* Metodo 2 
@@ -529,11 +517,11 @@
 			var date = new Date();
 			date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
 			expires = "; expires=" + date.toGMTString();
-		} else {
+		}else{
 			expires = "";
 		}
 		document.cookie = escape(name) + "=" + escape(value) + expires + "; path=/";
-		}
+	}
 
 	function readCookie(name) {
 		var nameEQ = escape(name) + "=";

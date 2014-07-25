@@ -66,6 +66,8 @@ modificar:
 borrar:
     path: /borrar/{fichero}
     defaults: { _controller: UsuarioBundle:Cuenta:borrar }
+    requirements:
+        fichero:  \d+
 descargar:
     path: /descargar/{fichero}
     defaults: { _controller: UsuarioBundle:Cuenta:descargar }
@@ -163,3 +165,5 @@ Noencontrado:
         _controller: FrameworkBundle:Redirect:urlRedirect
         path: /home
         permanent: true
+    requirements:
+        pagina: .+

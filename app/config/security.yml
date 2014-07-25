@@ -42,6 +42,7 @@ security:
                 default_target_path: /home
                 always_use_default_target_path: true
                 require_previous_session: false
+                csrf_provider: form.csrf_provider
             logout:
                 path:   /logout
                 target: /

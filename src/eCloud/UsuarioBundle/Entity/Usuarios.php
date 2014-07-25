@@ -6,6 +6,7 @@ namespace eCloud\UsuarioBundle\Entity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use eCloud\UsuarioBundle\Validator\Constraints as eCloudAssert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
@@ -222,6 +223,7 @@ class Usuarios implements UserInterface {
      * @var string
      *
      * @ORM\Column(name="zone", type="string", length=255)
+	 * @Assert\NotBlank(groups={"registro", "perfil"})
      */
     private $zone;
 
