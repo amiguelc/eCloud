@@ -4,10 +4,8 @@ namespace eCloud\UsuarioBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class CuentaControllerTest extends WebTestCase
-{
-    public function testIndex()
-    {
+class CuentaControllerTest extends WebTestCase{
+    public function testIndex(){
         $client = static::createClient();
 
         $crawler = $client->request('GET', '/');		
@@ -22,7 +20,7 @@ class CuentaControllerTest extends WebTestCase
 		$this->assertRegExp("/login$/", $location, 'Login erroneo redirige a /login');
 		
 		//Probar Login Correcto
-		$crawler = $client->request('POST', '/login_check', array('_username' => 'q','_password' => 'q'));
+		$crawler = $client->request('POST', '/login_check', array('_username' => 'q@q.com','_password' => 'qqqqq'));
 		$response = $client->getResponse();
 		$location = $response->headers->get('Location');
 		$this->assertRegExp("/home$/", $location, 'Login correcto redirige a /home');

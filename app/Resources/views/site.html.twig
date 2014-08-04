@@ -17,34 +17,35 @@
 {% endblock javascripts %}
 {% block body %}
 	<div id="container">
-		<header class="header_in">
-			<a href="{{ path('home') }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>
-			<div class='login_box'>
-				<span style='position:relative;right:15px;color:white;font-size:20px;'>Hola, <i>{{ app.user.nombreusuario }} </i></span> 
-				<button class='mid green button' onclick="window.location='{{ path('logout') }}'">Salir</button>
-			</div>
+		<header class="header_out">
+			<a href="{{ path('home') }}"><img src="{{ asset('bundles/usuario/images/logo.png') }}"></a>		
+			{% set currentPath = app.request.attributes.get('_route') %}
+			{% set pages = ['login','recovery'] %}
+			{% if currentPath|split('/')|last not in pages %}
+				<div class='login_box'>
+					<form action="{{ path('login_check') }}" method="post">
+						<label for="username">Email:</label>
+						<input type="text" id="username" name="_username" value="" />
+						
+						<label for="password">Password:</label>
+						<input type="password" id="password" name="_password" />
+						
+						<input type="hidden" name="_target_path" value="/home" />
+						<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+						<button class="mid button green" type="submit">Entrar</button>
+					</form>
+				</div>
+			{% endif %}
 		</header>
-		<div id="nav" style="visibility:hidden;">
-			<nav>
-				<ul>
-					<li id='menu_perfil'><a href={{ path('perfil') }}>Mi perfil</a></li>
-					<li id='menu_ficheros'><a href={{ path('ficheros') }}>Ficheros </a></li>
-					<li id='menu_eventos'><a href={{ path('eventos') }}>Eventos </a></li>
-					<li id='menu_links'><a href={{ path('links') }}>Links</a></li>
-				</ul>
-			</nav>		
-		</div>
-		<article class="article_in">
-			<img class='bgbox' src="{{ asset('bundles/usuario/images/imagen_portada.png') }}">
-			
-				{% block article %}{% endblock %}
+		<article class="article_out">
+				{{ block('article') }}
 		</article>
-		<footer class="footer_in">
+		<footer class="footer_out">
 			&copy; {{ 'now' | date('Y') }} - eCloud
 			<a class='footer_links' href="{{ path('ayuda') }}">Ayuda</a>
 			<a class='footer_links' href="{{ path('contacto') }}">Contacto</a>
 			<a class='footer_links' href="{{ path('privacidad') }}">Privacidad</a>
 			<a class='footer_links' href="{{ path('sobre-nosotros') }}">Sobre nosotros</a>
-		</footer>
+		</footer>	
 	</div>
 {% endblock body %}

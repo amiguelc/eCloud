@@ -36,50 +36,50 @@ perfil:
     defaults: { _controller: UsuarioBundle:Cuenta:perfil }
 ficheros:
     path: /ficheros
-    defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
+    defaults: { _controller: UsuarioBundle:Ficheros:ficheros, ruta: / }
 _ficheros:
     path: /ficheros/
-    defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
+    defaults: { _controller: UsuarioBundle:Ficheros:ficheros, ruta: / }
 ficheros2:
     path: /ficheros/{ruta}
-    defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
+    defaults: { _controller: UsuarioBundle:Ficheros:ficheros, ruta: / }
     requirements:
         ruta: ".+"
 _ficheros2:
     path: /ficheros/{ruta}/
-    defaults: { _controller: UsuarioBundle:Cuenta:ficheros, ruta: / }
+    defaults: { _controller: UsuarioBundle:Ficheros:ficheros, ruta: / }
     requirements:
         ruta: ".+"
 fichero:
     path: /fichero/{id}
-    defaults: { _controller: UsuarioBundle:Cuenta:fichero, id: 0 }
+    defaults: { _controller: UsuarioBundle:Ficheros:fichero, id: 0 }
     requirements:
         id:  \d+
 subir:
     path: /subir
-    defaults: { _controller: UsuarioBundle:Cuenta:subir }
+    defaults: { _controller: UsuarioBundle:Ficheros:subir }
 modificar:
     path: /modificar/{fichero}
-    defaults: { _controller: UsuarioBundle:Cuenta:modificar, fichero: 0 }
+    defaults: { _controller: UsuarioBundle:Ficheros:modificar, fichero: 0 }
     requirements:
         fichero:  \d+
 borrar:
     path: /borrar/{fichero}
-    defaults: { _controller: UsuarioBundle:Cuenta:borrar }
+    defaults: { _controller: UsuarioBundle:Ficheros:borrar }
     requirements:
         fichero:  \d+
 descargar:
     path: /descargar/{fichero}
-    defaults: { _controller: UsuarioBundle:Cuenta:descargar }
+    defaults: { _controller: UsuarioBundle:Descargas:descargaInterna }
 eventos:
     path: /eventos
     defaults: { _controller: UsuarioBundle:Cuenta:eventos }
 links:
     path: /links
-    defaults: { _controller: UsuarioBundle:Cuenta:links, id: 0 }
+    defaults: { _controller: UsuarioBundle:Links:links, id: 0 }
 borrarlink:
     path: /borrarlink/{id}
-    defaults: { _controller: UsuarioBundle:Cuenta:borrarlink, id: 0 }
+    defaults: { _controller: UsuarioBundle:Links:borrarlink, id: 0 }
 ################################################################################################ API
 api_conectado:
     path: /api/conectado
@@ -89,23 +89,23 @@ api_perfil:
     defaults: { _controller: UsuarioBundle:Cuenta:perfiljson, info: all }
 api_ficheros:
     path: /api/ficheros
-    defaults: { _controller: UsuarioBundle:Cuenta:ficherosjson, ruta: / }
+    defaults: { _controller: UsuarioBundle:Ficheros:ficherosjson, ruta: / }
 _api_ficheros:
     path: /api/ficheros/
-    defaults: { _controller: UsuarioBundle:Cuenta:ficherosjson, ruta: / }
+    defaults: { _controller: UsuarioBundle:Ficheros:ficherosjson, ruta: / }
 api_ficheros2:
     path: /api/ficheros/{ruta}
-    defaults: { _controller: UsuarioBundle:Cuenta:ficherosjson, ruta: / }
+    defaults: { _controller: UsuarioBundle:Ficheros:ficherosjson, ruta: / }
     requirements:
         ruta: ".+"
 api_modificar:
     path: /api/modificar/{fichero}
-    defaults: { _controller: UsuarioBundle:Cuenta:modificarjson, fichero: 0 }
+    defaults: { _controller: UsuarioBundle:Ficheros:modificarjson, fichero: 0 }
     requirements:
         fichero:  \d+
 api_fichero:
     path: /api/fichero/{id}
-    defaults: { _controller: UsuarioBundle:Cuenta:ficherojson, id: 0 }
+    defaults: { _controller: UsuarioBundle:Ficheros:ficherojson, id: 0 }
 api_eventos:
     path: /api/eventos/desde={desde}&hasta={hasta}&start={start}&cantidad={cantidad}&nocache={nocache}
     defaults: { _controller: UsuarioBundle:Cuenta:eventosjson, desde: 1, hasta: 1, start: 0, cantidad: 100000}
@@ -117,7 +117,7 @@ api_eventos:
 ################################################################################################ Descarga Externa
 download:
     path: /!{descarga}
-    defaults: { _controller: UsuarioBundle:Cuenta:download, descarga: 0 }
+    defaults: { _controller: UsuarioBundle:Descargas:descargaExterna, descarga: 0 }
 ############################################################################################## SECCION ADMIN
 admin_home:
     path: /admin
@@ -145,7 +145,7 @@ admin_login_check:
 admin_logout:
     path: /admin/logout
 
-################################################################################################ PAGINAS ESTATICAS FRONTEND AL FINAL, YA QUE ES CUANDO LAS OTRAS NO LAS ENCUENTRA
+################################################################################################ PAGINAS ESTATICAS AL FINAL
 ayuda:
     path: /ayuda
     defaults: { _controller: UsuarioBundle:Sitio:ayuda }

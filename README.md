@@ -15,13 +15,13 @@ Requisitos
 	<li>Windows o Linux. PHP 5.4.11+ y Apache2.</li>
 	<li>Habilitar las extensiones de php php_fileinfo y php_openssl.</li>
 	<li>Habilitar el modulo de apache rewrite para hacer las rutas amigables.</li>
-	<li>Fichero php.ini. En el caso de wampserver y derivados vigilar que el fichero php.ini sea el que toca.
+	<li>Fichero php.ini. En el caso de wampserver y derivados asegurarse que el fichero php.ini modificado sea el adecuado.
 		<ul>
 			<li>memory_limit = 6728M 				&#60;- Limite de memoria.</li>
 			<li>upload_max_filesize 400000M		&#60;- El tamaño maximo del fichero a recibir.</li>
 			<li>post_max_size 400000M				&#60;- El tamaño maximo de datos a recibir del metodo POST usado en los formularios de envios de datos del navegador.</li>
 			<li>max_execution_time = 14400.		&#60;- Tiempo de ejecucion maxima de los scripts php, necesario que sea alto debido a que mientras esta recibiendo ficheros el script sigue en ejecucion.</li>
-			<li>xdebug.max_nesting_level = 250		&#60;- Para permitir la mas anidaciones en las funciones. En caso de no estar por defecto, incluirla.</li>
+			<li>xdebug.max_nesting_level = 250		&#60;- Para permitir mas anidaciones en las funciones. En caso de no estar por defecto, incluirla.</li>
 		</ul>
 	</li>
 </ul>
