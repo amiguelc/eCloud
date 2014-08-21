@@ -1,6 +1,6 @@
-<?php
+Ôªø<?php
 /*
-P·gina acessible solo desde la ip 127.0.0.1
+P√°gina acessible solo desde la ip 127.0.0.1
 
 Requisitos
 
@@ -9,14 +9,14 @@ Requisitos
     Habilitar el modulo de apache rewrite para hacer las rutas amigables.
     Fichero php.ini. En el caso de wampserver vigilar que el fichero php.ini sea el que toca.
         memory_limit = 6728M <- Limite de memoria.
-        upload_max_filesize 400000M <- El tamaÒo maximo del fichero a recibir.
-        post_max_size 400000M <- El tamaÒo maximo de datos a recibir del metodo POST usado en los formularios de envios de datos del navegador.
+        upload_max_filesize 400000M <- El tama√±o maximo del fichero a recibir.
+        post_max_size 400000M <- El tama√±o maximo de datos a recibir del metodo POST usado en los formularios de envios de datos del navegador.
         max_execution_time = 14400. <- Tiempo de ejecucion maxima de los scripts php, necesario que sea alto debido a que mientras esta recibiendo ficheros el script sigue en ejecucion.
         xdebug.max_nesting_level = 250 <- Para permitir la mas anidaciones en las funciones. En caso de no estar por defecto, incluirla.
 
 */
 
-if ($_SERVER['REMOTE_ADDR']!="127.0.0.1"){echo "P·gina accesible solo desde la ip 127.0.0.1."; die();}
+if ($_SERVER['REMOTE_ADDR']!="127.0.0.1"){echo "P√°gina accesible solo desde la ip 127.0.0.1."; die();}
 
 if (!isset($_GET['paso'])){$_GET['paso']=1;}
 
@@ -28,7 +28,7 @@ echo "<hr></hr>";
 if ($_GET['paso']==1){
 
 	echo "<h3>Primer paso: Configurar ficheros</h3>";
-	echo "<b>Nota</b>: Estos ficheros de configuracion estan creados con el formato YAML, modificar un simple espacio destrozaria la configuracion. <br>Por eso se recomienda tan solo modificar lo necesario y respetar la estructura.<br>";
+	echo "<b>Nota</b>: Estos ficheros de configuraci√≥n estan creados con el formato YAML, modificar un simple espacio destrozaria la configuraci√≥n. <br>Por eso se recomienda tan solo modificar lo necesario y respetar la estructura.<br>";
 	if (PHP_OS=="Linux"){echo "Ten en cuenta que en Linux el servidor Apache necesita permisos de escritura sobre estos ficheros para el usuario www-data.<br>";}
 	
 	if(isset($_POST["recup"])){
@@ -120,7 +120,7 @@ if ($_GET['paso']==1){
 	if (!file_exists($var_archivos) || !is_writable($var_archivos)){echo "<br><span style='color:red;'> No existe o no se tiene permisos sobre la carpeta ".$var_archivos.".</span>";}
 	
 	//////////////////////////////////////////////////////////////security////////////////////////////////////////////////////
-	echo "<h4> Fichero app/config/security.yml para configurar la contraseÒa de administrador por defecto admin:admin1</h4>";
+	echo "<h4> Fichero app/config/security.yml para configurar la contrase√±a de administrador por defecto admin:admin1</h4>";
 	$writ2=TRUE;
 	if (!is_writable("app/config/security.yml")){echo "<span style='color:red;'>El fichero no tiene permisos de escritura para el usuario de apache.</span><br>";$writ2=FALSE;}
 	$resum=FALSE;
@@ -192,7 +192,7 @@ if ($_GET['paso']==1){
 if ($_GET['paso']==2){
 	echo "<h3>Segundo paso: Cumplir los requisitos</h3>";
 	include "check.php";	
-	echo "<br><br><input type='button' value='Siguiente' onclick=\"location.search='?paso=3'\">  Nota: El siguiente paso se toma su tiempo en descargar datos, se paciente.";
+	echo "<br><br><input type='button' value='Siguiente' onclick=\"location.search='?paso=3'\">  Nota: El siguiente paso tarda en descargar datos, se paciente.";
 }
 
 //Tercer paso
@@ -257,7 +257,7 @@ if ($_GET['paso']==4){
 //Ultimo paso
 if ($_GET['paso']==5){
 	echo "<h3>Ultimo paso: Configurar el Virtualhost de Apache</h3>";
-	echo "Para dar salida al proyecto a los usuarios.
+	echo "Para dar salida al proyecto a los usuarios. <b>Tienes que editar el fichero t√∫.</b>
 	<br><br> Ejemplo:<br> 
 <pre>
 	-Ejemplo de virtualhost, en apache 2.4 modificar el fichero apache/conf/extra/httpd-vhosts.conf tal que:
