@@ -100,6 +100,7 @@ Versiones.<br>
 	- eCloud [En construcción] <br>
 	- Symfony versión 2.4.2. Incluye Doctrine como gestor de bases de datos.
 	
-<br>Webs de referencia: <a href='https://katarian.com/'>Tienda de videojuegos online</a>
+<br>Webs de referencia:
+<br><a href='https://katarian.com/'>Tienda de videojuegos online</a>
 <br><a href='http://ipweb.org/'>My ip</a>
 
