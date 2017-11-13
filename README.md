@@ -101,4 +101,6 @@ Versiones.<br>
 	- Symfony versión 2.4.2. Incluye Doctrine como gestor de bases de datos.
 	
 <br>
-Web: <a href='https://katarian.com/'>Tienda de videojuegos online</a>
+Webs de referencia: <a href='https://katarian.com/'>Tienda de videojuegos online</a>
+<a href='http://ipweb.org/'>My ip</a>
+
